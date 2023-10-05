@@ -21,10 +21,10 @@ class PointsViewSet(viewsets.ModelViewSet):
 
 
 def api_create(request, *args, **kwargs):
-        Points.objects.all().delete()
-        names = request.data
-        print(names)
-        for name in names:
-            Points.objects.create(name=name)
+    Points.objects.all().delete()
+    names = request.data
+    print(names)
+    for name in names:
+        Points.objects.create(name=name)
 
-        return HTTPStatus.CREATED
+    return HTTPStatus.CREATED

@@ -1,12 +1,9 @@
 import httplib2
-import apiclient.discovery
 import os
 
-from oauth2client.service_account import ServiceAccountCredentials
-
-from googleapiclient.discovery import build
-
 from dotenv import load_dotenv
+from oauth2client.service_account import ServiceAccountCredentials
+from googleapiclient.discovery import build
 
 load_dotenv()
 
@@ -17,14 +14,20 @@ def get_service_sacc():
     creds_json = os.path.dirname(__file__) + '/' + CREDENTIALS_FILE
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
-    creds_service = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scopes).authorize(httplib2.Http())
+    creds_service = ServiceAccountCredentials.from_json_keyfile_name(
+        creds_json,
+        scopes
+    ).authorize(httplib2.Http())
     return build('sheets', 'v4', http=creds_service)
 
 
 if __name__ == '__main__':
     SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
     SHEET_ID = os.getenv('SHEET_ID')
-    resp = get_service_sacc().spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range='Лист1').execute()
+    resp = get_service_sacc().spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_ID,
+        range='Лист1'
+    ).execute()
     print(resp)
     body = {
         'values':
