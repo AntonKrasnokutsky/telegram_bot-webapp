@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--tg-theme-text-color);
+            background: var(--tg-theme-bg-color);
+        }
+
+        #main {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            border: 0;
+            border-radius: 5px;
+            height: 60px;
+            width: 150px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--tg-theme-button-color);
+            background: var(--tg-theme-button-text-color);
+         }
+
+        button:hover {
+            background: var(--tg-theme-secondary-bg-color);
+        }
+
+        #form_service {
+            display: block;
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            outline: none;
+            margin: 10px 5%;
+            padding: 15px 10px;
+            font-size: 14px;
+            border: 2px solid silver;
+            border-radius: 5px;
+        }
+        
+        input:focus {
+            border-color: red;
+        }
+
+        select {
+            outline: none;
+            margin: 10px 5%;
+            padding: 15px 10px;
+            font-size: 14px;
+            border: 2px solid silver;
+            border-radius: 5px;
+        }
+
+        select:focus {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+    <form id="form_service">
+        <label for="coffee">Кофе</label>
+        <input type="range" name="coffee" id="coffee" step="1" min="0" max="2" value="0">
+        <div id="value_coffee">0 кг.</div>
+
+        <label for="cream">Сливки</label>
+        <input type="range" name="cream" id="cream" step="1" min="0" max="2" value="0">
+        <div id="value_cream">0 кг.</div>
+
+        <label for="chocolate">Шоколад</label>
+        <input type="range" name="chocolate" id="chocolate" step="1" min="0" max="2" value="0">
+        <div id="value_chocolate">0 кг.</div>
+
+        <label for="raf">Раф</label>
+        <input type="range" name="raf" id="raf" step="1" min="0" max="2" value="0">
+        <div id="value_raf">0 кг.</div>
+
+        <label for="sugar">Сахар (от 0 до 100 с шагом 10)</label>
+        <input type="range" name="sugar" id="sugar" step="10" min="0" max="100" value="0">
+        <div id="value_sugar">0 шт.</div>
+
+        <label for="syrup">Сироп</label>
+        <input type="range" name="syrup" id="syrup" step="1" min="0" max="3" value="0">
+        <div id="value_syrup">0</div>
+
+        <label for="glasses">Стаканы (от 0 до 100 с шагом 10)</label>
+        <input type="range" name="glasses" id="glasses" step="10" min="0" max="100" value="0">
+        <div id="value_glasses">0 шт.</div>
+        
+        <label for="covers">Крышки (от 0 до 100 с шагом 10)</label>
+        <input type="range" name="covers" id="covers" step="10" min="0" max="100" value="0">
+        <div id="value_covers">0 шт.</div>
+        
+        <label for="stirrer">Размешиватели (от 0 до 100 с шагом 10)</label>
+        <input type="range" name="stirrer" id="stirrer" step="10" min="0" max="100" value="0">
+        <div id="value_stirrer">0 шт.</div>
+
+        <label for="collection">Сумма инкассации</label>
+        <input type="number" name="collection" id="collection" min="0" value="0">
+        
+        <button id="end_service">Завершить</button>
+    </form>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        let service = document.getElementById("service")
+        let end_service = document.getElementById("end_service")
+        let coffee = document.getElementById("coffee")
+        let cream = document.getElementById("cream")
+        let chocolate = document.getElementById("chocolate")
+        let raf = document.getElementById("raf")
+        let sugar = document.getElementById("sugar")
+        let syrup = document.getElementById("syrup")
+        let glasses = document.getElementById("glasses")
+        let covers = document.getElementById("covers")
+        let stirrer = document.getElementById("stirrer")
+
+        tg.expand();
+
+        coffee.addEventListener("change", () => {
+            document.getElementById("value_coffee").innerText = coffee.value + " кг.";
+        });
+
+        cream.addEventListener("change", () => {
+            document.getElementById("value_cream").innerText = cream.value + " кг.";
+        });
+
+        chocolate.addEventListener("change", () => {
+            document.getElementById("value_chocolate").innerText = chocolate.value + " кг.";
+        });
+
+        raf.addEventListener("change", () => {
+            document.getElementById("value_raf").innerText = raf.value + " кг.";
+        });
+
+        sugar.addEventListener("change", () => {
+            document.getElementById("value_sugar").innerText = sugar.value + " шт.";
+        });
+
+        syrup.addEventListener("change", () => {
+            document.getElementById("value_syrup").innerText = syrup.value;
+        });
+
+        glasses.addEventListener("change", () => {
+            document.getElementById("value_glasses").innerText = glasses.value + " шт.";
+        });
+
+        covers.addEventListener("change", () => {
+            document.getElementById("value_covers").innerText = covers.value + " шт.";
+        });
+
+        stirrer.addEventListener("change", () => {
+            document.getElementById("value_stirrer").innerText = stirrer.value + " шт.";
+        });
+
+        end_service.addEventListener("click", () => {
+
+            let data = {
+                coffi: document.getElementById("coffee").value,
+                cream: document.getElementById("cream").value,
+                chocolate: document.getElementById("chocolate").value,
+                raf: document.getElementById("raf").value,
+                sugar: document.getElementById("sugar").value,
+                syrup: document.getElementById("syrup").value,
+                glasses: document.getElementById("glasses").value,
+                covers: document.getElementById("covers").value,
+                stirrer: document.getElementById("stirrer").value,
+                collection: document.getElementById("collection").value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+    </script>
+</body>
+</html>
