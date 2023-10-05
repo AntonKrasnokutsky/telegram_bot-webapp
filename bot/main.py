@@ -1,11 +1,11 @@
-import httplib2
 import json
 import os
-import requests
+from datetime import datetime
 
+import httplib2
+import requests
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.web_app_info import WebAppInfo
-from datetime import datetime
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
