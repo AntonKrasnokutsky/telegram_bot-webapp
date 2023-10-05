@@ -14,17 +14,8 @@ class PointsViewSet(viewsets.ModelViewSet):
     def create(self, *args, **kwargs):
         Points.objects.all().delete()
         names = self.request.data
+        print(names)
         for name in names['names']:
             Points.objects.create(name=name)
 
         return JsonResponse(self.request.data, status=HTTPStatus.BAD_REQUEST)
-
-
-def api_create(request, *args, **kwargs):
-    Points.objects.all().delete()
-    names = request.data
-    print(names)
-    for name in names:
-        Points.objects.create(name=name)
-
-    return HTTPStatus.CREATED

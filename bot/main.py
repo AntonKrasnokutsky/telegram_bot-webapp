@@ -1,6 +1,7 @@
 import httplib2
 import json
 import os
+import requests
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.web_app_info import WebAppInfo
@@ -68,7 +69,14 @@ def append_in_table(data: dict):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    points = ['Точка 1', 'Точка 2']
+    points = {
+        "names":
+        [
+            "Точка 1",
+            "Точка 2"
+        ]}
+    response = requests.post('http://62.173.142.147/api/points/', data=points)
+    print(response)
     markup = types.InlineKeyboardMarkup()
     markup.add(
         types.InlineKeyboardButton(
