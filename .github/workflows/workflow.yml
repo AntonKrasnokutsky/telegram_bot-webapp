@@ -67,8 +67,8 @@ jobs:
           script: |
             sudo docker compose stop
             sudo docker compose rm backend bot
-            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/backend
-            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/bot
+            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend
+            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/coffee_bot
 
             rm .env
             touch .env
@@ -85,7 +85,8 @@ jobs:
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
             echo SHEET_ID=${{ secrets.SHEET_ID }} >> .env
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
             sudo docker compose up -d
 
   send_message:
