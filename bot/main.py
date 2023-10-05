@@ -14,6 +14,7 @@ load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 URL = os.getenv('URL')
+URL_API = os.getenv('URL_API')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -70,12 +71,12 @@ def append_in_table(data: dict):
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     points = {
-        "names":
-        [
-            "Точка 1",
-            "Точка 2"
-        ]}
-    response = requests.post('http://62.173.142.147/api/points/', data=points)
+        'names': [
+            'Имя 1',
+            'Имя 2'
+        ]
+    }
+    response = requests.post(URL_API, json=json.dumps(points))
     print(response)
     markup = types.InlineKeyboardMarkup()
     markup.add(

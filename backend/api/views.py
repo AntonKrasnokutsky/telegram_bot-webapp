@@ -1,10 +1,11 @@
+import json
 from http import HTTPStatus
 
+from django.http import JsonResponse
+from points.models import Points
 from rest_framework import viewsets
 
-from points.models import Points
 from .serializes import PointsSerializer
-from django.http import JsonResponse
 
 
 class PointsViewSet(viewsets.ModelViewSet):
@@ -13,9 +14,8 @@ class PointsViewSet(viewsets.ModelViewSet):
 
     def create(self, *args, **kwargs):
         Points.objects.all().delete()
-        names = self.request.data
-        print(names)
+        names = json.loads(self.request.data)
         for name in names['names']:
             Points.objects.create(name=name)
 
-        return JsonResponse(self.request.data, status=HTTPStatus.BAD_REQUEST)
+        return JsonResponse(names, status=HTTPStatus.CREATED)
