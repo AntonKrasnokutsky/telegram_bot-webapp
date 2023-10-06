@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--tg-theme-text-color);
+            background: var(--tg-theme-bg-color);
+        }
+
+        #main {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            border: 0;
+            border-radius: 5px;
+            height: 60px;
+            width: 150px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--tg-theme-button-color);
+            background: var(--tg-theme-button-text-color);
+         }
+
+        button:hover {
+            background: var(--tg-theme-secondary-bg-color);
+        }
+
+        #form_service {
+            display: block;
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            outline: none;
+            margin: 10px 5%;
+            padding: 15px 10px;
+            font-size: 14px;
+            border: 2px solid silver;
+            border-radius: 5px;
+        }
+        
+        input:focus {
+            border-color: red;
+        }
+
+        select {
+            outline: none;
+            margin: 10px 5%;
+            padding: 15px 10px;
+            font-size: 14px;
+            border: 2px solid silver;
+            border-radius: 5px;
+        }
+
+        select:focus {
+            border-color: red;
+        }
+
+        .btn_div {
+            display: inline-block;
+        }
+
+        .btn {
+            border: 1px solid;
+            border-radius: 5px;
+            height: 50px;
+            width: 50px;
+            font-size: 30px;
+            font-weight: 600;
+            line-height: 50px;
+            color: var(--tg-theme-button-color);
+            background: var(--tg-theme-button-text-color);
+        }
+
+        /* .btn:hover {
+            background: var(--tg-theme-secondary-bg-color);
+        } */
+    </style>
+</head>
+<body>
+    <div id="main">
+    <form id="form_service">
+        <div id="points">
+            <select required id="select_points">
+                <option disabled selected></option>
+                {% for point in points %}
+                    <option value={{ point.name }}>{{point.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="div_coffee">
+            <label for="coffee">Кофе</label>
+            <input type="number" id="coffee" value="0" step="1" min="0" max="2" readonly>
+            <div id="coffee_btn">
+                <div class="btn_div btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)">-</div>
+                <div class="btn_div btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)">+</div>
+            </div>
+        </div>
+
+        <div id="div_cream">
+            <label for="cream">Сливки</label>
+            <input type="number" id="cream" value="0" step="1" min="0" max="2" readonly>
+            <div id="cream_btn">
+                <div class="btn_div btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)">-</div>
+                <div class="btn_div btn" id="cream_inc" onclick="btn_inc('cream', 2, 1)">+</div>
+            </div>
+        </div>
+
+        <div id="div_chocolate">
+            <label for="chocolate">Шоколад</label>
+            <input type="number" id="chocolate" value="0" step="1" min="0" max="2" readonly>
+            <div id="chocolate_btn">
+                <div  class="btn_div btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)">-</div>
+                <div  class="btn_div btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)">+</div>
+            </div>
+        </div>
+
+        <div id="div_raf">
+            <label for="raf">Раф</label>
+            <input type="number" id="raf" value="0" step="1" min="0" max="2" readonly>
+            <div id="raf_btn">
+                <div  class="btn_div btn" id="raf_dec" onclick="btn_dec('raf', 0, 1)">-</div>
+                <div  class="btn_div btn" id="raf_inc" onclick="btn_inc('raf', 2, 1)">+</div>
+            </div>
+        </div>
+
+        <div id="div_sugar">
+            <label for="sugar">Сахар</label>
+            <input type="number" id="sugar" value="0" step="10" min="0" max="100" readonly>
+            <div id="sugar_btn">
+                <div  class="btn_div btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 10)">-</div>
+                <div  class="btn_div btn" id="sugar_inc" onclick="btn_inc('sugar', 100, 10)">+</div>
+            </div>
+        </div>
+
+        <div id="div_syrup">
+            <label for="syrup">Сироп</label>
+            <input type="number" id="syrup" value="0" step="1" min="0" max="3" readonly>
+            <div id="syrup_btn">
+                <div  class="btn_div btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)">-</div>
+                <div  class="btn_div btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)">+</div>
+            </div>
+        </div>
+
+        <div id="div_glasses">
+            <label for="glasses">Стаканы</label>
+            <input type="number" id="glasses" value="0" step="10" min="0" max="100" readonly>
+            <div id="glasses_btn">
+                <div  class="btn_div btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 10)">-</div>
+                <div  class="btn_div btn" id="glasses_inc" onclick="btn_inc('glasses', 100, 10)">+</div>
+            </div>
+        </div>
+
+        <div id="div_covers">
+            <label for="covers">Крышки</label>
+            <input type="number" id="covers" value="0" step="10" min="0" max="100" readonly>
+            <div id="covers_btn">
+                <div class="btn_div btn" id="covers_dec" onclick="btn_dec('covers', 0, 10)">-</div>
+                <div class="btn_div btn" id="covers_inc" onclick="btn_inc('covers', 100, 10)">+</div>
+            </div>
+        </div>
+
+        <div id="div_stirrer">
+            <label for="stirrer">Размешиватели</label>
+            <input type="number" id="stirrer" value="0" step="10" min="0" max="100" readonly>
+            <div id="stirrer_btn">
+                <div  class="btn_div btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 10)">-</div>
+                <div  class="btn_div btn" id="stirrer_inc" onclick="btn_inc('stirrer', 100, 10)">+</div>
+            </div>
+        </div>
+
+        <label for="collection">Сумма инкассации</label>
+        <input type="number" name="collection" id="collection" min="0" value="0">
+
+        <button id="end_service">Завершить</button>
+    </form>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        let service = document.getElementById("service")
+        let end_service = document.getElementById("end_service")
+        let coffee = document.getElementById("coffee")
+        let cream = document.getElementById("cream")
+        let chocolate = document.getElementById("chocolate")
+        let raf = document.getElementById("raf")
+        let sugar = document.getElementById("sugar")
+        let syrup = document.getElementById("syrup")
+        let glasses = document.getElementById("glasses")
+        let covers = document.getElementById("covers")
+        let stirrer = document.getElementById("stirrer")
+        let initDataURLSP = new URLSearchParams(tg.initDataUnsafe);
+        document.getElementById("indata").innerText = initDataURLSP.toString()
+        document.getElementById("tgdata").innerText = tg.initData.toString()
+        console.log(initDataURLSP.toString())
+        tg.expand();
+
+        function btn_inc(id, max, step) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            result = result + step
+            if(result>max){
+                result = max
+            }
+            document.getElementById(id).value = result
+        };
+
+        function btn_dec(id, min, step) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            result = result - step
+            if(result<min){
+                result = min
+            }
+            document.getElementById(id).value = result
+        };
+
+        function cream_btn_inc(id) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            result = result + 1
+            if(result>2){
+                result = 2
+            }
+            document.getElementById(id).value = result
+        };
+
+        function cream_btn_dec(id) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            result = result - 1
+            if(result<0){
+                result = 0
+            }
+            document.getElementById(id).value = result
+        };
+        
+        end_service.addEventListener("click", () => {
+
+            let data = {
+                point: document.getElementById("select_points").value,
+                coffee: document.getElementById("coffee").value,
+                cream: document.getElementById("cream").value,
+                chocolate: document.getElementById("chocolate").value,
+                raf: document.getElementById("raf").value,
+                sugar: document.getElementById("sugar").value,
+                syrup: document.getElementById("syrup").value,
+                glasses: document.getElementById("glasses").value,
+                covers: document.getElementById("covers").value,
+                stirrer: document.getElementById("stirrer").value,
+                collection: document.getElementById("collection").value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+    </script>
+</body>
+</html>

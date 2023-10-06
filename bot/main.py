@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 
+from http import HTTPStatus
 import httplib2
 import requests
 from aiogram import Bot, Dispatcher, executor, types
@@ -41,7 +42,7 @@ def append_in_table(data: dict):
             str(datetime.now())[:19],
             data['user'],
             'ФИО',
-            'Точка',
+            data['point'],
             f'₽1\xa0{data["collection"]}',
             data['coffee'],
             data['cream'],
@@ -77,14 +78,19 @@ async def start(message: types.Message):
         ]
     }
     response = requests.post(URL_API, json=json.dumps(points))
-    print(response)
-    markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton(
-            'Обслуживание',
-            web_app=WebAppInfo(url=URL, points=points)
-        ))
-    await message.answer('Приветствие', reply_markup=markup)
+    if response.status_code == HTTPStatus.CREATED:
+
+        markup = types.InlineKeyboardMarkup()
+        markup.add(
+            types.InlineKeyboardButton(
+                'Обслуживание',
+                web_app=WebAppInfo(url=URL, points=points)
+            ))
+        await message.answer('Приветствие', reply_markup=markup)
+    else:
+        await message.answer(
+            'Список точек не передан, нажмите "/start" ещё раз'
+        )
 
 
 @dp.message_handler(content_types=['web_app_data'])
