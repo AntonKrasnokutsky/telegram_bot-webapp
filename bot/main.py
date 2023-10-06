@@ -21,7 +21,8 @@ dp = Dispatcher(bot)
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
-SHEET_ID = os.getenv('SHEET_ID')
+SHEET_SERVICE = os.getenv('SHEET_SERVICE')
+SHEET_SETTING = os.getenv('SHEET_SETTING')
 
 
 def get_service_sacc():
@@ -33,6 +34,20 @@ def get_service_sacc():
         scopes
     ).authorize(httplib2.Http())
     return build('sheets', 'v4', http=creds_service)
+
+
+def get_list_points():
+    ranges = ['Настройки!A2:A3000']
+    results = get_service_sacc().spreadsheets().values().batchGet(
+        spreadsheetId=SPREADSHEET_ID,
+        ranges=ranges,
+        majorDimension='COLUMNS',
+        valueRenderOption='FORMATTED_VALUE',
+        dateTimeRenderOption='FORMATTED_STRING'
+    ).execute()
+    sheet_values = results['valueRanges'][0]['values'][0]
+    sheet_values.remove('')
+    return sheet_values
 
 
 def append_in_table(data: dict):
@@ -71,12 +86,11 @@ def append_in_table(data: dict):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
+
     points = {
-        'names': [
-            'Имя 1',
-            'Имя 2'
-        ]
+        'names': get_list_points()
     }
+    print(json.dumps(points))
     response = requests.post(URL_API, json=json.dumps(points))
     print(response)
     if response.status_code == HTTPStatus.CREATED:

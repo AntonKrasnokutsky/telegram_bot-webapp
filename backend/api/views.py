@@ -3,16 +3,19 @@ from http import HTTPStatus
 
 from django.http import JsonResponse
 from points.models import Points
+from rest_framework import viewsets
+
+from .serializes import PointsSerializer
 
 
 def points_api(request, *args, **kwargs):
     methods = ['POST', 'GET', ]
     if request.method not in methods:
-        print("Go")
         return JsonResponse(
             'Неподдерживаемый тип запроса',
-            HTTPStatus.METHOD_NOT_ALLOWED
+            HTTPStatus.BAD_REQUEST
         )
+
     if request.method == 'POST':
         Points.objects.all().delete()
         try:
@@ -31,3 +34,19 @@ def points_api(request, *args, **kwargs):
         for point in points:
             result['names'].append(point.name)
         return JsonResponse(result, status=HTTPStatus.OK)
+
+
+class PointsViewSet(viewsets.ModelViewSet):
+    queryset = Points.objects.all()
+    serializer_class = PointsSerializer
+
+    def create(self, *args, **kwargs):
+        Points.objects.all().delete()
+        try:
+            names = json.loads(self.request.data)
+        except TypeError:
+            names = self.request.data
+        for name in names['names']:
+            Points.objects.create(name=name)
+
+        return JsonResponse(names, status=HTTPStatus.CREATED)
