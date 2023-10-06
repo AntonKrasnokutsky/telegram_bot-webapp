@@ -78,6 +78,7 @@ async def start(message: types.Message):
         ]
     }
     response = requests.post(URL_API, json=json.dumps(points))
+    print(response)
     if response.status_code == HTTPStatus.CREATED:
 
         markup = types.InlineKeyboardMarkup()
