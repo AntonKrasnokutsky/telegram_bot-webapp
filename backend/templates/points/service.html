@@ -90,11 +90,12 @@
     <div id="main">
     <form id="form_service">
         <div id="points">
-            <input name="city" list="cities" />
+            <input id="city" name="city" list="cities" />
             <datalist id="cities">
                 {% for point in points %}
-                    <option value={{ point.name }}>{{ point.name }}</option>
+                    <option value={{ point }}> {{ point }}</option>
                 {% endfor %}
+                <option value="01234567890123456789012345678 9012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" />
             </datalist>
             <input name="point" list="points" />
             <datalist id="points">
@@ -196,9 +197,7 @@
         <label for="collection">Сумма инкассации</label>
         <input type="number" name="collection" id="collection" min="0" value="0">
 
-        <button id="end_service">Завершить</button>
-    </form>
-    </div>
+        <button id="end_service">Завершить</button>cities
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
@@ -214,9 +213,8 @@
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
         let initDataURLSP = new URLSearchParams(tg.initDataUnsafe);
-        document.getElementById("indata").innerText = initDataURLSP.toString()
-        document.getElementById("tgdata").innerText = tg.initData.toString()
-        console.log(initDataURLSP.toString())
+        let cities = document.getElementById("city")
+
         tg.expand();
 
         function btn_inc(id, max, step) {
@@ -237,24 +235,10 @@
             document.getElementById(id).value = result
         };
 
-        function cream_btn_inc(id) {
-            var result = parseInt(document.getElementById(id).value, 10)
-            result = result + 1
-            if(result>2){
-                result = 2
-            }
-            document.getElementById(id).value = result
-        };
+        cities.addEventListener("change", () => {
+            console.log(cities.list.innerHTML)
+        });
 
-        function cream_btn_dec(id) {
-            var result = parseInt(document.getElementById(id).value, 10)
-            result = result - 1
-            if(result<0){
-                result = 0
-            }
-            document.getElementById(id).value = result
-        };
-        
         end_service.addEventListener("click", () => {
 
             let data = {
