@@ -5,5 +5,5 @@ from .views import PointsViewSet
 app_name = 'api'
 
 urlpatterns = [
-    path('points/', PointsViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('points/', PointsViewSet.as_view({'post': 'create'})),
 ]
