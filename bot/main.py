@@ -90,9 +90,7 @@ async def start(message: types.Message):
     points = {
         'names': get_list_points()
     }
-    print(json.dumps(points))
     response = requests.post(URL_API, json=json.dumps(points))
-    print(response)
     if response.status_code == HTTPStatus.CREATED:
 
         markup = types.InlineKeyboardMarkup()
