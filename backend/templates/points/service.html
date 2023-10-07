@@ -95,23 +95,7 @@
                 {% for point in points %}
                     <option value={{ point }}> {{ point }}</option>
                 {% endfor %}
-                <option value="01234567890123456789012345678 9012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" />
             </datalist>
-            <input name="point" list="points" />
-            <datalist id="points">
-
-                <option value="Naples" />
-                <option value="London" />
-                <option value="Berlin" />
-                <option value="New York" />
-                <option value="Frattamaggiore" />
-            </datalist>
-            <!-- <select required id="select_points">
-                <option disabled selected></option>
-                {% for point in points %}
-                    <option value={{ point.name }}>{{point.name}}</option>
-                {% endfor %}
-            </select> -->
         </div>
         <div id="div_coffee">
             <label for="coffee">Кофе</label>
