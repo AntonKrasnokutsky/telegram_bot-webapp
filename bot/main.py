@@ -89,13 +89,11 @@ def append_in_table(data: dict):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-
+    print('Start')
     points = {
         'names': get_list_points()
     }
     response = requests.post(URL_API, json=json.dumps(points))
-    print(response)
-    print(HTTPStatus.CREATED)
     if response.status_code == HTTPStatus.CREATED:
 
         markup = types.InlineKeyboardMarkup()

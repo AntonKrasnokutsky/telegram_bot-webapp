@@ -90,11 +90,20 @@
     <div id="main">
     <form id="form_service">
         <div id="points">
-            <input name="point" id="select_points" list="points" />
-            <datalist id="points">
+            <input name="city" list="cities" />
+            <datalist id="cities">
                 {% for point in points %}
-                    <option value={{ point.name }} />
+                    <option value={{ point.name }}>{{ point.name }}</option>
                 {% endfor %}
+            </datalist>
+            <input name="point" list="points" />
+            <datalist id="points">
+
+                <option value="Naples" />
+                <option value="London" />
+                <option value="Berlin" />
+                <option value="New York" />
+                <option value="Frattamaggiore" />
             </datalist>
             <!-- <select required id="select_points">
                 <option disabled selected></option>
