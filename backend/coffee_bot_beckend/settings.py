@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
-from pathlib import Path
 
 load_dotenv()
 load_dotenv(os.getenv('ENV'))
@@ -28,14 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    'backend',
-    '127.0.0.1',
-    'localhost',
-    '62.173.142.147',
-]
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = [os.getenv('HOST_IP'), os.getenv('DOMAIN_NAIM'), 'localhost']
 
 
 # Application definition
@@ -82,7 +80,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'coffee_bot_beckend.wsgi.application'
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -79,8 +79,13 @@ jobs:
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
             echo SHEET_ID=${{ secrets.SHEET_ID }} >> .env
+            echo HOST_IP=${{ secrets.HOST }} >> .env
+            echo DOMAIN_NAIM=${{ secrets.DOMAIN_NAIM }} >> .env
+
+            
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
             sudo docker compose up -d
+            sudo ./upd.sh
 
   send_message:
     runs-on: ubuntu-latest
