@@ -4,7 +4,6 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from points.models import Points
 from rest_framework import viewsets
-from rest_framework.response import Response
 
 from .serializes import PointsSerializer
 
@@ -25,8 +24,13 @@ def points_api(request, *args, **kwargs):
             names = request.data
         for name in names['names']:
             Points.objects.create(name=name)
-
-        return JsonResponse(names, status=HTTPStatus.CREATED)
+        points = Points.objects.all()
+        result = {
+            'names': []
+        }
+        for point in points:
+            result['names'].append(point.name)
+        return JsonResponse(result, status=HTTPStatus.CREATED)
     else:
         points = Points.objects.all()
         result = {
@@ -49,24 +53,16 @@ class PointsViewSet(viewsets.ModelViewSet):
             names = self.request.data
         for name in names['names']:
             Points.objects.create(name=name)
-
-        return JsonResponse(names, status=HTTPStatus.CREATED)
+        points = Points.objects.all()
+        result = {'names': []}
+        for point in points:
+            result['names'].append(point.name)
+        return JsonResponse(result, status=HTTPStatus.CREATED)
 
     # def list(self, *args, **kwargs):
     #     points = Points.objects.all()
-    #     result = {
-    #         'names': [
-
-    #         ]
-    #     }
+    #     # result = PointsSerializer(points, many=True).data
     #     for point in points:
     #         result['names'].append(point.name)
     #     print(result)
     #     return JsonResponse(result, status=HTTPStatus.OK)
-    def list(self, *args, **kwargs):
-        points = Points.objects.all()
-        result = PointsSerializer(points, many=True).data
-        # for point in points:
-        #     result['names'].append(point.name)
-        print(result)
-        return Response(result)

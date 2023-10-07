@@ -1,10 +1,9 @@
 from django.urls import path
 
-from .views import points_api   # PointsViewSet,
+from .views import PointsViewSet
 
 app_name = 'api'
 
 urlpatterns = [
-    path('points/', points_api),
-    # PointsViewSet.as_view({'get': 'list', 'post': 'create'})
+    path('points/', PointsViewSet.as_view({'get': 'list', 'post': 'create'})),
 ]
