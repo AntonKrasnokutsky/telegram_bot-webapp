@@ -84,22 +84,24 @@
             color: var(--tg-theme-button-color);
             background: var(--tg-theme-button-text-color);
         }
-
-        /* .btn:hover {
-            background: var(--tg-theme-secondary-bg-color);
-        } */
     </style>
 </head>
 <body>
     <div id="main">
     <form id="form_service">
         <div id="points">
-            <select required id="select_points">
+            <input name="point" id="select_points" list="points" />
+            <datalist id="points">
+                {% for point in points %}
+                    <option value={{ point.name }} />
+                {% endfor %}
+            </datalist>
+            <!-- <select required id="select_points">
                 <option disabled selected></option>
                 {% for point in points %}
                     <option value={{ point.name }}>{{point.name}}</option>
                 {% endfor %}
-            </select>
+            </select> -->
         </div>
         <div id="div_coffee">
             <label for="coffee">Кофе</label>

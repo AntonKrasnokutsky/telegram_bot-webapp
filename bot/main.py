@@ -46,7 +46,10 @@ def get_list_points():
         dateTimeRenderOption='FORMATTED_STRING'
     ).execute()
     sheet_values = results['valueRanges'][0]['values'][0]
-    sheet_values.remove('')
+    try:
+        sheet_values.remove('')
+    except ValueError:
+        pass
     return sheet_values
 
 
