@@ -61,7 +61,7 @@ def append_in_table(data: dict):
             data['user'],
             'ФИО',
             data['point'],
-            f'₽1\xa0{data["collection"]}',
+            f'₽\xa0{data["collection"]}',
             data['coffee'],
             data['cream'],
             data['chocolate'],
