@@ -57,7 +57,7 @@ def append_in_table(data: dict):
     body = {
         'values':
         [[
-            str(datetime.now())[:19],
+            data['date'],
             data['user'],
             'ФИО',
             data['point'],
@@ -89,7 +89,6 @@ def append_in_table(data: dict):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    print('Start')
     points = {
         'names': get_list_points()
     }
@@ -111,12 +110,10 @@ async def start(message: types.Message):
 
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
-    print(message.web_app_data.data)
     data = json.loads(message.web_app_data.data)
-    print(data)
     data['user'] = message.from_user.username
+    data['date'] = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     append_in_table(data)
-    data['date'] = str(datetime.now())[:19]
     await message.answer(data)
 
 

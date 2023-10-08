@@ -91,13 +91,13 @@
     <form id="form_service">
         <div id="div_points">
             <label for="point">Точка обслуживания:</label>
-            <input id="point" name="points_name" list="points" />
+            <input id="point" name="points_name" list="points" required />
             <datalist id="points">
             </datalist>
         </div>
         <div id="div_coffee">
             <label for="coffee">Кофе</label>
-            <input type="number" id="coffee" value="0" step="1" min="0" max="2" readonly>
+            <input type="number" id="coffee" value="0" step="1" min="0" max="2" readonly >
             <div id="coffee_btn">
                 <div class="btn_div btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)">-</div>
                 <div class="btn_div btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)">+</div>
@@ -115,7 +115,7 @@
 
         <div id="div_chocolate">
             <label for="chocolate">Шоколад</label>
-            <input type="number" id="chocolate" value="0" step="1" min="0" max="2" readonly>
+            <input type="number" id="chocolate" value="0" step="1" min="0" max="2" readonly >
             <div id="chocolate_btn">
                 <div  class="btn_div btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)">-</div>
                 <div  class="btn_div btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)">+</div>
@@ -179,7 +179,7 @@
         <label for="collection">Сумма инкассации</label>
         <input type="number" name="collection" id="collection" min="0" value="0">
 
-        <div id="end_service">Завершить</div>
+        <button id="end_service">Завершить</button>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
@@ -209,15 +209,21 @@
 
         function btn_inc(id, max, step) {
             var result = parseInt(document.getElementById(id).value, 10)
-            result = result + step
+            if (isNaN(result)) {
+                result = -1;
+            };
+            result = result + step;
             if(result>max){
-                result = max
-            }
-            document.getElementById(id).value = result
+                result = max;
+            };
+            document.getElementById(id).value = result;
         };
 
         function btn_dec(id, min, step) {
             var result = parseInt(document.getElementById(id).value, 10)
+            if (isNaN(result)) {
+                result = 1;
+            };
             result = result - step
             if(result<min){
                 result = min
