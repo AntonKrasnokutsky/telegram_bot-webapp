@@ -96,9 +96,9 @@ async def start(message: types.Message):
     response = requests.post(URL_API, json=json.dumps(points))
     if response.status_code == HTTPStatus.CREATED:
 
-        markup = types.InlineKeyboardMarkup()
+        markup = types.ReplyKeyboardMarkup()
         markup.add(
-            types.InlineKeyboardButton(
+            types.KeyboardButton(
                 'Обслуживание',
                 web_app=WebAppInfo(url=URL, points=points)
             ))
@@ -111,6 +111,7 @@ async def start(message: types.Message):
 
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
+    print(message.web_app_data.data)
     data = json.loads(message.web_app_data.data)
     print(data)
     data['user'] = message.from_user.username
