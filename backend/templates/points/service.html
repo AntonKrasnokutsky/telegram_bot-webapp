@@ -89,12 +89,10 @@
 <body>
     <div id="main">
     <form id="form_service">
-        <div id="points">
-            <input id="city" name="city" list="cities" />
-            <datalist id="cities">
-                {% for point in points %}
-                    <option value={{ point }}> {{ point }}</option>
-                {% endfor %}
+        <div id="div_points">
+            <label for="point">Точка обслуживания:</label>
+            <input id="point" name="points_name" list="points" />
+            <datalist id="points">
             </datalist>
         </div>
         <div id="div_coffee">
@@ -180,9 +178,7 @@
 
         <label for="collection">Сумма инкассации</label>
         <input type="number" name="collection" id="collection" min="0" value="0">
-
-        <button id="end_service">Завершить</button>cities
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        Кофеram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         let service = document.getElementById("service")
@@ -196,10 +192,49 @@
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
-        let initDataURLSP = new URLSearchParams(tg.initDataUnsafe);
-        let cities = document.getElementById("city")
+        // let initDataURLSP = new URLSearchParams(tg.initDataUnsafe);
+        // let cities = document.getElementById("city")
 
         tg.expand();
+
+        function onstart() {
+            var options = '';
+            {% for item in data %}
+                options += '<option value="' + "{{ item.value }}" + '" />';
+            {% endfor %};
+            document.getElementById('points').innerHTML = options;
+            // let cities = document.getElementById("cities")
+            // var select = document.getElementById("cities")
+            // console.log(select.options);
+            // select.options.add(new Option('1'));
+            // {% for item in data %}
+            //     select.options.add(new Option("{{ item.value }}")),
+            // {% endfor %};
+
+
+            // var input = document.getElementById('posAdult'),
+            //     parent = input.parentNode,
+            //     select = document.createElement('SELECT');
+            // select.id = input.id;
+            // select.name = input.name;
+            // // {% for name in names %}
+            // //     console.log(name.name),
+            // //     // select.options.add(new Option("{{name}}"));	
+            // // {% endfor %}
+            // select.options.add(new Option(''));	
+            // select.options.add(new Option('1'));
+            // select.options.add(new Option('2'));
+            // select.options.add(new Option('3'));
+            // select.options.add(new Option('4'));
+            // parent.insertBefore(select, input);
+            // // parent.removeChild(input);
+
+            // {% for name in names %}
+
+            // {% endfor %}
+        };
+
+        onstart();
 
         function btn_inc(id, max, step) {
             var result = parseInt(document.getElementById(id).value, 10)
@@ -219,14 +254,14 @@
             document.getElementById(id).value = result
         };
 
-        cities.addEventListener("change", () => {
-            console.log(cities.list.innerHTML)
-        });
+        // cities.addEventListener("change", () => {
+        //     console.log(cities.list.innerHTML)
+        // });
 
         end_service.addEventListener("click", () => {
 
             let data = {
-                point: document.getElementById("select_points").value,
+                point: document.getElementById("point").value,
                 coffee: document.getElementById("coffee").value,
                 cream: document.getElementById("cream").value,
                 chocolate: document.getElementById("chocolate").value,
