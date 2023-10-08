@@ -54,7 +54,6 @@ def get_list_points():
 
 
 def append_in_table(data: dict):
-    print('Записываем в таблицу')
     body = {
         'values':
         [[
@@ -80,14 +79,12 @@ def append_in_table(data: dict):
             '',
             'photo'
         ]]}
-    print(f'Данные для записи: {data}')
     get_service_sacc().spreadsheets().values().append(
         spreadsheetId=SPREADSHEET_ID,
         range='Лист1',
         valueInputOption="USER_ENTERED",
         body=body
     ).execute()
-    print('Запись завершена')
 
 
 @dp.message_handler(commands=['start'])
