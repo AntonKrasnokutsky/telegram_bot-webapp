@@ -179,7 +179,7 @@
         <label for="collection">Сумма инкассации</label>
         <input type="number" name="collection" id="collection" min="0" value="0">
 
-        <button id="end_service">Завершить</button>
+        <div id="end_service">Завершить</div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
@@ -228,7 +228,7 @@
         end_service.addEventListener("click", () => {
 
             let data = {
-                point: document.getElementById("point").value,
+                // point: document.getElementById("point").value,
                 coffee: document.getElementById("coffee").value,
                 cream: document.getElementById("cream").value,
                 chocolate: document.getElementById("chocolate").value,
@@ -240,7 +240,7 @@
                 stirrer: document.getElementById("stirrer").value,
                 collection: document.getElementById("collection").value,
             };
-
+            console.log(JSON.stringify(data))
             tg.sendData(JSON.stringify(data));
             tg.close();
         });

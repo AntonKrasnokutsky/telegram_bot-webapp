@@ -112,6 +112,7 @@ async def start(message: types.Message):
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     data = json.loads(message.web_app_data.data)
+    print(data)
     data['user'] = message.from_user.username
     append_in_table(data)
     data['date'] = str(datetime.now())[:19]
