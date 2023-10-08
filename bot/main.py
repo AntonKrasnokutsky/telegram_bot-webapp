@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 from http import HTTPStatus
 import httplib2
@@ -112,7 +112,10 @@ async def start(message: types.Message):
 async def web_app(message: types.Message):
     data = json.loads(message.web_app_data.data)
     data['user'] = message.from_user.username
-    data['date'] = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    date_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
+    tz = datetime.strptime('+0300', '%z').tzinfo
+    date_msk = date_utc.astimezone(tz)
+    data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
     append_in_table(data)
     await message.answer(data)
 
