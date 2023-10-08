@@ -71,7 +71,7 @@ def append_in_table(data: dict):
             data['glasses'],
             data['covers'],
             data['stirrer'],
-            data['collection'],
+            '',     # трубочки?
             '',
             '',
             '',
