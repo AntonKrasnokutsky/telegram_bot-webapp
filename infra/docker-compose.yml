@@ -12,6 +12,7 @@ services:
     image: antonkrasnokutsky/coffee_bot
     restart: always
     volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./tg-bot-400810-9e0f62bd9a0e.json:/app/tg-bot-400810-9e0f62bd9a0e.json
     env_file:
       - .env
