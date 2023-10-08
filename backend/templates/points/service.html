@@ -43,46 +43,42 @@
         }
 
         input {
-            width: 90%;
-            outline: none;
-            margin: 10px 5%;
-            padding: 15px 10px;
+            display: inline-block;
+            width: 55px;
+            /* height: 50px; */
+            /* outline: none; */
+            margin: 10px 5px;
+            padding: 15px 5px;
             font-size: 14px;
-            border: 2px solid silver;
+            text-align: center;
+            border: 1px solid silver;
             border-radius: 5px;
         }
         
-        input:focus {
-            border-color: red;
-        }
-
-        select {
-            outline: none;
-            margin: 10px 5%;
-            padding: 15px 10px;
-            font-size: 14px;
-            border: 2px solid silver;
-            border-radius: 5px;
-        }
-
-        select:focus {
-            border-color: red;
-        }
-
-        .btn_div {
-            display: inline-block;
+        .input_long {
+            width: 90%;
         }
 
         .btn {
-            border: 1px solid;
-            border-radius: 5px;
+            /* margin: 10px 5px;
+            display: inline-block; */
+            border: 2px solid;
+            /* border-radius: 5px;
             height: 50px;
             width: 50px;
             font-size: 30px;
             font-weight: 600;
-            line-height: 50px;
+            line-height: 50px; */
             color: var(--tg-theme-button-color);
             background: var(--tg-theme-button-text-color);
+        }
+
+        .ib {
+            display: inline-block;
+        }
+
+        .bor {
+            border: 1px solid silver;
         }
     </style>
 </head>
@@ -90,94 +86,85 @@
     <div id="main">
     <form id="form_service">
         <div id="div_points">
-            <label for="point">Точка обслуживания:</label>
-            <input id="point" name="points_name" list="points" required />
+            <p>Точка обслуживания:</p>
+            <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required />
             <datalist id="points">
             </datalist>
         </div>
-        <div id="div_coffee">
-            <label for="coffee">Кофе</label>
-            <input type="number" id="coffee" value="0" step="1" min="0" max="2" readonly >
-            <div id="coffee_btn">
-                <div class="btn_div btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)">-</div>
-                <div class="btn_div btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)">+</div>
+
+        <div>
+            <div class="ib bor" id="div_coffee">
+                <p >Кофе</p>
+                <input class="input btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)" value="-" readonly>
+                <input id="coffee" value="0" step="1" min="0" max="2" readonly >
+                <input class="input btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_cream">
+                <p>Сливки</p>
+                <input class="input btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)" value="-" readonly>
+                <input id="cream" value="0" step="1" min="0" max="2" readonly>
+                <input class="input btn" id="cream_inc" onclick="btn_inc('cream', 2, 1)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_chocolate">
+                <p>Шоколад</p>
+                <input class="input btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)" value="-" readonly>
+                <input id="chocolate" value="0" step="1" min="0" max="2" readonly >
+                <input class="input btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)" value="+" readonly>
             </div>
         </div>
 
-        <div id="div_cream">
-            <label for="cream">Сливки</label>
-            <input type="number" id="cream" value="0" step="1" min="0" max="2" readonly>
-            <div id="cream_btn">
-                <div class="btn_div btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)">-</div>
-                <div class="btn_div btn" id="cream_inc" onclick="btn_inc('cream', 2, 1)">+</div>
+        <div style="display: inline-block;">
+            <div class="ib bor" id="div_raf">
+                <p>Раф</p>
+                <input class="input btn" id="raf_dec" onclick="btn_dec('raf', 0, 1)" value="-" readonly>
+                <input id="raf" value="0" step="1" min="0" max="2" readonly>
+                <input class="input btn" id="raf_inc" onclick="btn_inc('raf', 2, 1)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_sugar">
+                <p>Сахар</p>
+                <input class="input btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 10)" value="-" readonly>
+                <input id="sugar" value="0" step="10" min="0" max="100" readonly>
+                <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 100, 10)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_syrup">
+                <p>Сироп</p>
+                <input class="input btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)" value="-" readonly>
+                <input id="syrup" value="0" step="1" min="0" max="3" readonly>
+                <input class="input btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)" value="+" readonly>
             </div>
         </div>
 
-        <div id="div_chocolate">
-            <label for="chocolate">Шоколад</label>
-            <input type="number" id="chocolate" value="0" step="1" min="0" max="2" readonly >
-            <div id="chocolate_btn">
-                <div  class="btn_div btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)">-</div>
-                <div  class="btn_div btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)">+</div>
+        <div>
+            <div class="ib bor" id="div_glasses">
+                <p>Стаканы</p>
+                <input class="input btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 10)" value="-" readonly>
+                <input id="glasses" value="0" step="10" min="0" max="100" readonly>
+                <input class="input btn" id="glasses_inc" onclick="btn_inc('glasses', 100, 10)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_covers">
+                <p>Крышки</p>
+                <input class="input btn" id="covers_dec" onclick="btn_dec('covers', 0, 10)" value="-" readonly>
+                <input id="covers" value="0" step="10" min="0" max="100" readonly>
+                <input class="input btn" id="covers_inc" onclick="btn_inc('covers', 100, 10)" value="+" readonly>
+            </div>
+
+            <div class="ib bor" id="div_stirrer">
+                <p>Размешиватели</p>
+                <input class="input btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 10)" value="-" readonly>
+                <input id="stirrer" value="0" step="10" min="0" max="100" readonly>
+                <input class="input btn" id="stirrer_inc" onclick="btn_inc('stirrer', 100, 10)" value="+" readonly>
             </div>
         </div>
 
-        <div id="div_raf">
-            <label for="raf">Раф</label>
-            <input type="number" id="raf" value="0" step="1" min="0" max="2" readonly>
-            <div id="raf_btn">
-                <div  class="btn_div btn" id="raf_dec" onclick="btn_dec('raf', 0, 1)">-</div>
-                <div  class="btn_div btn" id="raf_inc" onclick="btn_inc('raf', 2, 1)">+</div>
-            </div>
+        <div id="div_collection">
+            <p>Сумма инкассации</p>
+            <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required>
         </div>
-
-        <div id="div_sugar">
-            <label for="sugar">Сахар</label>
-            <input type="number" id="sugar" value="0" step="10" min="0" max="100" readonly>
-            <div id="sugar_btn">
-                <div  class="btn_div btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 10)">-</div>
-                <div  class="btn_div btn" id="sugar_inc" onclick="btn_inc('sugar', 100, 10)">+</div>
-            </div>
-        </div>
-
-        <div id="div_syrup">
-            <label for="syrup">Сироп</label>
-            <input type="number" id="syrup" value="0" step="1" min="0" max="3" readonly>
-            <div id="syrup_btn">
-                <div  class="btn_div btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)">-</div>
-                <div  class="btn_div btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)">+</div>
-            </div>
-        </div>
-
-        <div id="div_glasses">
-            <label for="glasses">Стаканы</label>
-            <input type="number" id="glasses" value="0" step="10" min="0" max="100" readonly>
-            <div id="glasses_btn">
-                <div  class="btn_div btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 10)">-</div>
-                <div  class="btn_div btn" id="glasses_inc" onclick="btn_inc('glasses', 100, 10)">+</div>
-            </div>
-        </div>
-
-        <div id="div_covers">
-            <label for="covers">Крышки</label>
-            <input type="number" id="covers" value="0" step="10" min="0" max="100" readonly>
-            <div id="covers_btn">
-                <div class="btn_div btn" id="covers_dec" onclick="btn_dec('covers', 0, 10)">-</div>
-                <div class="btn_div btn" id="covers_inc" onclick="btn_inc('covers', 100, 10)">+</div>
-            </div>
-        </div>
-
-        <div id="div_stirrer">
-            <label for="stirrer">Размешиватели</label>
-            <input type="number" id="stirrer" value="0" step="10" min="0" max="100" readonly>
-            <div id="stirrer_btn">
-                <div  class="btn_div btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 10)">-</div>
-                <div  class="btn_div btn" id="stirrer_inc" onclick="btn_inc('stirrer', 100, 10)">+</div>
-            </div>
-        </div>
-
-        <label for="collection">Сумма инкассации</label>
-        <input type="number" name="collection" id="collection" min="0" value="0">
 
         <button id="end_service">Завершить</button>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -246,7 +233,7 @@
                 stirrer: document.getElementById("stirrer").value,
                 collection: document.getElementById("collection").value,
             };
-            console.log(JSON.stringify(data))
+
             tg.sendData(JSON.stringify(data));
             tg.close();
         });
