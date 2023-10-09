@@ -246,7 +246,7 @@
         });
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
-            if (document.getElementById("point").value = "") {
+            if (document.getElementById("point").value == "") {
                 document.getElementById("error_point").innerText = "Не выбрана точка";
                 return;
             }
