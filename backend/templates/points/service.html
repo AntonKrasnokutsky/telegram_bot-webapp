@@ -234,6 +234,18 @@
         };
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            document.getElementById("error_point").innerText = "";
+            document.getElementById("error_coffee").innerText = "";
+            document.getElementById("error_cream").innerText = "";
+            document.getElementById("error_chocolate").innerText = "";
+            document.getElementById("error_raf").innerText = "";
+            document.getElementById("error_sugar").innerText = "";
+            document.getElementById("error_syrup").innerText = "";
+            document.getElementById("error_glasses").innerText = "";
+            document.getElementById("error_covers").innerText = "";
+            document.getElementById("error_stirrer").innerText = "";
+            document.getElementById("error_collection").innerText = "";
+
             if (point.value == "") {
                 document.getElementById("error_point").innerText = "Не выбрана точка";
                 return;
