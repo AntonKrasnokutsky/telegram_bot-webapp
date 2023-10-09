@@ -94,6 +94,7 @@
             <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
             <datalist id="points">
             </datalist>
+            <div style="color: red;" id="error_point"></div>
         </div>
 
         <div>
@@ -226,6 +227,32 @@
         };
 
         end_service.addEventListener("click", () => {
+            let data = {
+                point: document.getElementById("point").value,
+                coffee: document.getElementById("coffee").value,
+                cream: document.getElementById("cream").value,
+                chocolate: document.getElementById("chocolate").value,
+                raf: document.getElementById("raf").value,
+                sugar: document.getElementById("sugar").value,
+                syrup: document.getElementById("syrup").value,
+                glasses: document.getElementById("glasses").value,
+                covers: document.getElementById("covers").value,
+                stirrer: document.getElementById("stirrer").value,
+                collection: document.getElementById("collection").value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+
+        Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            if (document.getElementById("point").value = "") {
+                document.getElementById("error_point").innerText = "Не выбрана точка"
+            }
+            if (isNaN(parseInt(document.getElementById("collection").value, 10))) {
+                document.getElementById("error_collection").innerText = "Не внесена сумма инкасации"
+            }
+
             let data = {
                 point: document.getElementById("point").value,
                 coffee: document.getElementById("coffee").value,
