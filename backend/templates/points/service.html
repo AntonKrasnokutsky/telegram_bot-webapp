@@ -247,10 +247,12 @@
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             if (document.getElementById("point").value = "") {
-                document.getElementById("error_point").innerText = "Не выбрана точка"
+                document.getElementById("error_point").innerText = "Не выбрана точка";
+                return;
             }
             if (isNaN(parseInt(document.getElementById("collection").value, 10))) {
                 document.getElementById("error_collection").innerText = "Не внесена сумма инкасации"
+                return;
             }
 
             let data = {
