@@ -101,22 +101,25 @@
             <div class="ib bor" id="div_coffee">
                 <p >Кофе</p>
                 <input class="input btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)" value="-" readonly>
-                <input id="coffee" value="0" step="1" min="0" max="2" readonly >
+                <input id="coffee" step="1" min="0" max="2" readonly >
                 <input class="input btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)" value="+" readonly>
+                <div style="color: red;" id="error_coffee"></div>
             </div>
 
             <div class="ib bor" id="div_cream">
                 <p>Сливки</p>
                 <input class="input btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)" value="-" readonly>
-                <input id="cream" value="0" step="1" min="0" max="2" readonly>
+                <input id="cream" step="1" min="0" max="2" readonly>
                 <input class="input btn" id="cream_inc" onclick="btn_inc('cream', 2, 1)" value="+" readonly>
+                <div style="color: red;" id="error_cream"></div>
             </div>
 
             <div class="ib bor" id="div_chocolate">
                 <p>Шоколад</p>
                 <input class="input btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)" value="-" readonly>
-                <input id="chocolate" value="0" step="1" min="0" max="2" readonly >
+                <input id="chocolate" step="1" min="0" max="2" readonly >
                 <input class="input btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)" value="+" readonly>
+                <div style="color: red;" id="error_chocolate"></div>
             </div>
         </div>
 
@@ -124,22 +127,25 @@
             <div class="ib bor" id="div_raf">
                 <p>Раф</p>
                 <input class="input btn" id="raf_dec" onclick="btn_dec('raf', 0, 1)" value="-" readonly>
-                <input id="raf" value="0" step="1" min="0" max="2" readonly>
+                <input id="raf" step="1" min="0" max="2" readonly>
                 <input class="input btn" id="raf_inc" onclick="btn_inc('raf', 2, 1)" value="+" readonly>
+                <div style="color: red;" id="error_raf"></div>
             </div>
 
             <div class="ib bor" id="div_sugar">
                 <p>Сахар</p>
                 <input class="input btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 10)" value="-" readonly>
-                <input id="sugar" value="0" step="10" min="0" max="100" readonly>
+                <input id="sugar" step="10" min="0" max="100" readonly>
                 <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 100, 10)" value="+" readonly>
+                <div style="color: red;" id="error_sugar"></div>
             </div>
 
             <div class="ib bor" id="div_syrup">
                 <p>Сироп</p>
                 <input class="input btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)" value="-" readonly>
-                <input id="syrup" value="0" step="1" min="0" max="3" readonly>
+                <input id="syrup" step="1" min="0" max="3" readonly>
                 <input class="input btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)" value="+" readonly>
+                <div style="color: red;" id="error_syrup"></div>
             </div>
         </div>
 
@@ -147,22 +153,25 @@
             <div class="ib bor" id="div_glasses">
                 <p>Стаканы</p>
                 <input class="input btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 10)" value="-" readonly>
-                <input id="glasses" value="0" step="10" min="0" max="100" readonly>
+                <input id="glasses" step="10" min="0" max="100" readonly>
                 <input class="input btn" id="glasses_inc" onclick="btn_inc('glasses', 100, 10)" value="+" readonly>
+                <div style="color: red;" id="error_glasses"></div>
             </div>
 
             <div class="ib bor" id="div_covers">
                 <p>Крышки</p>
                 <input class="input btn" id="covers_dec" onclick="btn_dec('covers', 0, 10)" value="-" readonly>
-                <input id="covers" value="0" step="10" min="0" max="100" readonly>
+                <input id="covers" step="10" min="0" max="100" readonly>
                 <input class="input btn" id="covers_inc" onclick="btn_inc('covers', 100, 10)" value="+" readonly>
+                <div style="color: red;" id="error_covers"></div>
             </div>
 
             <div class="ib bor" id="div_stirrer">
                 <p>Размешиватели</p>
                 <input class="input btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 10)" value="-" readonly>
-                <input id="stirrer" value="0" step="10" min="0" max="100" readonly>
+                <input id="stirrer" step="10" min="0" max="100" readonly>
                 <input class="input btn" id="stirrer_inc" onclick="btn_inc('stirrer', 100, 10)" value="+" readonly>
+                <div style="color: red;" id="error_stirrer"></div>
             </div>
         </div>
 
@@ -172,12 +181,10 @@
             <div style="color: red;" id="error_collection"></div>
         </div>
 
-        <button id="end_service">Завершить</button>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
-        let service = document.getElementById("service")
-        let end_service = document.getElementById("end_service")
+        let point = document.getElementById("point")
         let coffee = document.getElementById("coffee")
         let cream = document.getElementById("cream")
         let chocolate = document.getElementById("chocolate")
@@ -226,47 +233,74 @@
             document.getElementById(id).value = result
         };
 
-        end_service.addEventListener("click", () => {
-            let data = {
-                point: document.getElementById("point").value,
-                coffee: document.getElementById("coffee").value,
-                cream: document.getElementById("cream").value,
-                chocolate: document.getElementById("chocolate").value,
-                raf: document.getElementById("raf").value,
-                sugar: document.getElementById("sugar").value,
-                syrup: document.getElementById("syrup").value,
-                glasses: document.getElementById("glasses").value,
-                covers: document.getElementById("covers").value,
-                stirrer: document.getElementById("stirrer").value,
-                collection: document.getElementById("collection").value,
-            };
-
-            tg.sendData(JSON.stringify(data));
-            tg.close();
-        });
-
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
-            if (document.getElementById("point").value == "") {
+            if (point.value == "") {
                 document.getElementById("error_point").innerText = "Не выбрана точка";
                 return;
             }
-            if (isNaN(parseInt(document.getElementById("collection").value, 10))) {
+
+            if (isNaN(parseInt(coffee.value, 10))) {
+                document.getElementById("error_coffee").innerText = "Укажите количество кофе";
+                return;
+            }
+
+            if (isNaN(parseInt(cream.value, 10))) {
+                document.getElementById("error_cream").innerText = "Укажите количество молока";
+                return;
+            }
+
+            if (isNaN(parseInt(chocolate.value, 10))) {
+                document.getElementById("error_chocolate").innerText = "Укажите количество шоколада";
+                return;
+            }
+
+            if (isNaN(parseInt(raf.value, 10))) {
+                document.getElementById("error_raf").innerText = "Укажите количество рафа";
+                return;
+            }
+
+            if (isNaN(parseInt(sugar.value, 10))) {
+                document.getElementById("error_sugar").innerText = "Укажите количество сахара";
+                return;
+            }
+
+            if (isNaN(parseInt(syrup.value, 10))) {
+                document.getElementById("error_syrup").innerText = "Укажите количество сиропа";
+                return;
+            }
+
+            if (isNaN(parseInt(glasses.value, 10))) {
+                document.getElementById("error_glasses").innerText = "Укажите количество стаканов";
+                return;
+            }
+
+            if (isNaN(parseInt(covers.value, 10))) {
+                document.getElementById("error_covers").innerText = "Укажите количество крышек";
+                return;
+            }
+
+            if (isNaN(parseInt(stirrer.value, 10))) {
+                document.getElementById("error_stirrer").innerText = "Укажите количество размешивателей";
+                return;
+            }
+
+            if (isNaN(parseInt(collection.value, 10))) {
                 document.getElementById("error_collection").innerText = "Не внесена сумма инкасации"
                 return;
             }
 
             let data = {
-                point: document.getElementById("point").value,
-                coffee: document.getElementById("coffee").value,
-                cream: document.getElementById("cream").value,
-                chocolate: document.getElementById("chocolate").value,
-                raf: document.getElementById("raf").value,
-                sugar: document.getElementById("sugar").value,
-                syrup: document.getElementById("syrup").value,
-                glasses: document.getElementById("glasses").value,
-                covers: document.getElementById("covers").value,
-                stirrer: document.getElementById("stirrer").value,
-                collection: document.getElementById("collection").value,
+                point: point.value,
+                coffee: coffee.value,
+                cream: cream.value,
+                chocolate: chocolate.value,
+                raf: raf.value,
+                sugar: sugar.value,
+                syrup: syrup.value,
+                glasses: glasses.value,
+                covers: covers.value,
+                stirrer: stirrer.value,
+                collection: collection.value,
             };
 
             tg.sendData(JSON.stringify(data));
