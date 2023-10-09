@@ -212,7 +212,7 @@
         function btn_inc(id, max, step) {
             var result = parseInt(document.getElementById(id).value, 10)
             if (isNaN(result)) {
-                result = -1;
+                result = -step;
             };
             result = result + step;
             if(result>max){
@@ -224,7 +224,7 @@
         function btn_dec(id, min, step) {
             var result = parseInt(document.getElementById(id).value, 10)
             if (isNaN(result)) {
-                result = 1;
+                result = step;
             };
             result = result - step
             if(result<min){
