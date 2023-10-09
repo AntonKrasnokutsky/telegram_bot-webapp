@@ -89,7 +89,7 @@ def append_service_in_table(data: dict):
             data['glasses'],
             data['covers'],
             data['stirrer'],
-            '',     # трубочки?
+            data['straws'],
             '',
             '',
             '',
@@ -109,13 +109,12 @@ def append_repair_in_table(data: dict):
     body = {
         'values':
         [[
-            '',
             data['date'],
             data['email'],
             data['fio'],
             data['point'],
             data['category'],
-            '',
+            data['repair'],
             '',
             '',
             '',

@@ -97,7 +97,7 @@
             <div class="ib bor" id="div_coffee">
                 <p >Кофе</p>
                 <input class="input btn" id="coffee_dec" onclick="btn_dec('coffee', 0, 1)" value="-" readonly>
-                <input id="coffee" step="1" min="0" max="2" readonly >
+                <input id="coffee" step="1" min="0" max="2" readonly value="0">
                 <input class="input btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)" value="+" readonly>
                 <div style="color: red;" id="error_coffee"></div>
             </div>
@@ -105,7 +105,7 @@
             <div class="ib bor" id="div_cream">
                 <p>Сливки</p>
                 <input class="input btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)" value="-" readonly>
-                <input id="cream" step="1" min="0" max="2" readonly>
+                <input id="cream" step="1" min="0" max="2" readonly value="0">
                 <input class="input btn" id="cream_inc" onclick="btn_inc('cream', 2, 1)" value="+" readonly>
                 <div style="color: red;" id="error_cream"></div>
             </div>
@@ -113,7 +113,7 @@
             <div class="ib bor" id="div_chocolate">
                 <p>Шоколад</p>
                 <input class="input btn" id="chocolate_dec" onclick="btn_dec('chocolate', 0, 1)" value="-" readonly>
-                <input id="chocolate" step="1" min="0" max="2" readonly >
+                <input id="chocolate" step="1" min="0" max="2" readonly value="0">
                 <input class="input btn" id="chocolate_inc" onclick="btn_inc('chocolate', 2, 1)" value="+" readonly>
                 <div style="color: red;" id="error_chocolate"></div>
             </div>
@@ -123,23 +123,23 @@
             <div class="ib bor" id="div_raf">
                 <p>Раф</p>
                 <input class="input btn" id="raf_dec" onclick="btn_dec('raf', 0, 1)" value="-" readonly>
-                <input id="raf" step="1" min="0" max="2" readonly>
+                <input id="raf" step="1" min="0" max="2" readonly  value="0">
                 <input class="input btn" id="raf_inc" onclick="btn_inc('raf', 2, 1)" value="+" readonly>
                 <div style="color: red;" id="error_raf"></div>
             </div>
 
             <div class="ib bor" id="div_sugar">
                 <p>Сахар</p>
-                <input class="input btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 10)" value="-" readonly>
-                <input id="sugar" step="10" min="0" max="100" readonly>
-                <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 100, 10)" value="+" readonly>
+                <input class="input btn" id="sugar_dec" onclick="btn_dec('sugar', 0, 50)" value="-" readonly>
+                <input id="sugar" step="50" min="0" max="250" readonly value="0">
+                <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 250, 50)" value="+" readonly>
                 <div style="color: red;" id="error_sugar"></div>
             </div>
 
             <div class="ib bor" id="div_syrup">
                 <p>Сироп</p>
                 <input class="input btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)" value="-" readonly>
-                <input id="syrup" step="1" min="0" max="3" readonly>
+                <input id="syrup" step="1" min="0" max="3" readonly value="0">
                 <input class="input btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)" value="+" readonly>
                 <div style="color: red;" id="error_syrup"></div>
             </div>
@@ -148,33 +148,41 @@
         <div>
             <div class="ib bor" id="div_glasses">
                 <p>Стаканы</p>
-                <input class="input btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 10)" value="-" readonly>
-                <input id="glasses" step="10" min="0" max="100" readonly>
-                <input class="input btn" id="glasses_inc" onclick="btn_inc('glasses', 100, 10)" value="+" readonly>
+                <input class="input btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 50)" value="-" readonly>
+                <input id="glasses" step="50" min="0" max="250" readonly value="0">
+                <input class="input btn" id="glasses_inc" onclick="btn_inc('glasses', 250, 50)" value="+" readonly>
                 <div style="color: red;" id="error_glasses"></div>
             </div>
 
             <div class="ib bor" id="div_covers">
                 <p>Крышки</p>
-                <input class="input btn" id="covers_dec" onclick="btn_dec('covers', 0, 10)" value="-" readonly>
-                <input id="covers" step="10" min="0" max="100" readonly>
-                <input class="input btn" id="covers_inc" onclick="btn_inc('covers', 100, 10)" value="+" readonly>
+                <input class="input btn" id="covers_dec" onclick="btn_dec('covers', 0, 100)" value="-" readonly>
+                <input id="covers" step="100" min="0" max="100" readonly value="0">
+                <input class="input btn" id="covers_inc" onclick="btn_inc('covers', 100, 100)" value="+" readonly>
                 <div style="color: red;" id="error_covers"></div>
             </div>
 
             <div class="ib bor" id="div_stirrer">
                 <p>Размешиватели</p>
-                <input class="input btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 10)" value="-" readonly>
-                <input id="stirrer" step="10" min="0" max="100" readonly>
-                <input class="input btn" id="stirrer_inc" onclick="btn_inc('stirrer', 100, 10)" value="+" readonly>
+                <input class="input btn" id="stirrer_dec" onclick="btn_dec('stirrer', 0, 250)" value="-" readonly>
+                <input id="stirrer" step="250" min="0" max="500" readonly value="0">
+                <input class="input btn" id="stirrer_inc" onclick="btn_inc('stirrer', 500, 250)" value="+" readonly>
                 <div style="color: red;" id="error_stirrer"></div>
             </div>
         </div>
-
-        <div id="div_collection">
-            <p>Сумма инкассации</p>
-            <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
-            <div style="color: red;" id="error_collection"></div>
+        <div>
+            <div class="ib bor" id="div_straws">
+                <p>Трубочки</p>
+                <input class="input btn" id="straws_dec" onclick="btn_dec('straws', 0, 50)" value="-" readonly>
+                <input id="straws" step="50" min="0" max="150" readonly value="0">
+                <input class="input btn" id="stirrer_inc" onclick="btn_inc('straws', 150, 50)" value="+" readonly>
+                <div style="color: red;" id="error_straws"></div>
+            </div>
+            <div class="ib bor" id="div_collection">
+                <p>Сумма инкассации</p>
+                <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
+                <div style="color: red;" id="error_collection"></div>
+            </div>
         </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -190,6 +198,7 @@
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
+        let straws = document.getElementById("straws")
 
         tg.expand();
         tg.MainButton.text = "Завершить обслуживание";
@@ -292,6 +301,11 @@
                 return;
             }
 
+            if (isNaN(parseInt(straws.value, 10))) {
+                document.getElementById("error_straws").innerText = "Укажите количество трубочек";
+                return;
+            }
+
             if (isNaN(parseInt(collection.value, 10))) {
                 document.getElementById("error_collection").innerText = "Не внесена сумма инкасации"
                 return;
@@ -310,6 +324,7 @@
                 covers: covers.value,
                 stirrer: stirrer.value,
                 collection: collection.value,
+                straws: straws,
             };
 
             tg.sendData(JSON.stringify(data));

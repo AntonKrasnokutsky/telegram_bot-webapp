@@ -73,12 +73,17 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
-            echo URL=${{ secrets.URL }} >> .env
+            echo URL_SERVICE=${{ secrets.URL_SERVICE }} >> .env
+            echo URL_REPAIR=${{ secrets.URL_REPAIR }} >> .env
             echo URL_API=${{ secrets.URL_API }} >> .env
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
-            echo SHEET_ID=${{ secrets.SHEET_ID }} >> .env
+            echo SHEET_SERVICE=${{ secrets.SHEET_SERVICE }} >> .env
+            echo SHEET_REPEAR=${{ secrets.SHEET_REPEAR }} >> .env
+            echo POINTS_RANGE=${{ secrets.POINTS_RANGE }} >> .env
+            echo SERVICEMAN_RANGE=${{ secrets.SERVICEMAN_RANGE }} >> .env
+
             echo HOST_IP=${{ secrets.HOST }} >> .env
             echo DOMAIN_NAIM=${{ secrets.DOMAIN_NAIM }} >> .env
 

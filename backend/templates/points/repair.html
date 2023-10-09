@@ -73,6 +73,11 @@
             border: 1px solid silver;
             padding: 2px 10px;
         }
+
+        .cb {
+            text-align: left;
+        }
+
     </style>
 </head>
 <body>
@@ -93,6 +98,18 @@
                 <option value="Категория 3">Категория 3</option>
             </select>
             <div style="color: red;" id="error_category"></div>
+        </div>
+        <div class="ib bor cb"  id="div_replace">
+            <div class="cb">
+                <input type="checkbox" id="replace_machine" value="Замена кофемашины" >
+                <label for="replace_machine">Замена кофемашины</label>
+              </div>
+            
+              <div class="cb">
+                <input type="checkbox" id="replace_cabinet" value="Замена тумбы">
+                <label for="replace_cabinet">Замена тумбы</label>
+              </div>
+
         </div>
         <div id="div_description">
             <p>Описание работ</p>
@@ -143,11 +160,21 @@
                 document.getElementById("error_description").innerText = "Не внесего описание";
                 return;
             }
+            var repair = "";
+
+            if (document.getElementById("replace_machine").checked) {
+                repair += document.getElementById("replace_machine").value + ", ";
+            };
+
+            if (document.getElementById("replace_cabinet").checked) {
+                repair += document.getElementById("replace_cabinet").value;
+            };
 
             let data = {
                 type: "repair",
                 point: point.value,
                 category: category.value,
+                repair: repair,
                 description: description.value,
             };
 
