@@ -1,10 +1,10 @@
+import httplib2
 import json
+import requests
 import os
 from datetime import datetime, timezone
-
 from http import HTTPStatus
-import httplib2
-import requests
+
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.web_app_info import WebAppInfo
 from dotenv import load_dotenv

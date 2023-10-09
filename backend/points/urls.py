@@ -13,5 +13,5 @@ urlpatterns = [
         'repair/',
         SomeTemplateView.as_view(template_name='points/repair.html')
     ),
-    
+
 ]
