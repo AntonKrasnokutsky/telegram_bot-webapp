@@ -163,8 +163,12 @@
             var repair = "";
 
             if (document.getElementById("replace_machine").checked) {
-                repair += document.getElementById("replace_machine").value + ", ";
+                repair += document.getElementById("replace_machine").value;
             };
+
+            if (document.getElementById("replace_machine").checked && document.getElementById("replace_cabinet").checked) {
+                repair += ", "
+            }
 
             if (document.getElementById("replace_cabinet").checked) {
                 repair += document.getElementById("replace_cabinet").value;
