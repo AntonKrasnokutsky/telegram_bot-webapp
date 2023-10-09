@@ -23,6 +23,8 @@ CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 SHEET_SERVICE = os.getenv('SHEET_SERVICE')
 SHEET_SETTING = os.getenv('SHEET_SETTING')
+POINTS_RANGE = os.getenv('POINTS_RANGE')
+SERVICEMAN_RANGE = os.getenv('SERVICEMAN_RANGE')
 
 
 def get_service_sacc():
@@ -37,10 +39,9 @@ def get_service_sacc():
 
 
 def get_list_points():
-    ranges = ['Настройки!A2:A3000']
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
-        ranges=ranges,
+        ranges=POINTS_RANGE,
         majorDimension='COLUMNS',
         valueRenderOption='FORMATTED_VALUE',
         dateTimeRenderOption='FORMATTED_STRING'
@@ -53,13 +54,29 @@ def get_list_points():
     return sheet_values
 
 
+def get_user_list():
+    results = get_service_sacc().spreadsheets().values().batchGet(
+        spreadsheetId=SPREADSHEET_ID,
+        ranges=SERVICEMAN_RANGE,
+        majorDimension='ROWS',
+        valueRenderOption='FORMATTED_VALUE',
+        dateTimeRenderOption='FORMATTED_STRING'
+    ).execute()
+    sheet_values = results['valueRanges'][0]['values']
+    try:
+        sheet_values.remove('')
+    except ValueError:
+        pass
+    return sheet_values
+
+
 def append_in_table(data: dict):
     body = {
         'values':
         [[
             data['date'],
-            data['user'],
-            'ФИО',
+            data['email'],
+            data['fio'],
             data['point'],
             f'₽\xa0{data["collection"]}',
             data['coffee'],
@@ -108,10 +125,23 @@ async def start(message: types.Message):
         )
 
 
+@dp.message_handler(commands=['users'])
+async def users(message: types.Message):
+    get_user_list()
+    await message.answer(
+        'Список точек не передан, нажмите "/start" ещё раз'
+    )
+
+
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     data = json.loads(message.web_app_data.data)
-    data['user'] = message.from_user.username
+    users = get_user_list()
+    for user in users:
+        if message.from_user.username == user[2]:
+            data['email'] = user[0]
+            data['fio'] = user[1]
+            break
     date_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)

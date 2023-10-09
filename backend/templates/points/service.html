@@ -91,7 +91,7 @@
     <form id="form_service">
         <div id="div_points">
             <p>Точка обслуживания:</p>
-            <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required />
+            <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
             <datalist id="points">
             </datalist>
         </div>
@@ -167,7 +167,8 @@
 
         <div id="div_collection">
             <p>Сумма инкассации</p>
-            <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required>
+            <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
+            <div style="color: red;" id="error_collection"></div>
         </div>
 
         <button id="end_service">Завершить</button>
@@ -187,6 +188,8 @@
         let stirrer = document.getElementById("stirrer")
 
         tg.expand();
+        tg.MainButton.text = "Service";
+        tg.MainButton.show();
 
         function onstart() {
             var options = '';
@@ -223,7 +226,6 @@
         };
 
         end_service.addEventListener("click", () => {
-
             let data = {
                 point: document.getElementById("point").value,
                 coffee: document.getElementById("coffee").value,
