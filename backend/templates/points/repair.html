@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ремонт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--tg-theme-text-color);
+            background: var(--tg-theme-bg-color);
+        }
+
+        #main {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            border: 0;
+            border-radius: 5px;
+            height: 60px;
+            width: 150px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--tg-theme-button-color);
+            background: var(--tg-theme-button-text-color);
+         }
+
+        button:hover {
+            background: var(--tg-theme-secondary-bg-color);
+        }
+
+        input {
+            display: inline-block;
+            width: 55px;
+            /* height: 50px; */
+            /* outline: none; */
+            margin: 10px 5px;
+            padding: 15px 5px;
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid silver;
+            border-radius: 5px;
+        }
+        
+        .input_long {
+            width: 90%;
+        }
+
+        .btn {
+            border: 2px solid;
+            height: 30px;
+            width: 30px;
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 30px; 
+            color: var(--tg-theme-button-color);
+            background: var(--tg-theme-button-text-color);
+        }
+
+        .ib {
+            display: inline-block;
+        }
+
+        .bor {
+            border: 1px solid silver;
+            padding: 2px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div id="div_points">
+            <p>Точка обслуживания:</p>
+            <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
+            <datalist id="points">
+            </datalist>
+            <div style="color: red;" id="error_point"></div>
+        </div>
+        <div id="div_category">
+            <p>Катеогрия ремонта</p>
+            <select class="input input_long" id="category">
+                <option disabled selected>Выбрите категорию</option>
+                <option value="Категория 1">Категория 1</option>
+                <option value="Категория 2">Категория 2</option>
+                <option value="Категория 3">Категория 3</option>
+            </select>
+            <div style="color: red;" id="error_category"></div>
+        </div>
+        <div id="div_description">
+            <p>Описание работ</p>
+            <textarea class="input input_long" id="description"  rows="5"></textarea>
+            <div style="color: red;" id="error_description"></div>
+        </div>
+
+    </div>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let point = document.getElementById("point")
+        let category = document.getElementById("category")
+        let description = document.getElementById("description")
+
+        tg.expand();
+        tg.MainButton.text = "Завершить ремонт";
+        tg.MainButton.show();
+
+        function onstart() {
+            var options = '';
+            {% for item in data %}
+                options += '<option value="' + "{{ item.value }}" + '" />';
+            {% endfor %};
+            document.getElementById('points').innerHTML = options;
+        };
+
+        onstart();
+
+        Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            document.getElementById("error_point").innerText = "";
+            document.getElementById("error_category").innerText = "";
+            document.getElementById("error_description").innerText = "";
+
+            if (point.value == "") {
+                document.getElementById("error_point").innerText = "Не выбрана точка";
+                return;
+            }
+
+            if (category.value == "") {
+                document.getElementById("error_category").innerText = "Не выбрана категория";
+                return;
+            }
+
+            if (description.value == "") {
+                document.getElementById("error_description").innerText = "Не внесего описание";
+                return;
+            }
+
+            let data = {
+                type: "repair",
+                point: point.value,
+                category: category.value,
+                description: description.value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+    </script>
+</body>
+</html>

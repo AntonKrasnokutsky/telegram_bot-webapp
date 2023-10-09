@@ -14,7 +14,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-URL = os.getenv('URL')
+URL_SERVICE = os.getenv('URL_SERVICE')
+URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API = os.getenv('URL_API')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
@@ -22,7 +23,7 @@ dp = Dispatcher(bot)
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 SHEET_SERVICE = os.getenv('SHEET_SERVICE')
-SHEET_SETTING = os.getenv('SHEET_SETTING')
+SHEET_REPEAR = os.getenv('SHEET_REPEAR')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICEMAN_RANGE = os.getenv('SERVICEMAN_RANGE')
 
@@ -70,7 +71,7 @@ def get_user_list():
     return sheet_values
 
 
-def append_in_table(data: dict):
+def append_service_in_table(data: dict):
     body = {
         'values':
         [[
@@ -98,7 +99,32 @@ def append_in_table(data: dict):
         ]]}
     get_service_sacc().spreadsheets().values().append(
         spreadsheetId=SPREADSHEET_ID,
-        range='Лист1',
+        range=SHEET_SERVICE,
+        valueInputOption="USER_ENTERED",
+        body=body
+    ).execute()
+
+
+def append_repair_in_table(data: dict):
+    body = {
+        'values':
+        [[
+            '',
+            data['date'],
+            data['email'],
+            data['fio'],
+            data['point'],
+            data['category'],
+            '',
+            '',
+            '',
+            '',
+            '',
+            data['description'],
+        ]]}
+    get_service_sacc().spreadsheets().values().append(
+        spreadsheetId=SPREADSHEET_ID,
+        range=SHEET_REPEAR,
         valueInputOption="USER_ENTERED",
         body=body
     ).execute()
@@ -106,31 +132,66 @@ def append_in_table(data: dict):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
+    await message.answer('Обновление списка точек, подождите.')
     points = {
         'names': get_list_points()
     }
     response = requests.post(URL_API, json=json.dumps(points))
     if response.status_code == HTTPStatus.CREATED:
 
-        markup = types.ReplyKeyboardMarkup()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.add(
             types.KeyboardButton(
                 'Обслуживание',
-                web_app=WebAppInfo(url=URL, points=points)
+                web_app=WebAppInfo(url=URL_SERVICE)
             ))
-        await message.answer('Приветствие', reply_markup=markup)
+        markup.add(
+            types.KeyboardButton(
+                'Ремонт',
+                web_app=WebAppInfo(url=URL_REPAIR)
+            ))
+        await message.answer('Бот готов к работе.', reply_markup=markup)
     else:
         await message.answer(
             'Список точек не передан, нажмите "/start" ещё раз'
         )
 
 
-@dp.message_handler(commands=['users'])
-async def users(message: types.Message):
-    get_user_list()
-    await message.answer(
-        'Список точек не передан, нажмите "/start" ещё раз'
-    )
+@dp.message_handler(commands=['update_points'])
+async def update_points(message: types.Message):
+    await message.answer('Обновление списка точек, подождите.')
+    points = {
+        'names': get_list_points()
+    }
+    response = requests.post(URL_API, json=json.dumps(points))
+    if response.status_code == HTTPStatus.CREATED:
+        await message.answer('Список точек обновлён')
+    else:
+        await message.answer(
+            'Список точек не обновлён, нажмите "/update_points" ещё раз'
+        )
+
+
+@dp.message_handler(commands=['service'])
+async def service(message: types.Message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(
+        types.KeyboardButton(
+            'Обслуживание',
+            web_app=WebAppInfo(url=URL_SERVICE)
+        ))
+    await message.answer('Обслуживание', reply_markup=markup)
+
+
+@dp.message_handler(commands=['repair'])
+async def repair(message: types.Message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(
+        types.KeyboardButton(
+            'Ремонт',
+            web_app=WebAppInfo(url=URL_REPAIR)
+        ))
+    await message.answer('Ремонт', reply_markup=markup)
 
 
 @dp.message_handler(content_types=['web_app_data'])
@@ -146,7 +207,10 @@ async def web_app(message: types.Message):
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
-    append_in_table(data)
+    if data['type'] == 'service':
+        append_service_in_table(data)
+    elif data['type'] == 'repair':
+        append_repair_in_table(data)
     await message.answer(data)
 
 

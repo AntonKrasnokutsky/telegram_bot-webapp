@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffi</title>
+    <title>Обслуживание</title>
     <style>
         * {
             margin: 0;
@@ -35,11 +36,6 @@
 
         button:hover {
             background: var(--tg-theme-secondary-bg-color);
-        }
-
-        #form_service {
-            display: block;
-            text-align: center;
         }
 
         input {
@@ -85,10 +81,10 @@
             padding: 2px 10px;
         }
     </style>
+
 </head>
 <body>
     <div id="main">
-    <form id="form_service">
         <div id="div_points">
             <p>Точка обслуживания:</p>
             <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
@@ -196,7 +192,7 @@
         let stirrer = document.getElementById("stirrer")
 
         tg.expand();
-        tg.MainButton.text = "Service";
+        tg.MainButton.text = "Завершить обслуживание";
         tg.MainButton.show();
 
         function onstart() {
@@ -302,6 +298,7 @@
             }
 
             let data = {
+                type: "service",
                 point: point.value,
                 coffee: coffee.value,
                 cream: cream.value,
