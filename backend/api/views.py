@@ -1,7 +1,9 @@
 import json
 from http import HTTPStatus
+import base64
 
-from django.http import JsonResponse
+from django.core.files.base import ContentFile
+from django.http import JsonResponse, HttpResponse
 from points.models import Points
 from rest_framework import viewsets
 
@@ -46,6 +48,7 @@ class PointsViewSet(viewsets.ModelViewSet):
     serializer_class = PointsSerializer
 
     def create(self, *args, **kwargs):
+        print("Go")
         Points.objects.all().delete()
         try:
             names = json.loads(self.request.data)
@@ -59,10 +62,22 @@ class PointsViewSet(viewsets.ModelViewSet):
             result['names'].append(point.name)
         return JsonResponse(result, status=HTTPStatus.CREATED)
 
-    # def list(self, *args, **kwargs):
-    #     points = Points.objects.all()
-    #     # result = PointsSerializer(points, many=True).data
-    #     for point in points:
-    #         result['names'].append(point.name)
-    #     print(result)
-    #     return JsonResponse(result, status=HTTPStatus.OK)
+
+def post_image(request):
+    if request.method == 'POST':
+        loads = json.loads(request.body)
+        name = loads['name']
+        data = loads['photo']
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, image_string = data.split(';base64,')
+            ext = format.split('/')[-1]
+            image = base64.b64decode(image_string)
+            data = ContentFile(
+                image,
+                name=f'{name}.{ext}'
+            )
+            print(name)
+            
+        # print(json.loads(request.body)['name'])
+
+    return HttpResponse('hello')

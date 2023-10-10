@@ -116,6 +116,7 @@
             <textarea class="input input_long" id="description"  rows="5"></textarea>
             <div style="color: red;" id="error_description"></div>
         </div>
+        <input type="file" id="photo" />
 
     </div>
     
@@ -185,6 +186,44 @@
             tg.sendData(JSON.stringify(data));
             tg.close();
         });
+
+        async function request(url, data, csrftoken) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(data),
+            });
+            const result = await response.text();
+            return result;
+        };
+
+        async function post_image(photo, name) {
+            const url = '{% url "api:post_image" %}';
+            // const data = {'name': document.getElementById('name').value, };
+            const data = {
+                "photo": photo,
+                "name": name,
+            };
+            console.log(name)
+            const csrftoken = '{{ csrf_token }}';
+            const result = await request(url, data, csrftoken);
+            console.log(result);
+        };
+
+        function encodeImageFileAsURL() {
+            var photo = document.getElementById("photo");
+
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                post_image(reader.result, photo.files[0]["name"])
+                return reader.result
+            };
+            reader.readAsDataURL(photo.files[0]);
+        };
+        
     </script>
 </body>
 </html>
