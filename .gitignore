@@ -1,4 +1,5 @@
 static/
+photo/
 *.json
 *.ods
 .vscode

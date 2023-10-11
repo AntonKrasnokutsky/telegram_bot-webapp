@@ -7,6 +7,6 @@ app_name = 'api'
 
 urlpatterns = [
     path('points/', PointsViewSet.as_view({'post': 'create'})),
-    path('image/', post_image, name='post_image'),
-    path('image/<str:name>', get_photo)
+    path('photo/', post_image, name='post_image'),
+    path('photo/<str:name>', get_photo)
 ]

@@ -100,8 +100,8 @@ def get_photo(request, name):
         if os.path.exists(complete_name) and os.path.isfile(complete_name):
             with open(complete_name, 'rb') as file:
                 data = file.read()
-            image = base64.b64encode(data)
-            return HttpResponse(image)
+            # image = base64.b64encode(data)
+            return HttpResponse(data)
         return HttpResponse('Ошибка файла')
     return HttpResponse(
         'Неподдерживаемый тип запроса',

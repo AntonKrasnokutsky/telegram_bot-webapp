@@ -1,9 +1,12 @@
+# import base64
 import httplib2
 import json
 import requests
 import os
 from datetime import datetime, timezone
 from http import HTTPStatus
+# from io import BytesIO
+from pathlib import Path
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.web_app_info import WebAppInfo
@@ -13,10 +16,13 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 load_dotenv()
 
+BASE_DIR = Path(__file__).resolve().parent
+
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 URL_SERVICE = os.getenv('URL_SERVICE')
 URL_REPAIR = os.getenv('URL_REPAIR')
-URL_API = os.getenv('URL_API')
+URL_API_POINTS = os.getenv('URL_API_POINTS')
+URL_API_PHOTO = os.getenv('URL_API_PHOTO')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -135,7 +141,7 @@ async def start(message: types.Message):
     points = {
         'names': get_list_points()
     }
-    response = requests.post(URL_API, json=json.dumps(points))
+    response = requests.post(URL_API_POINTS, json=json.dumps(points))
     if response.status_code == HTTPStatus.CREATED:
 
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -162,7 +168,7 @@ async def update_points(message: types.Message):
     points = {
         'names': get_list_points()
     }
-    response = requests.post(URL_API, json=json.dumps(points))
+    response = requests.post(URL_API_POINTS, json=json.dumps(points))
     if response.status_code == HTTPStatus.CREATED:
         await message.answer('Список точек обновлён')
     else:
@@ -211,6 +217,30 @@ async def web_app(message: types.Message):
     elif data['type'] == 'repair':
         append_repair_in_table(data)
     await message.answer(data)
+    if len(data['photo']):
+        photos = []
+        for name in data['photo']:
+            result = requests.get(URL_API_PHOTO + name)
+            if result.text not in [
+                'Ошибка файла',
+                'Неподдерживаемый тип запроса'
+            ]:
+                photos.append(
+                    os.path.join(BASE_DIR, 'photo', name)
+                )
+                with open(photos[-1], 'wb') as photo:
+                    photo.write(result.text)
+                await bot.send_photo(chat_id=message.chat.id, photo=photos[-1])
+
+            else:
+                await message.answer('Проблема с фото')
+            # with open(f'photo/{name}', 'wb') as photo:
+            #     photo.write(requests.get(URL_API_PHOTO + name).content)
+
+            # photos.append(
+            #    BytesIO(requests.get(URL_API_PHOTO + name).content)
+            # )
+            # await bot.send_photo(chat_id=message.chat.id, photo=photos[-1])
 
 
 if __name__ == "__main__":
