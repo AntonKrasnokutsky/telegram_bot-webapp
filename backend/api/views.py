@@ -82,7 +82,7 @@ def post_image(request):
             complete_name = os.path.join(
                 BASE_DIR,
                 'photo',
-                f'phInternal Server Erroroto{curent_file}.{ext}'
+                f'photo{curent_file}.{ext}'
             )
             with open(complete_name, 'wb') as file:
                 file.write(image)

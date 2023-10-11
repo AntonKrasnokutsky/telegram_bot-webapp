@@ -218,22 +218,22 @@ async def web_app(message: types.Message):
     elif data['type'] == 'repair':
         append_repair_in_table(data)
     await message.answer(data)
-    if len(data['photo']):
-        # photos = []
-        for name in data['photo']:
-            result = requests.get(URL_API_PHOTO + name, stream=True)
-            if (result.text not in [
-                    'Ошибка файла',
-                    'Неподдерживаемый тип запроса']
-                    and result.status_code == HTTPStatus.OK):
-                file = os.path.join(BASE_DIR, 'photo', name)
-                with open(file, 'wb') as photo:
-                    print('File')
-                    result.raw.decode_content = True
-                    shutil.copyfileobj(result.raw, photo)
+    # if len(data['photo']):
+    #     # photos = []
+    #     for name in data['photo']:
+    #         result = requests.get(URL_API_PHOTO + name, stream=True)
+    #         if (result.text not in [
+    #                 'Ошибка файла',
+    #                 'Неподдерживаемый тип запроса']
+    #                 and result.status_code == HTTPStatus.OK):
+    #             file = os.path.join(BASE_DIR, 'photo', name)
+    #             with open(file, 'wb') as photo:
+    #                 print('File')
+    #                 result.raw.decode_content = True
+    #                 shutil.copyfileobj(result.raw, photo)
 
-            else:
-                await message.answer('Проблема с фото')
+    #         else:
+    #             await message.answer('Проблема с фото')
 
 
 if __name__ == "__main__":
