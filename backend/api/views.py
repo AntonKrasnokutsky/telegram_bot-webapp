@@ -96,7 +96,7 @@ def post_image(request):
 
 def get_photo(request, name):
     if request.method == 'GET':
-        complete_name = os.path.join(BASE_DIR, 'photo', 'photo3.jpeg')
+        complete_name = os.path.join(BASE_DIR, 'photo', name)
         if os.path.exists(complete_name) and os.path.isfile(complete_name):
             file = open(complete_name, 'rb')
             response = FileResponse(file)

@@ -222,16 +222,15 @@ async def web_app(message: types.Message):
         # photos = []
         for name in data['photo']:
             result = requests.get(URL_API_PHOTO + name)
-            print(result.text)
+            # print(result.text)
             if (result.text not in [
                     'Ошибка файла',
                     'Неподдерживаемый тип запроса']
                     and result.status_code == HTTPStatus.OK):
-                if result.status_code == HTTPStatus.OK:
-                    file = os.path.join(BASE_DIR, 'photo', name)
-                    with open(file, 'wb') as photo:
-                        result.raw.decode_content = True
-                        shutil.copyfileobj(result.raw, photo)
+                file = os.path.join(BASE_DIR, 'photo', name)
+                with open(file, 'wb') as photo:
+                    result.raw.decode_content = True
+                    shutil.copyfileobj(result.raw, photo)
 
                 # photos.append(
                 #     os.path.join(BASE_DIR, 'photo', name)
