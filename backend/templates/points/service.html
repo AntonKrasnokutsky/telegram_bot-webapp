@@ -199,6 +199,7 @@
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
         let straws = document.getElementById("straws")
+        let list_photo = []
 
         tg.expand();
         tg.MainButton.text = "Завершить обслуживание";
@@ -325,11 +326,46 @@
                 stirrer: stirrer.value,
                 collection: collection.value,
                 straws: straws,
+                photo: list_photo
             };
 
             tg.sendData(JSON.stringify(data));
             tg.close();
         });
+
+        async function request(url, data, csrftoken) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(data),
+            });
+            const result = await response.text();
+            return result;
+        };
+
+        async function post_image(photo, name) {
+            const url = '{% url "api:post_image" %}';
+            const data = {
+                "photo": photo,
+            };
+            const csrftoken = '{{ csrf_token }}';
+            const result = await request(url, data, csrftoken);
+            list_photo.push(result)
+        };
+
+        function encodeImageFileAsURL() {
+            var photo = document.getElementById("photo");
+
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                post_image(reader.result)
+                return reader.result
+            };
+            reader.readAsDataURL(photo.files[0]);
+        };
     </script>
 </body>
 </html>

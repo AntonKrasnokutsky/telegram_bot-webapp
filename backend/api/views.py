@@ -1,13 +1,17 @@
 import json
 from http import HTTPStatus
 import base64
+import os
 
-from django.core.files.base import ContentFile
 from django.http import JsonResponse, HttpResponse
 from points.models import Points
 from rest_framework import viewsets
 
 from .serializes import PointsSerializer
+from coffee_bot_beckend.settings import BASE_DIR
+
+PHOTO_LIMIT = 3
+PATH_FILE_LIMIT = os.path.join(BASE_DIR, 'photo', 'limit')
 
 
 def points_api(request, *args, **kwargs):
@@ -48,7 +52,6 @@ class PointsViewSet(viewsets.ModelViewSet):
     serializer_class = PointsSerializer
 
     def create(self, *args, **kwargs):
-        print("Go")
         Points.objects.all().delete()
         try:
             names = json.loads(self.request.data)
@@ -66,18 +69,40 @@ class PointsViewSet(viewsets.ModelViewSet):
 def post_image(request):
     if request.method == 'POST':
         loads = json.loads(request.body)
-        name = loads['name']
         data = loads['photo']
         if isinstance(data, str) and data.startswith('data:image'):
+            with open(PATH_FILE_LIMIT, 'r') as file:
+                curent_file = int(file.read())
+            curent_file += 1
+            if curent_file > PHOTO_LIMIT:
+                curent_file = 1
             format, image_string = data.split(';base64,')
             ext = format.split('/')[-1]
             image = base64.b64decode(image_string)
-            data = ContentFile(
-                image,
-                name=f'{name}.{ext}'
+            complete_name = os.path.join(
+                BASE_DIR,
+                'photo',
+                f'photo{curent_file}.{ext}'
             )
-            print(name)
-            
-        # print(json.loads(request.body)['name'])
+            with open(complete_name, 'wb') as file:
+                file.write(image)
+            with open(PATH_FILE_LIMIT, 'w') as file:
+                file.write(str(curent_file))
+            return HttpResponse(f'photo{curent_file}.{ext}')
+    return HttpResponse(
+        'Неподдерживаемый тип запроса',
+    )
 
-    return HttpResponse('hello')
+
+def get_photo(request, name):
+    if request.method == 'GET':
+        complete_name = os.path.join(BASE_DIR, 'photo', name)
+        if os.path.exists(complete_name) and os.path.isfile(complete_name):
+            with open(complete_name, 'rb') as file:
+                data = file.read()
+            image = base64.b64encode(data)
+            return HttpResponse(image)
+        return HttpResponse('Ошибка файла')
+    return HttpResponse(
+        'Неподдерживаемый тип запроса',
+    )

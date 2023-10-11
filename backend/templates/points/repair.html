@@ -116,7 +116,7 @@
             <textarea class="input input_long" id="description"  rows="5"></textarea>
             <div style="color: red;" id="error_description"></div>
         </div>
-        <input type="file" id="photo" />
+        <input type="file" id="photo" onchange="encodeImageFileAsURL()"/>
 
     </div>
     
@@ -127,6 +127,7 @@
         let point = document.getElementById("point")
         let category = document.getElementById("category")
         let description = document.getElementById("description")
+        let list_photo = []
 
         tg.expand();
         tg.MainButton.text = "Завершить ремонт";
@@ -181,6 +182,7 @@
                 category: category.value,
                 repair: repair,
                 description: description.value,
+                photo: list_photo,
             };
 
             tg.sendData(JSON.stringify(data));
@@ -202,15 +204,12 @@
 
         async function post_image(photo, name) {
             const url = '{% url "api:post_image" %}';
-            // const data = {'name': document.getElementById('name').value, };
             const data = {
                 "photo": photo,
-                "name": name,
             };
-            console.log(name)
             const csrftoken = '{{ csrf_token }}';
             const result = await request(url, data, csrftoken);
-            console.log(result);
+            list_photo.push(result)
         };
 
         function encodeImageFileAsURL() {
@@ -218,7 +217,7 @@
 
             var reader = new FileReader();
             reader.onloadend = function() {
-                post_image(reader.result, photo.files[0]["name"])
+                post_image(reader.result)
                 return reader.result
             };
             reader.readAsDataURL(photo.files[0]);
