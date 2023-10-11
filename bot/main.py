@@ -217,8 +217,27 @@ async def web_app(message: types.Message):
         append_service_in_table(data)
     elif data['type'] == 'repair':
         append_repair_in_table(data)
+    # print('Send photo')
+    # fpath = os.path.join(BASE_DIR, 'photo', 'photo1.jpeg')
+    # print(fpath)
+    # file = types.InputFile(fpath)
+    # # file = open(fpath, 'rb')
+    # # await message.answer_photo(file)
+    # print(message.chat.id)
+    # await bot.send_photo(chat_id=message.chat.id, photo=file)
+    # print('Send data')
     await message.answer(data)
-    # if len(data['photo']):
+
+    if len(data['photo']):
+        for name in data['photo']:
+            fpath = os.path.join(BASE_DIR, 'photo', name)
+            print(fpath)
+            file = types.InputFile(fpath)
+            # file = os.path.join(BASE_DIR, 'photo', name)
+            await bot.send_photo(
+                message.chat.id,
+                photo=file, caption=data['point']
+            )
     #     # photos = []
     #     for name in data['photo']:
     #         result = requests.get(URL_API_PHOTO + name, stream=True)
