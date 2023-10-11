@@ -221,44 +221,22 @@ async def web_app(message: types.Message):
     if len(data['photo']):
         # photos = []
         for name in data['photo']:
-            result = requests.get(URL_API_PHOTO + name)
-            # print(result.text)
+            result = requests.get(URL_API_PHOTO + name, stream=True)
             if (result.text not in [
                     'Ошибка файла',
                     'Неподдерживаемый тип запроса']
                     and result.status_code == HTTPStatus.OK):
                 file = os.path.join(BASE_DIR, 'photo', name)
                 with open(file, 'wb') as photo:
+                    print('File')
                     result.raw.decode_content = True
                     shutil.copyfileobj(result.raw, photo)
 
-                # photos.append(
-                #     os.path.join(BASE_DIR, 'photo', name)
-                # )
-                # with open(photos[-1], 'wb') as photo:
-                #     photo.write(result.text)
-                await bot.send_photo(chat_id=message.chat.id, photo=photo)
-
             else:
                 await message.answer('Проблема с фото')
-            # with open(f'photo/{name}', 'wb') as photo:
-            #     photo.write(requests.get(URL_API_PHOTO + name).content)
-
-            # photos.append(
-            #    BytesIO(requests.get(URL_API_PHOTO + name).content)
-            # )
-            # await bot.send_photo(chat_id=message.chat.id, photo=photos[-1])
 
 
 if __name__ == "__main__":
     # logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-
-    result = requests.get(URL_API_PHOTO + 'photo3.jpeg', stream=True)
-    # print(result.text)
-    if result.status_code == HTTPStatus.OK:
-        file = os.path.join(BASE_DIR, 'photo', 'photo3.jpeg')
-        with open(file, 'wb') as photo:
-            result.raw.decode_content = True
-            shutil.copyfileobj(result.raw, photo)
 
     executor.start_polling(dp)
