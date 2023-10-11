@@ -82,7 +82,7 @@ def post_image(request):
             complete_name = os.path.join(
                 BASE_DIR,
                 'photo',
-                f'photo{curent_file}.{ext}'
+                f'phInternal Server Erroroto{curent_file}.{ext}'
             )
             with open(complete_name, 'wb') as file:
                 file.write(image)
@@ -98,8 +98,8 @@ def get_photo(request, name):
     if request.method == 'GET':
         complete_name = os.path.join(BASE_DIR, 'photo', name)
         if os.path.exists(complete_name) and os.path.isfile(complete_name):
-            with open(complete_name, 'rb') as file:
-                return FileResponse(file)
+            file = open(complete_name, 'rb')
+            return FileResponse(file)
         return HttpResponse('Ошибка файла')
     return HttpResponse(
         'Неподдерживаемый тип запроса',
