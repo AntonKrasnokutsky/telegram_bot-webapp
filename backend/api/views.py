@@ -96,10 +96,11 @@ def post_image(request):
 
 def get_photo(request, name):
     if request.method == 'GET':
-        complete_name = os.path.join(BASE_DIR, 'photo', name)
+        complete_name = os.path.join(BASE_DIR, 'photo', 'photo3.jpeg')
         if os.path.exists(complete_name) and os.path.isfile(complete_name):
             file = open(complete_name, 'rb')
-            return FileResponse(file)
+            response = FileResponse(file)
+            return response
         return HttpResponse('Ошибка файла')
     return HttpResponse(
         'Неподдерживаемый тип запроса',

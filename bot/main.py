@@ -254,13 +254,12 @@ async def web_app(message: types.Message):
 if __name__ == "__main__":
     # logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-    result = requests.get(URL_API_PHOTO + 'photo1.jpeg')
-    print(result.text)
+    result = requests.get(URL_API_PHOTO + 'photo3.jpeg', stream=True)
+    # print(result.text)
     if result.status_code == HTTPStatus.OK:
-        if result.status_code == HTTPStatus.OK:
-            file = os.path.join(BASE_DIR, 'photo', 'photo1.jpeg')
-            with open(file, 'wb') as photo:
-                result.raw.decode_content = True
-                shutil.copyfileobj(result.raw, photo)
+        file = os.path.join(BASE_DIR, 'photo', 'photo3.jpeg')
+        with open(file, 'wb') as photo:
+            result.raw.decode_content = True
+            shutil.copyfileobj(result.raw, photo)
 
     executor.start_polling(dp)
