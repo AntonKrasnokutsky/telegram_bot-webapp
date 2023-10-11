@@ -1,4 +1,5 @@
 # import base64
+import shutil
 import httplib2
 import json
 import requests
@@ -218,19 +219,25 @@ async def web_app(message: types.Message):
         append_repair_in_table(data)
     await message.answer(data)
     if len(data['photo']):
-        photos = []
+        # photos = []
         for name in data['photo']:
             result = requests.get(URL_API_PHOTO + name)
-            if result.text not in [
-                'Ошибка файла',
-                'Неподдерживаемый тип запроса'
-            ]:
-                photos.append(
-                    os.path.join(BASE_DIR, 'photo', name)
-                )
-                with open(photos[-1], 'wb') as photo:
-                    photo.write(result.text)
-                await bot.send_photo(chat_id=message.chat.id, photo=photos[-1])
+            if (result.text not in [
+                    'Ошибка файла',
+                    'Неподдерживаемый тип запроса']
+                    and result.status_code == HTTPStatus.OK):
+                if result.status_code == HTTPStatus.OK:
+                    file = os.path.join(BASE_DIR, 'photo', name)
+                    with open(file, 'wb') as photo:
+                        result.raw.decode_content = True
+                        shutil.copyfileobj(result.raw, photo)
+
+                # photos.append(
+                #     os.path.join(BASE_DIR, 'photo', name)
+                # )
+                # with open(photos[-1], 'wb') as photo:
+                #     photo.write(result.text)
+                await bot.send_photo(chat_id=message.chat.id, photo=photo)
 
             else:
                 await message.answer('Проблема с фото')
@@ -245,4 +252,5 @@ async def web_app(message: types.Message):
 
 if __name__ == "__main__":
     # logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
     executor.start_polling(dp)

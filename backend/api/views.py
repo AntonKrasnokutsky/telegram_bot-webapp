@@ -3,7 +3,7 @@ from http import HTTPStatus
 import base64
 import os
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from points.models import Points
 from rest_framework import viewsets
 
@@ -99,9 +99,7 @@ def get_photo(request, name):
         complete_name = os.path.join(BASE_DIR, 'photo', name)
         if os.path.exists(complete_name) and os.path.isfile(complete_name):
             with open(complete_name, 'rb') as file:
-                data = file.read()
-            # image = base64.b64encode(data)
-            return HttpResponse(data)
+                return FileResponse(file)
         return HttpResponse('Ошибка файла')
     return HttpResponse(
         'Неподдерживаемый тип запроса',
