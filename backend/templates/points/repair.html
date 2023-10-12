@@ -54,6 +54,11 @@
             width: 90%;
         }
 
+        .input_file {
+            width: 126px;
+            border: 0px;
+        }
+
         .btn {
             border: 2px solid;
             height: 30px;
@@ -89,34 +94,39 @@
             </datalist>
             <div style="color: red;" id="error_point"></div>
         </div>
-        <div id="div_category">
-            <p>Катеогрия ремонта</p>
-            <select class="input input_long" id="category">
-                <option disabled selected>Выбрите категорию</option>
-                <option value="Категория 1">Категория 1</option>
-                <option value="Категория 2">Категория 2</option>
-                <option value="Категория 3">Категория 3</option>
-            </select>
-            <div style="color: red;" id="error_category"></div>
+        <div class="ib">
+            <div style="padding-bottom: 10px;" id="div_category">
+                <p>Катеогрия ремонта</p>
+                <select class="input input_long" id="category">
+                    <option disabled selected></option>
+                    <option value="Категория 1">Категория 1</option>
+                    <option value="Категория 2">Категория 2</option>
+                    <option value="Категория 3">Категория 3</option>
+                </select>
+                <div style="color: red;" id="error_category"></div>
+            </div>
+            <div class="bor cb" id="div_replace">
+                <label for="div_replace">Замена:</label>
+                <div class="cb">
+                    <input type="checkbox" id="replace_machine" value="Замена кофемашины" >
+                    <label for="replace_machine">Замена кофемашины</label>
+                </div>
+                
+                <div class="cb">
+                    <input type="checkbox" id="replace_cabinet" value="Замена тумбы">
+                    <label for="replace_cabinet">Замена тумбы</label>
+                </div>
+            </div>
         </div>
-        <div class="ib bor cb"  id="div_replace">
-            <div class="cb">
-                <input type="checkbox" id="replace_machine" value="Замена кофемашины" >
-                <label for="replace_machine">Замена кофемашины</label>
-              </div>
-            
-              <div class="cb">
-                <input type="checkbox" id="replace_cabinet" value="Замена тумбы">
-                <label for="replace_cabinet">Замена тумбы</label>
-              </div>
-
-        </div>
-        <div id="div_description">
+        <div style="padding-top: 10px;" id="div_description">
             <p>Описание работ</p>
             <textarea class="input input_long" id="description"  rows="5"></textarea>
             <div style="color: red;" id="error_description"></div>
         </div>
-        <input type="file" id="photo" onchange="encodeImageFileAsURL()"/>
+        <div id="div_file">
+            <input class="input input_file" type="file" id="photo" onchange="encodeImageFileAsURL()"/>
+            <label>Количество загруженных фото: </label><label id="len_photo">0</label>
+        </div>
 
     </div>
     
@@ -210,6 +220,7 @@
             const csrftoken = '{{ csrf_token }}';
             const result = await request(url, data, csrftoken);
             list_photo.push(result)
+            document.getElementById("len_photo").innerText = list_photo.length
         };
 
         function encodeImageFileAsURL() {

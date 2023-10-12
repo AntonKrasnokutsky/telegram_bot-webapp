@@ -41,8 +41,6 @@
         input {
             display: inline-block;
             width: 55px;
-            /* height: 50px; */
-            /* outline: none; */
             margin: 10px 5px;
             padding: 15px 5px;
             font-size: 14px;
@@ -55,16 +53,15 @@
             width: 90%;
         }
 
+        .input_file {
+            width: 126px;
+            border: 0px;
+        }
+
         .btn {
-            /* margin: 10px 5px;
-            display: inline-block; */
             border: 2px solid;
             height: 30px;
             width: 30px;
-
-            /* border-radius: 5px;
-            height: 50px;
-            width: 50px;*/
             font-size: 17px;
             font-weight: 600;
             line-height: 30px; 
@@ -182,6 +179,11 @@
                 <p>Сумма инкассации</p>
                 <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
                 <div style="color: red;" id="error_collection"></div>
+            </div>
+
+            <div id="div_file">
+                <input class="input input_file" type="file" id="photo" onchange="encodeImageFileAsURL()"/>
+                <label>Количество загруженных фото: </label><label id="len_photo">0</label>
             </div>
         </div>
 
@@ -354,6 +356,7 @@
             const csrftoken = '{{ csrf_token }}';
             const result = await request(url, data, csrftoken);
             list_photo.push(result)
+            document.getElementById("len_photo").innerText = list_photo.length
         };
 
         function encodeImageFileAsURL() {
