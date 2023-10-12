@@ -1,5 +1,7 @@
 # import base64
 # import shutil
+import logging
+import sys
 import httplib2
 import json
 import requests
@@ -256,6 +258,6 @@ async def web_app(message: types.Message):
 
 
 if __name__ == "__main__":
-    # logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
     executor.start_polling(dp)

@@ -75,7 +75,8 @@ jobs:
             echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
             echo URL_SERVICE=${{ secrets.URL_SERVICE }} >> .env
             echo URL_REPAIR=${{ secrets.URL_REPAIR }} >> .env
-            echo URL_API=${{ secrets.URL_API }} >> .env
+            echo URL_API_PHOTO=${{ secrets.URL_API_POINTS }} >> .env
+            echo URL_API_PHOTO=${{ secrets.URL_API_PHOTO }} >> .env
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
