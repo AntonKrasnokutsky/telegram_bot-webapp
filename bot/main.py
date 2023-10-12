@@ -239,7 +239,8 @@ async def web_app(message: types.Message):
             # file = os.path.join(BASE_DIR, 'photo', name)
             await bot.send_photo(
                 CHAT_ID,
-                photo=file, caption=data['point']
+                photo=file,
+                caption={data['point']} + ' ' + {data['fio']},
             )
     #     # photos = []
     #     for name in data['photo']:
