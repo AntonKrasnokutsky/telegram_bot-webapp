@@ -184,6 +184,7 @@
             <div id="div_file">
                 <input class="input input_file" type="file" multiple id="photo" onchange="encodeImageFileAsURL()"/>
                 <label>Количество загруженных фото: </label><label id="len_photo">0</label>
+                <div id="load_file_process"></div>
             </div>
         </div>
 
@@ -357,12 +358,14 @@
             const result = await request(url, data, csrftoken);
             list_photo.push(result)
             document.getElementById("len_photo").innerText = list_photo.length
+            document.getElementById("load_file_process").innerText = ""
         };
 
         function encodeImageFileAsURL() {
             var photo = document.getElementById("photo");
 
             for ( i = 0; i < photo.files.length; i++){
+                document.getElementById("load_file_process").innerText = "Подождите. Файл загружается"
                 var reader = new FileReader();
                 reader.onloadend = function() {
                     post_image(reader.result)
