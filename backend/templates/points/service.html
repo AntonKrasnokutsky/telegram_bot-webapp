@@ -182,7 +182,7 @@
             </div>
 
             <div id="div_file">
-                <input class="input input_file" type="file" multiple id="photo" onchange="encodeImageFileAsURL()"/>
+                <input class="input input_file" type="file" multiple id="photo" onchange="encodeImageFileAsURL()" accept=".jpg, .jpeg"/>
                 <label>Количество загруженных фото: </label><label id="len_photo">0</label>
                 <div id="load_file_process"></div>
             </div>
@@ -356,9 +356,14 @@
             };
             const csrftoken = '{{ csrf_token }}';
             const result = await request(url, data, csrftoken);
-            list_photo.push(result)
-            document.getElementById("len_photo").innerText = list_photo.length
-            document.getElementById("load_file_process").innerText = ""
+            if (!result.includes(log_err)){
+                list_photo.push(result)
+                document.getElementById("len_photo").innerText = list_photo.length
+                document.getElementById("load_file_process").innerText = ""
+            }
+            else {
+                document.getElementById("load_file_process").innerText = "Файл не загружен"
+            }
         };
 
         function encodeImageFileAsURL() {
