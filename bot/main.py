@@ -26,6 +26,7 @@ URL_SERVICE = os.getenv('URL_SERVICE')
 URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
 URL_API_PHOTO = os.getenv('URL_API_PHOTO')
+CHAT_ID = os.getenv('CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -237,7 +238,7 @@ async def web_app(message: types.Message):
             file = types.InputFile(fpath)
             # file = os.path.join(BASE_DIR, 'photo', name)
             await bot.send_photo(
-                message.chat.id,
+                CHAT_ID,
                 photo=file, caption=data['point']
             )
     #     # photos = []

@@ -84,9 +84,9 @@ jobs:
             echo SHEET_REPEAR=${{ secrets.SHEET_REPEAR }} >> .env
             echo POINTS_RANGE=${{ secrets.POINTS_RANGE }} >> .env
             echo SERVICEMAN_RANGE=${{ secrets.SERVICEMAN_RANGE }} >> .env
-
             echo HOST_IP=${{ secrets.HOST }} >> .env
             echo DOMAIN_NAIM=${{ secrets.DOMAIN_NAIM }} >> .env
+            echo CHAT_ID=${{ secrets.CHAT_ID }} >> .env
 
             
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
