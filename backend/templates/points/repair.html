@@ -228,7 +228,7 @@
 
         function encodeImageFileAsURL() {
             var photo = document.getElementById("photo");
-            document.getElementById("len_photo").innerText = "Go"
+            document.getElementById("len_photo").innerText = photo.files.length
             console.log("Go")
             for ( i = 0; i < photo.files.length; i++){
                 document.getElementById("load_file_process").innerText = document.getElementById("load_file_process").innerText + photo.files[i].name + '\n'
