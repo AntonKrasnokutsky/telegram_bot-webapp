@@ -182,7 +182,7 @@
             </div>
 
             <div id="div_file">
-                <input class="input input_file" type="file" id="photo" onchange="encodeImageFileAsURL()"/>
+                <input class="input input_file" type="file" multiple id="photo" onchange="encodeImageFileAsURL()"/>
                 <label>Количество загруженных фото: </label><label id="len_photo">0</label>
             </div>
         </div>
@@ -361,13 +361,15 @@
 
         function encodeImageFileAsURL() {
             var photo = document.getElementById("photo");
-
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                post_image(reader.result)
-                return reader.result
-            };
-            reader.readAsDataURL(photo.files[0]);
+            console.log('Go')
+            for ( i = 0; i < photo.files.length; i++){
+                var reader = new FileReader();
+                reader.onloadend = function() {
+                    post_image(reader.result)
+                    return reader.result
+                };
+                reader.readAsDataURL(photo.files[i]);
+            }
         };
     </script>
 </body>
