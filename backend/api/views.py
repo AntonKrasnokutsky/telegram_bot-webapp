@@ -10,7 +10,7 @@ from rest_framework import viewsets
 from .serializes import PointsSerializer
 from coffee_bot_beckend.settings import BASE_DIR
 
-PHOTO_LIMIT = os.getenv("PHOTO_LIMIT")
+PHOTO_LIMIT = int(os.getenv("PHOTO_LIMIT"))
 PATH_FILE_LIMIT = os.path.join(BASE_DIR, 'photo', 'limit')
 
 
