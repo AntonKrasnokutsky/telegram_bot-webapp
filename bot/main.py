@@ -89,7 +89,7 @@ def append_service_in_table(data: dict):
             data['email'],
             data['fio'],
             data['point'],
-            f'₽\xa0{data["collection"]}',
+            f'₽\xa0 {data["collection"]}',
             data['coffee'],
             data['cream'],
             data['chocolate'],
@@ -101,8 +101,7 @@ def append_service_in_table(data: dict):
             data['stirrer'],
             data['straws'],
         ]]}
-    
-    print(body)
+
     get_service_sacc().spreadsheets().values().append(
         spreadsheetId=SPREADSHEET_ID,
         range=SHEET_SERVICE,
