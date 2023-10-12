@@ -204,8 +204,9 @@ async def web_app(message: types.Message):
     users = get_user_list()
     data['email'] = 'Нет данных'
     data['fio'] = 'Нет данных'
+
     for user in users:
-        if message.from_user.username == user[2]:
+        if int(message.from_user.id) == int(user[2]):
             data['email'] = user[0]
             data['fio'] = user[1]
             break
