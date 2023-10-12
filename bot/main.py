@@ -100,13 +100,9 @@ def append_service_in_table(data: dict):
             data['covers'],
             data['stirrer'],
             data['straws'],
-            '',
-            '',
-            '',
-            '',
-            '',
-            'photo'
         ]]}
+    
+    print(body)
     get_service_sacc().spreadsheets().values().append(
         spreadsheetId=SPREADSHEET_ID,
         range=SHEET_SERVICE,
