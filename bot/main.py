@@ -202,6 +202,8 @@ async def repair(message: types.Message):
 async def web_app(message: types.Message):
     data = json.loads(message.web_app_data.data)
     users = get_user_list()
+    data['email'] = ''
+    data['fio'] = ''
     for user in users:
         if message.from_user.username == user[2]:
             data['email'] = user[0]
