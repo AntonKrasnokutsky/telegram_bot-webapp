@@ -1,4 +1,4 @@
-static/
+backend/static/
 photo/
 *.json
 *.ods
