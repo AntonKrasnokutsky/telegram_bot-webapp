@@ -53,11 +53,6 @@
             width: 90%;
         }
 
-        .input_file {
-            width: 126px;
-            border: 0px;
-        }
-
         .btn {
             border: 2px solid;
             height: 30px;
@@ -180,12 +175,6 @@
                 <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
                 <div style="color: red;" id="error_collection"></div>
             </div>
-
-            <div id="div_file">
-                <input class="input input_file" type="file" multiple id="photo" onchange="encodeImageFileAsURL()" accept=".jpg, .jpeg"/>
-                <label>Количество загруженных фото: </label><label id="len_photo">0</label>
-                <div id="load_file_process"></div>
-            </div>
         </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -202,7 +191,6 @@
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
         let straws = document.getElementById("straws")
-        let list_photo = []
 
         tg.expand();
         tg.MainButton.text = "Завершить обслуживание";
@@ -329,55 +317,11 @@
                 stirrer: stirrer.value,
                 collection: collection.value,
                 straws: straws.value,
-                photo: list_photo
             };
 
             tg.sendData(JSON.stringify(data));
             tg.close();
         });
-
-        async function request(url, data, csrftoken) {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken,
-                },
-                body: JSON.stringify(data),
-            });
-            const result = await response.text();
-            return result;
-        };
-
-        async function post_image(photo, name) {
-            const url = '{% url "api:post_image" %}';
-            const data = {
-                "photo": photo,
-            };
-            const csrftoken = '{{ csrf_token }}';
-            const result = await request(url, data, csrftoken);
-            if (!result.includes(log_err)){
-                list_photo.push(result)
-                document.getElementById("len_photo").innerText = list_photo.length
-                document.getElementById("load_file_process").innerText = ""
-            }
-            else {
-                document.getElementById("load_file_process").innerText = "Файл не загружен"
-            }
-        };
-
-        function encodeImageFileAsURL() {
-            var photo = document.getElementById("photo");
-            for ( i = 0; i < photo.files.length; i++){
-                document.getElementById("load_file_process").innerText = "Подождите. Файл загружается"
-                var reader = new FileReader();
-                reader.onloadend = function() {
-                    post_image(reader.result)
-                    return reader.result
-                };
-                reader.readAsDataURL(photo.files[i]);
-            }
-        };
     </script>
 </body>
 </html>

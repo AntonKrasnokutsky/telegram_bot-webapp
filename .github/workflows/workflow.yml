@@ -76,7 +76,6 @@ jobs:
             echo URL_SERVICE=${{ secrets.URL_SERVICE }} >> .env
             echo URL_REPAIR=${{ secrets.URL_REPAIR }} >> .env
             echo URL_API_POINTS=${{ secrets.URL_API_POINTS }} >> .env
-            echo URL_API_PHOTO=${{ secrets.URL_API_PHOTO }} >> .env
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
@@ -87,7 +86,6 @@ jobs:
             echo HOST_IP=${{ secrets.HOST }} >> .env
             echo DOMAIN_NAIM=${{ secrets.DOMAIN_NAIM }} >> .env
             echo CHAT_ID=${{ secrets.CHAT_ID }} >> .env
-            echo PHOTO_LIMIT=${{ secrets.PHOTO_LIMIT }} >> .env
             
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
             sudo docker compose up -d

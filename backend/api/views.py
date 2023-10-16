@@ -1,107 +1,62 @@
-import json
-from http import HTTPStatus
-import base64
 import os
+from http import HTTPStatus
 
-from django.http import JsonResponse, HttpResponse, FileResponse
+import httplib2
+from coffee_bot_beckend.settings import PATH_TO_ENV
+from django.http import JsonResponse
+from googleapiclient.discovery import build
+from oauth2client.service_account import ServiceAccountCredentials
 from points.models import Points
 from rest_framework import viewsets
 
-from .serializes import PointsSerializer
-from coffee_bot_beckend.settings import BASE_DIR
-
-PHOTO_LIMIT = int(os.getenv("PHOTO_LIMIT", default=10))
-PATH_FILE_LIMIT = os.path.join(BASE_DIR, 'photo', 'limit')
+CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
+SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
+POINTS_RANGE = os.getenv('POINTS_RANGE')
 
 
-def points_api(request, *args, **kwargs):
-    methods = ['POST', 'GET', ]
-    if request.method not in methods:
-        return JsonResponse(
-            'Неподдерживаемый тип запроса',
-            HTTPStatus.BAD_REQUEST
-        )
+def get_service_sacc():
+    creds_json = os.path.join(PATH_TO_ENV, CREDENTIALS_FILE)
+    scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
-    if request.method == 'POST':
-        Points.objects.all().delete()
-        try:
-            names = json.loads(request.data)
-        except TypeError:
-            names = request.data
-        for name in names['names']:
-            Points.objects.create(name=name)
-        points = Points.objects.all()
-        result = {
-            'names': []
-        }
-        for point in points:
-            result['names'].append(point.name)
-        return JsonResponse(result, status=HTTPStatus.CREATED)
-    else:
-        points = Points.objects.all()
-        result = {
-            'names': []
-        }
-        for point in points:
-            result['names'].append(point.name)
-        return JsonResponse(result, status=HTTPStatus.OK)
+    creds_service = ServiceAccountCredentials.from_json_keyfile_name(
+        creds_json,
+        scopes
+    ).authorize(httplib2.Http())
+    return build('sheets', 'v4', http=creds_service)
+
+
+def get_list_points():
+    results = get_service_sacc().spreadsheets().values().batchGet(
+        spreadsheetId=SPREADSHEET_ID,
+        ranges=POINTS_RANGE,
+        majorDimension='COLUMNS',
+        valueRenderOption='FORMATTED_VALUE',
+        dateTimeRenderOption='FORMATTED_STRING'
+    ).execute()
+    sheet_values = results['valueRanges'][0]['values'][0]
+    try:
+        sheet_values.remove('')
+    except ValueError:
+        pass
+    return sheet_values
 
 
 class PointsViewSet(viewsets.ModelViewSet):
     queryset = Points.objects.all()
-    serializer_class = PointsSerializer
 
-    def create(self, *args, **kwargs):
-        Points.objects.all().delete()
+    def list(self, *args, **kwargs):
         try:
-            names = json.loads(self.request.data)
-        except TypeError:
-            names = self.request.data
-        for name in names['names']:
-            Points.objects.create(name=name)
-        points = Points.objects.all()
-        result = {'names': []}
-        for point in points:
-            result['names'].append(point.name)
-        return JsonResponse(result, status=HTTPStatus.CREATED)
-
-
-def post_image(request):
-    if request.method == 'POST':
-        loads = json.loads(request.body)
-        data = loads['photo']
-        if isinstance(data, str) and data.startswith('data:image'):
-            with open(PATH_FILE_LIMIT, 'r') as file:
-                curent_file = int(file.read())
-            curent_file += 1
-            if curent_file > PHOTO_LIMIT:
-                curent_file = 1
-            format, image_string = data.split(';base64,')
-            ext = format.split('/')[-1]
-            image = base64.b64decode(image_string)
-            complete_name = os.path.join(
-                BASE_DIR,
-                'photo',
-                f'photo{curent_file}.{ext}'
+            points = get_list_points()
+        except Exception:
+            return JsonResponse(
+                {'error': 'Список не обновлен'},
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-            with open(complete_name, 'wb') as file:
-                file.write(image)
-            with open(PATH_FILE_LIMIT, 'w') as file:
-                file.write(str(curent_file))
-            return HttpResponse(f'photo{curent_file}.{ext}')
-    return HttpResponse(
-        'Неподдерживаемый тип запроса',
-    )
 
-
-def get_photo(request, name):
-    if request.method == 'GET':
-        complete_name = os.path.join(BASE_DIR, 'photo', name)
-        if os.path.exists(complete_name) and os.path.isfile(complete_name):
-            file = open(complete_name, 'rb')
-            response = FileResponse(file)
-            return response
-        return HttpResponse('Ошибка файла')
-    return HttpResponse(
-        'Неподдерживаемый тип запроса',
-    )
+        Points.objects.all().delete()
+        for name in points:
+            Points.objects.create(name=name)
+        return JsonResponse(
+            {'message': 'Список точек обновлен'},
+            status=HTTPStatus.OK
+        )
