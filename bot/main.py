@@ -242,14 +242,10 @@ async def web_app(message: types.Message):
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
 async def forward_photo(message: types.Message):
-    await bot.send_message(
+    await bot.send_photo(
         chat_id=CHAT_ID,
-        text=current_point[message.from_user.id]
-    )
-    await bot.forward_message(
-        chat_id=CHAT_ID,
-        from_chat_id=message.chat.id,
-        message_id=message.message_id,
+        photo=message.photo[-1].file_id,
+        caption=current_point[message.from_user.id]
     )
 
 
