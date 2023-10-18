@@ -49,6 +49,8 @@
         }
 
         select {
+            font-size: 20px;
+            font-weight: 600;
             height: 36px;
             line-height: 36px;
             border-radius: 10px;
@@ -79,6 +81,8 @@
         }
 
         textarea {
+            font-size: 20px;
+            font-weight: 500;
             -webkit-border-radius: 10px;
             -moz-border-radius: 10px;
             border-radius: 10px;
@@ -86,7 +90,6 @@
     </style>
 </head>
 <body>
-    <input>
     <div id="main">
         <div id="div_points">
             <p>Точка обслуживания:</p>
@@ -106,21 +109,21 @@
                 </select>
                 <div style="color: red;" id="error_category"></div>
             </div>
-            <div class="bor cb" style="width: 50%; align-content: center;" id="div_replace">
+            <div class="bor cb" id="div_replace">
                 <label for="div_replace">Замена:</label>
                 <div class="cb">
                     <input type="checkbox" id="replace_machine" value="Замена кофемашины" >
-                    <label for="replace_machine">Замена кофемашины</label>
+                    <label style="font-size: 20px; font-weight: 500;" for="replace_machine">Замена кофемашины</label>
                 </div>
                 
                 <div class="cb">
                     <input type="checkbox" id="replace_cabinet" value="Замена тумбы">
-                    <label for="replace_cabinet">Замена тумбы</label>
+                    <label style="font-size: 20px; font-weight: 500;" for="replace_cabinet">Замена тумбы</label>
                 </div>
             </div>
         </div>
         <div style="padding-top: 20px;" id="div_description">
-            <p>Описание работ</p>
+            <p style="font-size: 20px;">Описание работ</p>
             <textarea class="input input_long" id="description"  rows="5"></textarea>
             <div style="color: red;" id="error_description"></div>
         </div>
