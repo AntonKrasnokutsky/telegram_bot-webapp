@@ -118,10 +118,6 @@ def append_repair_in_table(data: dict):
             data['point'],
             data['category'],
             data['repair'],
-            '',
-            '',
-            '',
-            '',
             data['description'],
         ]]}
     get_service_sacc().spreadsheets().values().append(
