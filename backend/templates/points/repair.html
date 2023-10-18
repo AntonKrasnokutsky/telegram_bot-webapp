@@ -32,21 +32,6 @@
             text-align: center;
         }
 
-        button {
-            border: 0;
-            border-radius: 5px;
-            height: 60px;
-            width: 150px;
-            font-size: 20px;
-            font-weight: 500;
-            color: var(--tg-theme-button-color);
-            background: var(--tg-theme-button-text-color);
-         }
-
-        button:hover {
-            background: var(--tg-theme-secondary-bg-color);
-        }
-
         input {
             display: inline-block;
             width: 55px;
@@ -55,11 +40,17 @@
             font-size: 16px;
             text-align: center;
             border: 1px solid silver;
-            border-radius: 5px;
+            border-radius: 10px;
         }
         
         .input_long {
             width: 90%;
+        }
+
+        select {
+            height: 36px;
+            line-height: 36px;
+            border-radius: 10px;
         }
 
         .btn {
@@ -89,6 +80,7 @@
     </style>
 </head>
 <body>
+    <input>
     <div id="main">
         <div id="div_points">
             <p>Точка обслуживания:</p>
@@ -108,7 +100,7 @@
                 </select>
                 <div style="color: red;" id="error_category"></div>
             </div>
-            <div class="bor cb" id="div_replace">
+            <div class="bor cb" style="width: 50%; align-content: center;" id="div_replace">
                 <label for="div_replace">Замена:</label>
                 <div class="cb">
                     <input type="checkbox" id="replace_machine" value="Замена кофемашины" >
