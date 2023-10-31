@@ -1,14 +1,18 @@
 # telegram_bot-webapp
-Телеграм-бот с использованием webApp
+Телеграм-бот с использованием webApp.
+Создан для системотизации сбора сведений о проведенных работах в таблице Google sheets, и пересылой фото-отчета в группу проверяющих
 
 ## Технология
 telegram_bot-webapp использует ряд технологий:
 - Python 3.11.5
 - aiogram 2.25.1
 - Django 4.2.6
+- Google api python client 2.101.0
+- Django rest framework 3.14.0
+
 
 ### Как запустить проект:
-`rgb(255,0,0)` Для полноценной работы запуск backend локально невозможен. Обязательно требуется сертификат ssl.`rgb(0,0,0)`
+$${\color{red}Для полноценной работы запуск backend локально невозможен. Обязательно требуется сертификат ssl.}$$
 
 Клонировать репозиторий и перейти в него в командной строке:
 
@@ -26,22 +30,7 @@ cd telegram_bot-webapp
 nano .env
 ```
 ```
-DB_ENGINE=django.db.backends.postgresql
-POSTGRES_DB=bdname
-POSTGRES_USER=username
-POSTGRES_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
-SECRET_KEY=develop_SECRET_KEY
-SPREADSHEET_ID=ID_таблицы_google
-POINTS_RANGE=Страница_и_диапазон_ячеек с точками
-CREDENTIALS_FILE=json_доступа_сервисного аккаунта
-```
-
-```
-nano backend/.env
-```
-```
+DB_ENGIN`
 ENV=путь_к_переменным_окружения
 ```
 
