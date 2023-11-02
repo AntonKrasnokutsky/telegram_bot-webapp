@@ -93,7 +93,8 @@ def append_service_in_table(data: dict):
             data['chocolate'],
             data['raf'],
             data['sugar'],
-            data['syrup'],
+            data['syrup_caramel'],
+            data['syrup_nut'],
             data['glasses'],
             data['covers'],
             data['stirrer'],
@@ -186,6 +187,31 @@ async def repair(message: types.Message):
     await message.answer('Ремонт', reply_markup=markup)
 
 
+def make_messagedata(data, *args, **kwargs):
+    result = ''
+    result += f'Вид работ: {data["type"]}\n'
+    result += f'Инженер: {data["fio"]}\n'
+    result += f'Точка обслуживания: {data["point"]}\n'
+    if data['type'] == 'Обслуживание':
+        result += f'Инкачация: ₽\xa0 {data["collection"]}\n'
+        result += f'Кофе: {data["coffee"]}\n'
+        result += f'Сливки: {data["cream"]}\n'
+        result += f'Шоколад: {data["chocolate"]}\n'
+        result += f'Раф: {data["raf"]}\n'
+        result += f'Сахар: {data["sugar"]}\n'
+        result += f'Сироп "Солёная карамель": {data["syrup_caramel"]}\n'
+        result += f'Сироп "Лесной орех": {data["syrup_nut"]}\n'
+        result += f'Стаканы: {data["glasses"]}\n'
+        result += f'Крышки: {data["covers"]}\n'
+        result += f'Размешиватели: {data["stirrer"]}\n'
+        result += f'Трубочки: {data["straws"]}'
+    elif data['type'] == 'Ремонт':
+        result += f'Категория: {data["category"]}\n'
+        result += f'Замена: {data["repair"]}\n'
+        result += f'Комментарий: {data["description"]}'
+    return result
+
+
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     data = json.loads(message.web_app_data.data)
@@ -202,6 +228,20 @@ async def web_app(message: types.Message):
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
+    syrup = data.pop('syrup')
+    if syrup == 0:
+        data['syrup_caramel'] = 0
+        data['syrup_nut'] = 0
+    elif syrup == 1:
+        data['syrup_caramel'] = 1
+        data['syrup_nut'] = 0
+    elif syrup == 2:
+        data['syrup_caramel'] = 0
+        data['syrup_nut'] = 1
+    elif syrup == 3:
+        data['syrup_caramel'] = 1
+        data['syrup_nut'] = 1
+
     if data['type'] == 'service':
         data['type'] = 'Обслуживание'
         append_service_in_table(data)
@@ -213,26 +253,8 @@ async def web_app(message: types.Message):
         f'Точка: {data["point"]}\n'
         f'Инженер: {data["fio"]}'
     )
-    message_data = ''
-    message_data += f'Вид работ: {data["type"]}\n'
-    message_data += f'Инженер: {data["fio"]}\n'
-    message_data += f'Точка обслуживания: {data["point"]}\n'
-    if data['type'] == 'Обслуживание':
-        message_data += f'Инкачация: ₽\xa0 {data["collection"]}\n'
-        message_data += f'Кофе: {data["coffee"]}\n'
-        message_data += f'Сливки: {data["cream"]}\n'
-        message_data += f'Шоколад: {data["chocolate"]}\n'
-        message_data += f'Раф: {data["raf"]}\n'
-        message_data += f'Сахар: {data["sugar"]}\n'
-        message_data += f'Сироп: {data["syrup"]}\n'
-        message_data += f'Стаканы: {data["glasses"]}\n'
-        message_data += f'Крышки: {data["covers"]}\n'
-        message_data += f'Размешиватели: {data["stirrer"]}\n'
-        message_data += f'Трубочки: {data["straws"]}'
-    elif data['type'] == 'Ремонт':
-        message_data += f'Категория: {data["category"]}\n'
-        message_data += f'Замена: {data["repair"]}\n'
-        message_data += f'Комментарий: {data["description"]}'
+    message_data = make_messagedata(data)
+
     await message.answer(message_data)
 
 

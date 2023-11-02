@@ -62,6 +62,14 @@
             width: 90%;
         }
 
+        select {
+            font-size: 20px;
+            font-weight: 600;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 5px;
+        }
+
         .btn {
             border: 2px solid;
             height: 30px;
@@ -80,6 +88,11 @@
         .bor {
             border: 1px solid silver;
             padding: 2px 10px;
+        }
+        .div_size {
+            vertical-align: bottom;
+            height: 99px;
+            width: 175px;
         }
     </style>
 
@@ -130,11 +143,15 @@
                 <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 250, 50)" value="+" readonly>
                 <div style="color: red;" id="error_sugar"></div>
             </div>
-            <div class="ib bor" id="div_syrup">
+            <div class="ib bor div_size" id="div_syrup">
                 <p>Сироп</p>
-                <input class="input btn" id="syrup_dec" onclick="btn_dec('syrup', 0, 1)" value="-" readonly>
-                <input id="syrup" step="1" min="0" max="3" readonly value="0">
-                <input class="input btn" id="syrup_inc" onclick="btn_inc('syrup', 3, 1)" value="+" readonly>
+                <select class="input input_long" id="syrup">
+                    <option selected value=0></option>
+                    <option value=1>Соленая карамель</option>
+                    <option value=2>Лесной орех</option>
+                    <option value=3>Оба</option>
+
+                </select>
                 <div style="color: red;" id="error_syrup"></div>
             </div>
             <div class="ib bor" id="div_glasses">
@@ -225,6 +242,10 @@
             document.getElementById(id).value = result
         };
 
+        syrup.addEventListener("change", () => {
+            console.log(syrup.value)
+        });
+
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             document.getElementById("error_point").innerText = "";
             document.getElementById("error_coffee").innerText = "";
@@ -268,10 +289,10 @@
                 return;
             }
 
-            if (isNaN(parseInt(syrup.value, 10))) {
-                document.getElementById("error_syrup").innerText = "Укажите количество сиропа";
-                return;
-            }
+            // if (isNaN(parseInt(syrup.value, 10))) {
+            //     document.getElementById("error_syrup").innerText = "Укажите количество сиропа";
+            //     return;
+            // }
 
             if (isNaN(parseInt(glasses.value, 10))) {
                 document.getElementById("error_glasses").innerText = "Укажите количество стаканов";
