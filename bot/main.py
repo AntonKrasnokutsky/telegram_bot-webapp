@@ -228,7 +228,7 @@ async def web_app(message: types.Message):
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
-    syrup = data.pop('syrup')
+    syrup = int(data.pop('syrup'))
     if syrup == 0:
         data['syrup_caramel'] = 0
         data['syrup_nut'] = 0
@@ -241,7 +241,6 @@ async def web_app(message: types.Message):
     elif syrup == 3:
         data['syrup_caramel'] = 1
         data['syrup_nut'] = 1
-
     if data['type'] == 'service':
         data['type'] = 'Обслуживание'
         append_service_in_table(data)
