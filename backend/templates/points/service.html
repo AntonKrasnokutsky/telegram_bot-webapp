@@ -150,16 +150,22 @@
             <div class="ib bor" id="div_syrup">
                 <p>Сироп</p>
                 <div class="cb">
-                    <input type="checkbox" id="syrup_caramel" value="Соленая карамель" >
-                    <label style="font-size: 20px; font-weight: 500;" for="caramel">Соленая карамель</label>
+                    <label style="font-size: 20px; font-weight: 500;" for="syrup_caramel" id="label_syrup_caramel">
+                        <input type="checkbox" id="syrup_caramel" value="Соленая карамель" >
+                        Соленая карамель
+                    </label>
                 </div>
                 <div class="cb">
-                    <input type="checkbox" id="syrup_nut" value="Лесной орех" >
-                    <label style="font-size: 20px; font-weight: 500;" for="nut">Лесной орех</label>
+                    <label style="font-size: 20px; font-weight: 500;" for="syrup_nut" id="label_syrup_nut">
+                        <input type="checkbox" id="syrup_nut" value="Лесной орех" >
+                        Лесной орех
+                    </label>
                 </div>
                 <div class="cb">
-                    <input type="checkbox" id="syrup_other" value="Другое" >
-                    <label style="font-size: 20px; font-weight: 500;" for="other">Другое</label>
+                    <label style="font-size: 20px; font-weight: 500;" for="syrup_other" id="label_syrup_other">
+                        <input type="checkbox" id="syrup_other" value="Другое" >
+                        Другое
+                    </label>
                 </div>
 
                 <div style="color: red;" id="error_syrup"></div>
@@ -209,11 +215,9 @@
         let chocolate = document.getElementById("chocolate")
         let raf = document.getElementById("raf")
         let sugar = document.getElementById("sugar")
-
         let syrup_caramel = document.getElementById("syrup_caramel")
         let syrup_nut = document.getElementById("syrup_nut")
         let syrup_other = document.getElementById("syrup_other")
-        
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
