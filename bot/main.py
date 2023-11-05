@@ -95,6 +95,7 @@ def append_service_in_table(data: dict):
             data['sugar'],
             data['syrup_caramel'],
             data['syrup_nut'],
+            data['syrup_other'],
             data['glasses'],
             data['covers'],
             data['stirrer'],
@@ -228,19 +229,22 @@ async def web_app(message: types.Message):
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
-    syrup = int(data.pop('syrup'))
-    if syrup == 0:
-        data['syrup_caramel'] = 0
-        data['syrup_nut'] = 0
-    elif syrup == 1:
-        data['syrup_caramel'] = 1
-        data['syrup_nut'] = 0
-    elif syrup == 2:
-        data['syrup_caramel'] = 0
-        data['syrup_nut'] = 1
-    elif syrup == 3:
-        data['syrup_caramel'] = 1
-        data['syrup_nut'] = 1
+    data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
+    data['syrup_nut'] = 1 if data['syrup_nut'] else 0
+    data['syrup_other'] = 1 if data['syrup_other'] else 0
+    # syrup = int(data.pop('syrup'))
+    # if syrup == 0:
+    #     data['syrup_caramel'] = 0
+    #     data['syrup_nut'] = 0
+    # elif syrup == 1:
+    #     data['syrup_caramel'] = 1
+    #     data['syrup_nut'] = 0
+    # elif syrup == 2:
+    #     data['syrup_caramel'] = 0
+    #     data['syrup_nut'] = 1
+    # elif syrup == 3:
+    #     data['syrup_caramel'] = 1
+    #     data['syrup_nut'] = 1
     if data['type'] == 'service':
         data['type'] = 'Обслуживание'
         append_service_in_table(data)

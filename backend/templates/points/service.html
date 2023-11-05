@@ -94,6 +94,9 @@
             height: 99px;
             width: 175px;
         }
+        .cb {
+            text-align: left;
+        }
     </style>
 
 </head>
@@ -143,17 +146,33 @@
                 <input class="input btn" id="sugar_inc" onclick="btn_inc('sugar', 250, 50)" value="+" readonly>
                 <div style="color: red;" id="error_sugar"></div>
             </div>
-            <div class="ib bor div_size" id="div_syrup">
+        </div>
+            <div class="ib bor" id="div_syrup">
                 <p>Сироп</p>
-                <select class="input input_long" id="syrup">
+                <div class="cb">
+                    <input type="checkbox" id="caramel" value="Соленая карамель" >
+                    <label style="font-size: 20px; font-weight: 500;" for="caramel">Соленая карамель</label>
+                </div>
+                <div class="cb">
+                    <input type="checkbox" id="nut" value="Лесной орех" >
+                    <label style="font-size: 20px; font-weight: 500;" for="nut">Лесной орех</label>
+                </div>
+                <div class="cb">
+                    <input type="checkbox" id="other" value="Другое" >
+                    <label style="font-size: 20px; font-weight: 500;" for="other">Другое</label>
+                </div>
+                
+
+                <!-- <select class="input input_long" id="syrup">
                     <option selected value=0></option>
                     <option value=1>Соленая карамель</option>
                     <option value=2>Лесной орех</option>
                     <option value=3>Оба</option>
 
-                </select>
+                </select> -->
                 <div style="color: red;" id="error_syrup"></div>
             </div>
+        <div>
             <div class="ib bor" id="div_glasses">
                 <p>Стаканы</p>
                 <input class="input btn" id="glasses_dec" onclick="btn_dec('glasses', 0, 50)" value="-" readonly>
@@ -198,7 +217,11 @@
         let chocolate = document.getElementById("chocolate")
         let raf = document.getElementById("raf")
         let sugar = document.getElementById("sugar")
-        let syrup = document.getElementById("syrup")
+        // let syrup = document.getElementById("syrup")
+        let syrup_caramel = document.getElementById("caramel")
+        let syrup_nut = document.getElementById("nut")
+        let syrup_other = document.getElementById("other")
+        
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
@@ -327,7 +350,9 @@
                 chocolate: chocolate.value,
                 raf: raf.value,
                 sugar: sugar.value,
-                syrup: syrup.value,
+                syrup_caramel: syrup_caramel.checked,
+                syrup_nut: syrup_nut.checked,
+                syrup_other: syrup_other.checked,
                 glasses: glasses.value,
                 covers: covers.value,
                 stirrer: stirrer.value,
