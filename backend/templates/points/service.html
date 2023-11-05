@@ -199,7 +199,6 @@
                 <div style="color: red;" id="error_collection"></div>
             </div>
         </div>
-        <button id="but">Кнопка</button>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
@@ -210,7 +209,7 @@
         let chocolate = document.getElementById("chocolate")
         let raf = document.getElementById("raf")
         let sugar = document.getElementById("sugar")
-        // let syrup = document.getElementById("syrup")
+
         let syrup_caramel = document.getElementById("syrup_caramel")
         let syrup_nut = document.getElementById("syrup_nut")
         let syrup_other = document.getElementById("syrup_other")
@@ -258,10 +257,6 @@
             document.getElementById(id).value = result
         };
 
-        // syrup.addEventListener("change", () => {
-        //     console.log(syrup.value)
-        // });
-
 
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
@@ -306,11 +301,6 @@
                 document.getElementById("error_sugar").innerText = "Укажите количество сахара";
                 return;
             }
-
-            // if (isNaN(parseInt(syrup.value, 10))) {
-            //     document.getElementById("error_syrup").innerText = "Укажите количество сиропа";
-            //     return;
-            // }
 
             if (isNaN(parseInt(glasses.value, 10))) {
                 document.getElementById("error_glasses").innerText = "Укажите количество стаканов";
@@ -357,30 +347,6 @@
 
             tg.sendData(JSON.stringify(data));
             tg.close();
-        });
-
-        let but = document.getElementById("but")
-
-        but.addEventListener("click", () => {
-            let data = {
-                type: "service",
-                point: point.value,
-                coffee: coffee.value,
-                cream: cream.value,
-                chocolate: chocolate.value,
-                raf: raf.value,
-                sugar: sugar.value,
-                syrup_caramel: syrup_caramel.checked,
-                syrup_nut: syrup_nut.checked,
-                syrup_other: syrup_other.checked,
-                glasses: glasses.value,
-                covers: covers.value,
-                stirrer: stirrer.value,
-                collection: collection.value,
-                straws: straws.value,
-            };
-
-            console.log(data)
         });
     </script>
 </body>

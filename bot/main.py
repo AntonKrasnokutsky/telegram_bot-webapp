@@ -202,6 +202,7 @@ def make_messagedata(data, *args, **kwargs):
         result += f'Сахар: {data["sugar"]}\n'
         result += f'Сироп "Солёная карамель": {data["syrup_caramel"]}\n'
         result += f'Сироп "Лесной орех": {data["syrup_nut"]}\n'
+        result += f'Сироп "Другой": {data["syrup_other"]}\n'
         result += f'Стаканы: {data["glasses"]}\n'
         result += f'Крышки: {data["covers"]}\n'
         result += f'Размешиватели: {data["stirrer"]}\n'
@@ -232,19 +233,6 @@ async def web_app(message: types.Message):
     data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
     data['syrup_nut'] = 1 if data['syrup_nut'] else 0
     data['syrup_other'] = 1 if data['syrup_other'] else 0
-    # syrup = int(data.pop('syrup'))
-    # if syrup == 0:
-    #     data['syrup_caramel'] = 0
-    #     data['syrup_nut'] = 0
-    # elif syrup == 1:
-    #     data['syrup_caramel'] = 1
-    #     data['syrup_nut'] = 0
-    # elif syrup == 2:
-    #     data['syrup_caramel'] = 0
-    #     data['syrup_nut'] = 1
-    # elif syrup == 3:
-    #     data['syrup_caramel'] = 1
-    #     data['syrup_nut'] = 1
     if data['type'] == 'service':
         data['type'] = 'Обслуживание'
         append_service_in_table(data)
