@@ -150,26 +150,18 @@
             <div class="ib bor" id="div_syrup">
                 <p>Сироп</p>
                 <div class="cb">
-                    <input type="checkbox" id="caramel" value="Соленая карамель" >
+                    <input type="checkbox" id="syrup_caramel" value="Соленая карамель" >
                     <label style="font-size: 20px; font-weight: 500;" for="caramel">Соленая карамель</label>
                 </div>
                 <div class="cb">
-                    <input type="checkbox" id="nut" value="Лесной орех" >
+                    <input type="checkbox" id="syrup_nut" value="Лесной орех" >
                     <label style="font-size: 20px; font-weight: 500;" for="nut">Лесной орех</label>
                 </div>
                 <div class="cb">
-                    <input type="checkbox" id="other" value="Другое" >
+                    <input type="checkbox" id="syrup_other" value="Другое" >
                     <label style="font-size: 20px; font-weight: 500;" for="other">Другое</label>
                 </div>
-                
 
-                <!-- <select class="input input_long" id="syrup">
-                    <option selected value=0></option>
-                    <option value=1>Соленая карамель</option>
-                    <option value=2>Лесной орех</option>
-                    <option value=3>Оба</option>
-
-                </select> -->
                 <div style="color: red;" id="error_syrup"></div>
             </div>
         <div>
@@ -207,6 +199,7 @@
                 <div style="color: red;" id="error_collection"></div>
             </div>
         </div>
+        <button id="but">Кнопка</button>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
@@ -218,9 +211,9 @@
         let raf = document.getElementById("raf")
         let sugar = document.getElementById("sugar")
         // let syrup = document.getElementById("syrup")
-        let syrup_caramel = document.getElementById("caramel")
-        let syrup_nut = document.getElementById("nut")
-        let syrup_other = document.getElementById("other")
+        let syrup_caramel = document.getElementById("syrup_caramel")
+        let syrup_nut = document.getElementById("syrup_nut")
+        let syrup_other = document.getElementById("syrup_other")
         
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
@@ -265,9 +258,11 @@
             document.getElementById(id).value = result
         };
 
-        syrup.addEventListener("change", () => {
-            console.log(syrup.value)
-        });
+        // syrup.addEventListener("change", () => {
+        //     console.log(syrup.value)
+        // });
+
+
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             document.getElementById("error_point").innerText = "";
@@ -362,6 +357,30 @@
 
             tg.sendData(JSON.stringify(data));
             tg.close();
+        });
+
+        let but = document.getElementById("but")
+
+        but.addEventListener("click", () => {
+            let data = {
+                type: "service",
+                point: point.value,
+                coffee: coffee.value,
+                cream: cream.value,
+                chocolate: chocolate.value,
+                raf: raf.value,
+                sugar: sugar.value,
+                syrup_caramel: syrup_caramel.checked,
+                syrup_nut: syrup_nut.checked,
+                syrup_other: syrup_other.checked,
+                glasses: glasses.value,
+                covers: covers.value,
+                stirrer: stirrer.value,
+                collection: collection.value,
+                straws: straws.value,
+            };
+
+            console.log(data)
         });
     </script>
 </body>
