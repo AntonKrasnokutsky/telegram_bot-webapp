@@ -63,7 +63,7 @@ def create_answer(values, field_name, *args, **kwargs):
     result = {field_name: []}
     pre_result = {}
     for value in values[2:]:
-        for pos in range (len(value)):
+        for pos in range(len(value)):
             if '₽\xa0 ' in value[pos]:
                 pre_result[values[0][pos]] = value[pos].translate(
                     {
@@ -100,7 +100,7 @@ class PointsViewSet(viewsets.ModelViewSet):
 
 class ServicesViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin):
-    
+
     def list(self, request, *args, **kwargs):
         try:
             services = get_list_services_and_repair(SERVICES)
@@ -109,7 +109,7 @@ class ServicesViewSet(viewsets.GenericViewSet,
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-        
+
         return JsonResponse(
             create_answer(services, 'services'),
             status=HTTPStatus.OK
@@ -117,8 +117,8 @@ class ServicesViewSet(viewsets.GenericViewSet,
 
 
 class RepairViewSet(viewsets.GenericViewSet,
-                      mixins.ListModelMixin):
-    
+                    mixins.ListModelMixin):
+
     def list(self, request, *args, **kwargs):
         try:
             repair = get_list_services_and_repair(REPAIR)
@@ -127,7 +127,7 @@ class RepairViewSet(viewsets.GenericViewSet,
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-        
+
         return JsonResponse(
             create_answer(repair, 'repair'),
             status=HTTPStatus.OK
