@@ -86,6 +86,9 @@ jobs:
             echo HOST_IP=${{ secrets.HOST }} >> .env
             echo DOMAIN_NAIM=${{ secrets.DOMAIN_NAIM }} >> .env
             echo CHAT_ID=${{ secrets.CHAT_ID }} >> .env
+            echo SERVICES=${{ secrets.SERVICES }} >> .env
+            echo REPAIRS=${{ secrets.REPAIRS }} >> .env
+
             
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
             sudo docker compose up -d

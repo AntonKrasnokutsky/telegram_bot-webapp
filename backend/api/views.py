@@ -13,7 +13,7 @@ CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICES = os.getenv('SERVICES')
-REPAIR = os.getenv('REPAIR')
+REPAIRS = os.getenv('REPAIRS')
 
 
 def get_service_sacc():
@@ -121,7 +121,7 @@ class RepairViewSet(viewsets.GenericViewSet,
 
     def list(self, request, *args, **kwargs):
         try:
-            repair = get_list_services_and_repair(REPAIR)
+            repairs = get_list_services_and_repair(REPAIRS)
         except Exception:
             return JsonResponse(
                 {'error': 'Спиосок не получен. Попробуйте позже'},
@@ -129,6 +129,6 @@ class RepairViewSet(viewsets.GenericViewSet,
             )
 
         return JsonResponse(
-            create_answer(repair, 'repair'),
+            create_answer(repairs, 'repairs'),
             status=HTTPStatus.OK
         )
