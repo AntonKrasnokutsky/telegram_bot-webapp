@@ -8,6 +8,6 @@ app_name = 'api'
 urlpatterns = [
     path('points/', PointsViewSet.as_view({'get': 'list'})),
     path('services/', ServicesViewSet.as_view({'get': 'list'})),
-    path('repair/', RepairViewSet.as_view({'get': 'list'})),
+    path('repairs/', RepairViewSet.as_view({'get': 'list'})),
 
 ]

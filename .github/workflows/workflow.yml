@@ -103,4 +103,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: ${{ github.workflow }} успешно выполнен! http://${{ secrets.HOST }}/
+        message: ${{ github.workflow }} успешно выполнен! http://${{ secrets.DOMAIN_NAIM }}/
