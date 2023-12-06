@@ -65,6 +65,9 @@ def create_answer(values, field_name, *args, **kwargs):
     for pos in range(len(values[0])):
         values[0][pos] = values[0][pos].translate(
             {
+                ord(','): None,
+                ord('"'): None,
+                ord("'"): None,
                 ord(' '): None
             })
     for value in values[2:]:
