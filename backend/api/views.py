@@ -62,6 +62,11 @@ def get_list_services_and_repair(range_value):
 def create_answer(values, field_name, *args, **kwargs):
     result = {field_name: []}
     pre_result = {}
+    for pos in range(len(values[0])):
+        values[0][pos] = values[0][pos].translate(
+            {
+                ord(' '): None
+            })
     for value in values[2:]:
         for pos in range(len(value)):
             if '₽\xa0 ' in value[pos]:
@@ -109,7 +114,6 @@ class ServicesViewSet(viewsets.GenericViewSet,
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-
         return JsonResponse(
             create_answer(services, 'services'),
             status=HTTPStatus.OK
