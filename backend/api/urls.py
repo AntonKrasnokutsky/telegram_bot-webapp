@@ -1,6 +1,11 @@
 from django.urls import include, path
 
-from .views import PointsViewSet, RepairViewSet, RepairViewASet, ServicesViewSet
+from .views import (
+    PointsViewSet,
+    RepairViewSet,
+    RepairViewASet,
+    ServicesViewSet
+)
 
 app_name = 'api'
 

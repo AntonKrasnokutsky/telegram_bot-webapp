@@ -145,7 +145,7 @@ class RepairViewSet(viewsets.GenericViewSet,
 
 
 class RepairViewASet(viewsets.GenericViewSet,
-                    mixins.ListModelMixin):
+                     mixins.ListModelMixin):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
