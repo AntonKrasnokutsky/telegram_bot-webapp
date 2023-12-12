@@ -158,7 +158,6 @@ class ServicesViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
-        date_limit = extract_date(request)
         try:
             services = get_list_services_and_repair(SERVICES)
         except Exception:
@@ -166,6 +165,8 @@ class ServicesViewSet(viewsets.GenericViewSet,
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
+
+        date_limit = extract_date(request)
         return JsonResponse(
             create_answer(services, 'services', date_limit),
             status=HTTPStatus.OK
@@ -177,7 +178,6 @@ class RepairViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
-        date_limit = extract_date(request)
         try:
             repairs = get_list_services_and_repair(REPAIRS)
         except Exception:
@@ -186,6 +186,7 @@ class RepairViewSet(viewsets.GenericViewSet,
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
+        date_limit = extract_date(request)
         return JsonResponse(
             create_answer(repairs, 'repairs', date_limit),
             status=HTTPStatus.OK
@@ -205,7 +206,8 @@ class RepairViewASet(viewsets.GenericViewSet,
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
+        date_limit = extract_date(request)
         return JsonResponse(
-            create_answer(repairs, 'repairs'),
+            create_answer(repairs, 'repairs', date_limit),
             status=HTTPStatus.OK
         )
