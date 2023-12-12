@@ -1,8 +1,9 @@
+import json
 import os
+from datetime import datetime
 from http import HTTPStatus
 
 import httplib2
-# from coffee_bot_beckend.settings import PATH_TO_ENV
 from django.http import JsonResponse
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
@@ -60,7 +61,25 @@ def get_list_services_and_repair(range_value):
     return sheet_values
 
 
-def create_answer(values, field_name, *args, **kwargs):
+def date_filter(value, date_limite, *args, **kwargs):
+    record_date = datetime.strptime(
+        value[0],
+        '%d.%m.%Y %H:%M:%S'
+    ).date()
+    if ('frome_date' in date_limite.keys()
+            and 'before_date' in date_limite.keys()):
+        return (
+            True
+            if (date_limite['frome_date'] <= record_date
+                and record_date <= date_limite['before_date'])
+            else False
+        )
+    elif 'frome_date' in date_limite.keys():
+        return True if date_limite['frome_date'] <= record_date else False
+    return True if record_date <= date_limite['before_date'] else False
+
+
+def create_answer(values, field_name, date_limit: dict, *args, **kwargs):
     result = {field_name: []}
     pre_result = {}
     for pos in range(len(values[0])):
@@ -72,6 +91,9 @@ def create_answer(values, field_name, *args, **kwargs):
                 ord(' '): None
             })
     for value in values[2:]:
+        if len(date_limit) != 0:
+            if not date_filter(value, date_limit):
+                continue
         for pos in range(len(value)):
             if '₽\xa0 ' in value[pos]:
                 pre_result[values[0][pos]] = value[pos].translate(
@@ -83,6 +105,30 @@ def create_answer(values, field_name, *args, **kwargs):
             else:
                 pre_result[values[0][pos]] = value[pos]
         result[field_name].append(pre_result.copy())
+    return result
+
+
+def extract_date(request, *args, **kwargs):
+    result = {}
+    try:
+        request_body = json.loads(request.body)
+        if 'frome_date' in request_body.keys():
+            result['frome_date'] = (
+                (
+                    datetime.strptime(
+                        request_body['frome_date'],
+                        '%d.%m.%Y'
+                    ).date()))
+        if 'before_date' in request_body.keys():
+            result['before_date'] = (
+                (
+                    datetime.strptime(
+                        request_body['before_date'],
+                        '%d.%m.%Y'
+                    ).date()))
+    except json.decoder.JSONDecodeError:
+        pass
+
     return result
 
 
@@ -112,6 +158,7 @@ class ServicesViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
+        date_limit = extract_date(request)
         try:
             services = get_list_services_and_repair(SERVICES)
         except Exception:
@@ -120,7 +167,7 @@ class ServicesViewSet(viewsets.GenericViewSet,
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
         return JsonResponse(
-            create_answer(services, 'services'),
+            create_answer(services, 'services', date_limit),
             status=HTTPStatus.OK
         )
 
@@ -130,6 +177,7 @@ class RepairViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
+        date_limit = extract_date(request)
         try:
             repairs = get_list_services_and_repair(REPAIRS)
         except Exception:
@@ -139,7 +187,7 @@ class RepairViewSet(viewsets.GenericViewSet,
             )
 
         return JsonResponse(
-            create_answer(repairs, 'repairs'),
+            create_answer(repairs, 'repairs', date_limit),
             status=HTTPStatus.OK
         )
 

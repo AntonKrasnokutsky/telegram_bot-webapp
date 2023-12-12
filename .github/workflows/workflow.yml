@@ -46,13 +46,13 @@ jobs:
         with:
           context: ./bot
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/coffee_bot:latest 
+          tags: ${{ secrets.DOCKER_USERNAME }}/coffee_bot:latest
       - name: Push coffee_bot_backend to Docker Hub
         uses: docker/build-push-action@v4
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend:latest 
+          tags: ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend:latest
 
   deploy:
     runs-on: ubuntu-latest
