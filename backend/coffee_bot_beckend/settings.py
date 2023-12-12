@@ -32,7 +32,12 @@ DEBUG = False
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = [os.getenv('HOST_IP'), os.getenv('DOMAIN_NAIM'), 'localhost', 'backend']
+    ALLOWED_HOSTS = [
+        os.getenv('HOST_IP'),
+        os.getenv('DOMAIN_NAME'),
+        f'https://{os.getenv("DOMAIN_NAME")}',
+        'localhost', 'backend'
+    ]
 
 
 # Application definition
