@@ -77,3 +77,28 @@ python manage.py migrate
 python manage.py collectstatic
 python manage.py runserver
 ```
+
+
+API
+
+Получение токена
+POST: localhost:8000/api/auth/token/login/
+{
+    "password": "password",
+    "username": "username"
+}
+
+Ответ:
+{
+    "auth_token": "token"
+}
+
+Только для авторизованных запросов
+Получение списка проведенных обслуживаний
+GET: localhost:8000/api/services/
+
+Получение списка проведенных ремонтов
+GET: localhost:8000/api/repairs/
+
+Обновление списка точек обслуживания
+GET: localhost:8000/api/points/

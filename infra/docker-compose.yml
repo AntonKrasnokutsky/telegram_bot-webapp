@@ -2,6 +2,7 @@ version: '3.3'
 services:
   db:
     image: postgres:14-alpine
+    restart: always
     env_file:
       - .env
     ports:
@@ -9,12 +10,40 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data/
   bot:
-    image: antonkrasnokutsky/coffee_bot
+    image: user/coffee_bot
     restart: always
     volumes:
-      - ./tg-bot-400810-9e0f62bd9a0e.json:/app/tg-bot-400810-9e0f62bd9a0e.json
-      - ./photo/:/app/photo/
+      - ./<google>-bot.json:/app/<google>-bot.json
     env_file:
       - .env
+  backend:
+    image: user/coffee_bot_backend
+    restart: always
+    volumes:
+      - ./<google>-bot.json:/app/<google>-bot.json
+      - static_value:/app/static/
+    depends_on:
+      - db
+    env_file:
+      - .env
+  swag:
+    image: linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=Europe/Moscow
+      - URL=server_name
+      - VALIDATION=http
+    volumes:
+      - ./nginx.conf:/config/nginx/site-confs/default.conf
+      - static_value:/usr/share/nginx/html/static/
+    ports:
+      - 443:443
+      - 80:80
+    depends_on:
+      - backend
+    restart: unless-stopped
 volumes:
   db_data:
+  static_value:

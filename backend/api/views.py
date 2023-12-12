@@ -2,12 +2,12 @@ import os
 from http import HTTPStatus
 
 import httplib2
-from coffee_bot_beckend.settings import PATH_TO_ENV
+# from coffee_bot_beckend.settings import PATH_TO_ENV
 from django.http import JsonResponse
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from points.models import Points
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, permissions, viewsets
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
@@ -17,11 +17,12 @@ REPAIRS = os.getenv('REPAIRS')
 
 
 def get_service_sacc():
-    creds_json = os.path.join(PATH_TO_ENV, CREDENTIALS_FILE)
+    # creds_json = os.path.join(PATH_TO_ENV, CREDENTIALS_FILE)
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
     creds_service = ServiceAccountCredentials.from_json_keyfile_name(
-        creds_json,
+        # creds_json,
+        CREDENTIALS_FILE,
         scopes
     ).authorize(httplib2.Http())
     return build('sheets', 'v4', http=creds_service)
@@ -108,6 +109,7 @@ class PointsViewSet(viewsets.ModelViewSet):
 
 class ServicesViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin):
+    # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
         try:
@@ -125,6 +127,26 @@ class ServicesViewSet(viewsets.GenericViewSet,
 
 class RepairViewSet(viewsets.GenericViewSet,
                     mixins.ListModelMixin):
+    # permission_classes = [permissions.IsAuthenticated, ]
+
+    def list(self, request, *args, **kwargs):
+        try:
+            repairs = get_list_services_and_repair(REPAIRS)
+        except Exception:
+            return JsonResponse(
+                {'error': 'Спиосок не получен. Попробуйте позже'},
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
+        return JsonResponse(
+            create_answer(repairs, 'repairs'),
+            status=HTTPStatus.OK
+        )
+
+
+class RepairViewASet(viewsets.GenericViewSet,
+                    mixins.ListModelMixin):
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
         try:

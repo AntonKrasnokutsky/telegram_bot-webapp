@@ -2,6 +2,8 @@ python-dotenv==1.0.0
 gunicorn==21.2.0
 Django==4.2.6
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
+djoser==2.2.2
 psycopg2-binary==2.9.9
 google-api-python-client==2.101.0
 oauth2client==4.1.3

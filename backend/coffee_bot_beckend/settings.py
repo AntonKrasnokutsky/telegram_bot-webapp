@@ -15,8 +15,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
-PATH_TO_ENV = os.getenv('ENV', default='')
-load_dotenv(os.path.join(PATH_TO_ENV, '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,12 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = [os.getenv('HOST_IP'), os.getenv('DOMAIN_NAIM'), 'localhost']
+    ALLOWED_HOSTS = [os.getenv('HOST_IP'), os.getenv('DOMAIN_NAIM'), 'localhost', 'backend']
 
 
 # Application definition
@@ -47,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
     'points',
     'api',
 ]
@@ -143,6 +143,23 @@ STATICFILES_DIRS = [
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
+
+# DJOSER = {
+#     "PERMISSIONS": {
+#         'user': ['recipes.permissions.AuthorOrAdminOrReadOnly']
+#     },
+#     "SERIALIZERS": {
+#         'user': 'users.serializers.FoodgramUserSerializer',
+#     }
+# }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
