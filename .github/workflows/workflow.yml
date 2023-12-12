@@ -69,6 +69,7 @@ jobs:
             sudo docker compose stop
             sudo docker compose rm backend bot
             sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/coffee_bot
+            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend
 
             rm .env
             touch .env
