@@ -64,6 +64,7 @@ def get_list_points():
 
 
 def get_user_list():
+    logging.debug('Получеие списка инженеров.')
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
         ranges=SERVICEMAN_RANGE,
@@ -135,7 +136,7 @@ async def start(message: types.Message):
     await message.answer('Обновление списка точек, подождите.')
     response = requests.get(URL_API_POINTS)
     if response.status_code == HTTPStatus.OK:
-
+        logging.debug('Запуск бота. Успешное обновление точек.')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.add(
             types.KeyboardButton(
@@ -149,6 +150,7 @@ async def start(message: types.Message):
             ))
         await message.answer('Бот готов к работе.', reply_markup=markup)
     else:
+        logging.warning('Запуск бота. Точки не обновлены.')
         await message.answer(
             'Список точек не обновлен, нажмите "/update_points" ещё раз'
         )
@@ -159,8 +161,10 @@ async def update_points(message: types.Message):
     await message.answer('Обновление списка точек, подождите.')
     response = requests.get(URL_API_POINTS)
     if response.status_code == HTTPStatus.OK:
+        logging.debug('Обновление точек. Успешно.')
         await message.answer('Список точек обновлён')
     else:
+        logging.warning('Обновление точек. Провал.')
         await message.answer(
             'Список точек не обновлён, нажмите "/update_points" ещё раз'
         )
@@ -168,6 +172,7 @@ async def update_points(message: types.Message):
 
 @dp.message_handler(commands=['service'])
 async def service(message: types.Message):
+    logging.debug('Отображение кнопки "Обслуживание".')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(
         types.KeyboardButton(
@@ -179,6 +184,7 @@ async def service(message: types.Message):
 
 @dp.message_handler(commands=['repair'])
 async def repair(message: types.Message):
+    logging.debug('Отображение кнопки "Ремонт".')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(
         types.KeyboardButton(
@@ -189,6 +195,7 @@ async def repair(message: types.Message):
 
 
 def make_messagedata(data, *args, **kwargs):
+    logging.debug('Подготовка ответного сообщения.')
     result = ''
     result += f'Вид работ: {data["type"]}\n'
     result += f'Инженер: {data["fio"]}\n'
@@ -216,6 +223,7 @@ def make_messagedata(data, *args, **kwargs):
 
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
+    logging.debug('WebApp.')
     data = json.loads(message.web_app_data.data)
     users = get_user_list()
     data['email'] = 'Нет данных'
@@ -234,9 +242,11 @@ async def web_app(message: types.Message):
     data['syrup_nut'] = 1 if data['syrup_nut'] else 0
     data['syrup_other'] = 1 if data['syrup_other'] else 0
     if data['type'] == 'service':
+        logging.debug('Данны по обслжуиванию.')
         data['type'] = 'Обслуживание'
         append_service_in_table(data)
     elif data['type'] == 'repair':
+        logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
         append_repair_in_table(data)
     current_point[message.from_user.id] = (
@@ -244,13 +254,14 @@ async def web_app(message: types.Message):
         f'Точка: {data["point"]}\n'
         f'Инженер: {data["fio"]}'
     )
-    message_data = make_messagedata(data)
-
-    await message.answer(message_data)
+    # message_data = make_messagedata(data)
+    logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
+    await message.answer(make_messagedata(data))
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
 async def forward_photo(message: types.Message):
+    logging.debug('Пересылка фотографии.')
     await bot.send_photo(
         chat_id=CHAT_ID,
         photo=message.photo[-1].file_id,

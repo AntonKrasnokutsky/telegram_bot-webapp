@@ -1,5 +1,7 @@
 import json
+import logging
 import os
+import sys
 from datetime import datetime
 from http import HTTPStatus
 
@@ -16,20 +18,23 @@ POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICES = os.getenv('SERVICES')
 REPAIRS = os.getenv('REPAIRS')
 
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
 
 def get_service_sacc():
-    # creds_json = os.path.join(PATH_TO_ENV, CREDENTIALS_FILE)
+    logging.info('API: Подключение к Google.')
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
     creds_service = ServiceAccountCredentials.from_json_keyfile_name(
-        # creds_json,
         CREDENTIALS_FILE,
         scopes
     ).authorize(httplib2.Http())
+    logging.info('API: Подключение к Google. Успешно.')
     return build('sheets', 'v4', http=creds_service)
 
 
 def get_list_points():
+    logging.info('API: Получение списка точек обслуживания.')
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
         ranges=POINTS_RANGE,
@@ -42,10 +47,12 @@ def get_list_points():
         sheet_values.remove('')
     except ValueError:
         pass
+    logging.info('API: Получение списка точек обслуживания. Успешно.')
     return sheet_values
 
 
 def get_list_services_and_repair(range_value):
+    logging.info('API: Получение списка обслуживаний или ремонтов.')
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
         ranges=range_value,
@@ -58,10 +65,12 @@ def get_list_services_and_repair(range_value):
         sheet_values.remove('')
     except ValueError:
         pass
+    logging.info('API: Получение списка обслуживаний или ремонтов. Успешно.')
     return sheet_values
 
 
 def date_filter(value, date_limite, *args, **kwargs):
+    logging.info('API: Фильтр списка обслуживаний или ремонтов по датам.')
     record_date = datetime.strptime(
         value[0],
         '%d.%m.%Y %H:%M:%S'
@@ -76,10 +85,16 @@ def date_filter(value, date_limite, *args, **kwargs):
         )
     elif 'frome_date' in date_limite.keys():
         return True if date_limite['frome_date'] <= record_date else False
+
+    logging.info(
+        'API: Фильтр списка обслуживаний или ремонтов по датам. Успешно.'
+    )
+
     return True if record_date <= date_limite['before_date'] else False
 
 
 def create_answer(values, field_name, date_limit: dict, *args, **kwargs):
+    logging.info('API: Подготовка ответного сообщения на запрос.')
     result = {field_name: []}
     pre_result = {}
     for pos in range(len(values[0])):
@@ -105,10 +120,12 @@ def create_answer(values, field_name, date_limit: dict, *args, **kwargs):
             else:
                 pre_result[values[0][pos]] = value[pos]
         result[field_name].append(pre_result.copy())
+    logging.info('API: Подготовка ответного сообщения на запрос. Успешно.')
     return result
 
 
 def extract_date(request, *args, **kwargs):
+    logging.info('API: Поиск ограничений по дате в запросе.')
     result = {}
     try:
         request_body = json.loads(request.body)
@@ -127,8 +144,11 @@ def extract_date(request, *args, **kwargs):
                         '%d.%m.%Y'
                     ).date()))
     except json.decoder.JSONDecodeError:
-        pass
-
+        logging.info(
+            'API: Поиск ограничений по дате в запросе. '
+            'Выдём список без ограничения.'
+        )
+    logging.info('API: Поиск ограничений по дате в запросе. Даты выбраны.')
     return result
 
 
@@ -136,9 +156,11 @@ class PointsViewSet(viewsets.ModelViewSet):
     queryset = Points.objects.all()
 
     def list(self, *args, **kwargs):
+        logging.info('API: Обновление списка точек.')
         try:
             points = get_list_points()
         except Exception:
+            logging.error('API: Обновление списка точек. Google недоступен.')
             return JsonResponse(
                 {'error': 'Список не обновлен'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
@@ -147,6 +169,7 @@ class PointsViewSet(viewsets.ModelViewSet):
         Points.objects.all().delete()
         for name in points:
             Points.objects.create(name=name)
+        logging.info('API: Обновление списка точек. Список точек обновлён.')
         return JsonResponse(
             {'message': 'Список точек обновлен'},
             status=HTTPStatus.OK
@@ -158,17 +181,23 @@ class ServicesViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
+        logging.info('API: Запрос списка обслуживний.')
         try:
             services = get_list_services_and_repair(SERVICES)
         except Exception:
+            logging.error('API: Запрос списка обслуживний. Google недоступен.')
             return JsonResponse(
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-        date_limit = extract_date(request)
+        logging.info('API: Запрос списка обслуживний. Успешно.')
         return JsonResponse(
-            create_answer(services, 'services', date_limit),
+            create_answer(
+                services,
+                'services',
+                extract_date(request)
+            ),
             status=HTTPStatus.OK
         )
 
@@ -178,17 +207,52 @@ class RepairViewSet(viewsets.GenericViewSet,
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
+        logging.info('API: Запрос списка ремонтров.')
         try:
             repairs = get_list_services_and_repair(REPAIRS)
         except Exception:
+            logging.info('API: Запрос списка ремонтров. Google недоступен.')
             return JsonResponse(
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-        date_limit = extract_date(request)
+        logging.info('API: Запрос списка ремонтров. Успешно.')
         return JsonResponse(
-            create_answer(repairs, 'repairs', date_limit),
+            create_answer(
+                repairs,
+                'repairs',
+                extract_date(request)
+            ),
+            status=HTTPStatus.OK
+        )
+
+
+class ServicesViewASet(viewsets.GenericViewSet,
+                       mixins.ListModelMixin):
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def list(self, request, *args, **kwargs):
+        logging.info('API(авторизация): Запрос списка обслуживний.')
+        try:
+            services = get_list_services_and_repair(SERVICES)
+        except Exception:
+            logging.error(
+                'API(авторизация): Запрос списка обслуживний. '
+                'Google недоступен.'
+            )
+            return JsonResponse(
+                {'error': 'Спиосок не получен. Попробуйте позже'},
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
+        logging.info('API(авторизация): Запрос списка обслуживний. Успешно.')
+        return JsonResponse(
+            create_answer(
+                services,
+                'services',
+                extract_date(request)
+            ),
             status=HTTPStatus.OK
         )
 
@@ -198,16 +262,24 @@ class RepairViewASet(viewsets.GenericViewSet,
     permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
+        logging.info('API(авторизация): Запрос списка ремонтров.')
         try:
             repairs = get_list_services_and_repair(REPAIRS)
         except Exception:
+            logging.error(
+                'API(авторизация): Запрос списка ремонтров. Google недоступен.'
+            )
             return JsonResponse(
                 {'error': 'Спиосок не получен. Попробуйте позже'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-        date_limit = extract_date(request)
+        logging.info('API(авторизация): Запрос списка ремонтров. Успешно.')
         return JsonResponse(
-            create_answer(repairs, 'repairs', date_limit),
+            create_answer(
+                repairs,
+                'repairs',
+                extract_date(request)
+            ),
             status=HTTPStatus.OK
         )
