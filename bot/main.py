@@ -22,9 +22,17 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 URL_SERVICE = os.getenv('URL_SERVICE')
 URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
+URL_API_SERVICE = os.getenv('URL_API_SERVICE')
+URL_API_AUTH = os.getenv('URL_API_AUTH')
+AUTH = {
+    'username': os.getenv('API_USER'),
+    'password': os.getenv('API_PASSWORD')
+}
 CHAT_ID = os.getenv('CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
+api_token = ''
+headers = {"Authorization": f"Token {api_token}"}
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
@@ -111,6 +119,51 @@ def append_service_in_table(data: dict):
     ).execute()
 
 
+def get_token(*args, **kwargs):
+    global api_token
+    global headers
+    response = requests.post(URL_API_AUTH, data=AUTH)
+    if response.status_code == HTTPStatus.OK:
+        logging.info('Обновление токена')
+        api_token = json.loads(response.text)['auth_token']
+        headers = {"Authorization": f"Token {api_token}"}
+    logging.info(f'Обновление токена. Status: {response.status_code}')
+    return response.status_code
+
+
+def send_service_info(data: dict, *args, **kwargs):
+    body = {
+        'date': data['date'],
+        'serviceman': data['fio'],
+        'point': data['point'],
+        'collection': data['collection'],
+        'coffee': data['coffee'],
+        'cream': data['cream'],
+        'chocolate': data['chocolate'],
+        'raf': data['raf'],
+        'sugar': data['sugar'],
+        'syrupcaramel': data['syrup_caramel'],
+        'syrupnut': data['syrup_nut'],
+        'syrupother': data['syrup_other'],
+        'glasses': data['glasses'],
+        'covers': data['covers'],
+        'stirrer': data['stirrer'],
+        'straws': data['straws']
+    }
+    response = requests.post(URL_API_SERVICE, data=body, headers=headers)
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        logging.info('Требуется обновление токена')
+        get_token()
+        response = requests.post(URL_API_SERVICE, data=body, headers=headers)
+
+    if response.status_code == HTTPStatus.OK:
+        logging.info('Данные по обслуживанию отправлены.')
+        return
+    logging.error(
+        f'Данные по обслуживанию не отправлены.Status: {response.status_code}'
+    )
+
+
 def append_repair_in_table(data: dict):
     body = {
         'values':
@@ -131,12 +184,24 @@ def append_repair_in_table(data: dict):
     ).execute()
 
 
+def update_points(*args, **kwargs):
+    response = requests.get(URL_API_POINTS, headers=headers)
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.get(URL_API_POINTS, headers=headers)
+    if response.status_code == HTTPStatus.OK:
+        logging.info('Список точек обновлен')
+        return True
+    logging.info(
+        f'Список точек не обновлен. Status: {response.status_code}'
+    )
+    return False
+
+
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await message.answer('Обновление списка точек, подождите.')
-    response = requests.get(URL_API_POINTS)
-    if response.status_code == HTTPStatus.OK:
-        logging.debug('Запуск бота. Успешное обновление точек.')
+    await message.answer('Запуск бота.')
+    if update_points():
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.add(
             types.KeyboardButton(
@@ -150,21 +215,18 @@ async def start(message: types.Message):
             ))
         await message.answer('Бот готов к работе.', reply_markup=markup)
     else:
-        logging.warning('Запуск бота. Точки не обновлены.')
         await message.answer(
             'Список точек не обновлен, нажмите "/update_points" ещё раз'
         )
 
 
 @dp.message_handler(commands=['update_points'])
-async def update_points(message: types.Message):
+async def update_points_command(message: types.Message):
     await message.answer('Обновление списка точек, подождите.')
-    response = requests.get(URL_API_POINTS)
-    if response.status_code == HTTPStatus.OK:
-        logging.debug('Обновление точек. Успешно.')
+    logging.debug('Обновление точек.')
+    if update_points():
         await message.answer('Список точек обновлён')
     else:
-        logging.warning('Обновление точек. Провал.')
         await message.answer(
             'Список точек не обновлён, нажмите "/update_points" ещё раз'
         )
@@ -238,13 +300,15 @@ async def web_app(message: types.Message):
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
-    data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
-    data['syrup_nut'] = 1 if data['syrup_nut'] else 0
-    data['syrup_other'] = 1 if data['syrup_other'] else 0
     if data['type'] == 'service':
         logging.debug('Данны по обслжуиванию.')
+        data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
+        data['syrup_nut'] = 1 if data['syrup_nut'] else 0
+        data['syrup_other'] = 1 if data['syrup_other'] else 0
         data['type'] = 'Обслуживание'
         append_service_in_table(data)
+        data['fio'] = message.from_user.id
+        send_service_info(data)
     elif data['type'] == 'repair':
         logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
@@ -254,7 +318,6 @@ async def web_app(message: types.Message):
         f'Точка: {data["point"]}\n'
         f'Инженер: {data["fio"]}'
     )
-    # message_data = make_messagedata(data)
     logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
     await message.answer(make_messagedata(data))
 

@@ -18,7 +18,7 @@ class SomeTemplateView(TemplateView):
                 'id': obj.id,
                 'value': obj.name,
             }
-            for obj in Points.objects.all()
+            for obj in Points.objects.filter(activ=True)
         ]
         logging.info('Запрос html страницы. Успешно.')
         return context

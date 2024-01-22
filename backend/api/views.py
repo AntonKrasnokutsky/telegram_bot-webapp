@@ -12,6 +12,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 from points.models import Points
 from rest_framework import mixins, permissions, viewsets
 
+from points.models import Services
+from .serialises import ServicesSerializer
+
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
@@ -154,6 +157,13 @@ def extract_date(request, *args, **kwargs):
 
 class PointsViewSet(viewsets.ModelViewSet):
     queryset = Points.objects.all()
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def __deactivate_points(self, *args, **kwargs):
+        points = Points.objects.all()
+        for point in points:
+            point.activ = False
+            point.save()
 
     def list(self, *args, **kwargs):
         logging.info('API: Обновление списка точек.')
@@ -166,9 +176,15 @@ class PointsViewSet(viewsets.ModelViewSet):
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-        Points.objects.all().delete()
+        # Points.objects.all().delete()
+        self.__deactivate_points()
         for name in points:
-            Points.objects.create(name=name)
+            try:
+                point = Points.objects.get(name=name)
+                point.activ = True
+                point.save()
+            except Points.DoesNotExist:
+                Points.objects.create(name=name)
         logging.info('API: Обновление списка точек. Список точек обновлён.')
         return JsonResponse(
             {'message': 'Список точек обновлен'},
@@ -228,33 +244,15 @@ class RepairViewSet(viewsets.GenericViewSet,
         )
 
 
-class ServicesViewASet(viewsets.GenericViewSet,
-                       mixins.ListModelMixin):
+class ServicesViewASet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     permission_classes = [permissions.IsAuthenticated, ]
-
-    def list(self, request, *args, **kwargs):
-        logging.info('API(авторизация): Запрос списка обслуживний.')
-        try:
-            services = get_list_services_and_repair(SERVICES)
-        except Exception:
-            logging.error(
-                'API(авторизация): Запрос списка обслуживний. '
-                'Google недоступен.'
-            )
-            return JsonResponse(
-                {'error': 'Спиосок не получен. Попробуйте позже'},
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
-
-        logging.info('API(авторизация): Запрос списка обслуживний. Успешно.')
-        return JsonResponse(
-            create_answer(
-                services,
-                'services',
-                extract_date(request)
-            ),
-            status=HTTPStatus.OK
-        )
+    http_method_names = ['get', 'post']
+    queryset = Services.objects.all()
+    serializer_class = ServicesSerializer
 
 
 class RepairViewASet(viewsets.GenericViewSet,
