@@ -29,15 +29,15 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = [
-        os.getenv('HOST_IP'),
-        os.getenv('DOMAIN_NAME'),
-        f'https://{os.getenv("DOMAIN_NAME")}',
-        'localhost', 'backend'
-    ]
+# if DEBUG:
+#     ALLOWED_HOSTS = ['*']
+# else:
+ALLOWED_HOSTS = [
+    os.getenv('HOST_IP'),
+    'beanstogo.ru',
+    'https://beanstogo.ru',
+    'localhost', 'backend'
+]
 
 
 # Application definition
