@@ -128,6 +128,8 @@ def get_token(*args, **kwargs):
         api_token = json.loads(response.text)['auth_token']
         headers = {"Authorization": f"Token {api_token}"}
     logging.info(f'Обновление токена. Status: {response.status_code}')
+    if response.status_code != HTTPStatus.OK:
+        logging.info(f'Обновление токена. Status: {response.text}')
     return response.status_code
 
 
@@ -291,11 +293,6 @@ async def web_app(message: types.Message):
     data['email'] = 'Нет данных'
     data['fio'] = 'Нет данных'
 
-    for user in users:
-        if int(message.from_user.id) == int(user[2]):
-            data['email'] = user[0]
-            data['fio'] = user[1]
-            break
     date_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
@@ -306,12 +303,23 @@ async def web_app(message: types.Message):
         data['syrup_nut'] = 1 if data['syrup_nut'] else 0
         data['syrup_other'] = 1 if data['syrup_other'] else 0
         data['type'] = 'Обслуживание'
-        append_service_in_table(data)
         data['fio'] = message.from_user.id
         send_service_info(data)
+        for user in users:
+            if int(message.from_user.id) == int(user[2]):
+                data['email'] = user[0]
+                data['fio'] = user[1]
+                break
+        append_service_in_table(data)
+
     elif data['type'] == 'repair':
         logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
+        for user in users:
+            if int(message.from_user.id) == int(user[2]):
+                data['email'] = user[0]
+                data['fio'] = user[1]
+                break
         append_repair_in_table(data)
     current_point[message.from_user.id] = (
         f'Вид работ: {data["type"]}\n'

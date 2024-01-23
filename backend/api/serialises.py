@@ -37,9 +37,14 @@ class ServicesSerializer(serializers.ModelSerializer):
         date = datetime.strptime(date_query, old_format).strftime(new_format)
 
         point = Points.objects.get(name=point_name['name'])
-        service_man = ServiceMan.objects.get(
-            telegram_id=service_man_telegram_id['name']
-        )
+        try:
+            service_man = ServiceMan.objects.get(
+                telegram_id=service_man_telegram_id['name']
+            )
+        except ServiceMan.DoesNotExist:
+            raise serializers.ValidationError(
+                {'serviceman': 'Инженер не зарегистрирован.'}
+            )
         return Services.objects.create(
             **self.validated_data,
             point=point,
