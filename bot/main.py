@@ -14,6 +14,12 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
+from .exceptions import (
+    AnyError,
+    ServiceInfoExistError,
+    ServiceManUnregisteredError
+)
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -159,11 +165,23 @@ def send_service_info(data: dict, *args, **kwargs):
         response = requests.post(URL_API_SERVICE, data=body, headers=headers)
 
     if response.status_code == HTTPStatus.OK:
-        logging.info('Данные по обслуживанию отправлены.')
         return
-    logging.error(
-        f'Данные по обслуживанию не отправлены.Status: {response.status_code}'
-    )
+
+    response_json = json.loads(response.text)
+    response_text = list(map(str, response_json))[0]
+    match response_text:
+        case 'serviceman':
+            raise ServiceManUnregisteredError(
+                'Не зарегистрирован'
+            )
+        case 'service_exist':
+            raise ServiceInfoExistError(
+                'Уже сохранено'
+            )
+        case _:
+            raise AnyError(
+                response.text
+            )
 
 
 def append_repair_in_table(data: dict):
@@ -285,11 +303,57 @@ def make_messagedata(data, *args, **kwargs):
     return result
 
 
+async def web_app_service(message: types.Message, data):
+    logging.debug('Данны по обслжуиванию.')
+    data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
+    data['syrup_nut'] = 1 if data['syrup_nut'] else 0
+    data['syrup_other'] = 1 if data['syrup_other'] else 0
+    data['type'] = 'Обслуживание'
+    data['fio'] = message.from_user.id
+    try:
+        send_service_info(data)
+        logging.info('Данные по обслуживанию отправлены.')
+    except ServiceManUnregisteredError:
+        answer = (
+            'Попытка внести данные незарегистрированным '
+            f'инженером: {message.from_user.username}'
+        )
+        logging.critical(answer)
+        await bot.send_message(
+            chat_id=CHAT_ID,
+            text=answer
+        )
+        await message.answer('Данные не сохранены')
+        return
+    except ServiceInfoExistError:
+        answer = 'Данные об обслуживании сегодня уже были сохранены'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+    except AnyError:
+        # answer = f'Данные не сохранены. Ответ сервера: {e.args}'
+        pass
+
+    users = get_user_list()
+    for user in users:
+        if int(message.from_user.id) == int(user[2]):
+            data['email'] = user[0]
+            data['fio'] = user[1]
+            break
+    current_point[message.from_user.id] = (
+        f'Вид работ: {data["type"]}\n'
+        f'Точка: {data["point"]}\n'
+        f'Инженер: {data["fio"]}'
+    )
+    append_service_in_table(data)
+    logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
+    await message.answer(make_messagedata(data))
+
+
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     logging.debug('WebApp.')
     data = json.loads(message.web_app_data.data)
-    users = get_user_list()
     data['email'] = 'Нет данных'
     data['fio'] = 'Нет данных'
 
@@ -298,36 +362,24 @@ async def web_app(message: types.Message):
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
     if data['type'] == 'service':
-        logging.debug('Данны по обслжуиванию.')
-        data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
-        data['syrup_nut'] = 1 if data['syrup_nut'] else 0
-        data['syrup_other'] = 1 if data['syrup_other'] else 0
-        data['type'] = 'Обслуживание'
-        data['fio'] = message.from_user.id
-        send_service_info(data)
-        for user in users:
-            if int(message.from_user.id) == int(user[2]):
-                data['email'] = user[0]
-                data['fio'] = user[1]
-                break
-        append_service_in_table(data)
-
+        web_app_service(message, data)
     elif data['type'] == 'repair':
         logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
+        users = get_user_list()
         for user in users:
             if int(message.from_user.id) == int(user[2]):
                 data['email'] = user[0]
                 data['fio'] = user[1]
                 break
         append_repair_in_table(data)
-    current_point[message.from_user.id] = (
-        f'Вид работ: {data["type"]}\n'
-        f'Точка: {data["point"]}\n'
-        f'Инженер: {data["fio"]}'
-    )
-    logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
-    await message.answer(make_messagedata(data))
+        current_point[message.from_user.id] = (
+            f'Вид работ: {data["type"]}\n'
+            f'Точка: {data["point"]}\n'
+            f'Инженер: {data["fio"]}'
+        )
+        logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
+        await message.answer(make_messagedata(data))
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)

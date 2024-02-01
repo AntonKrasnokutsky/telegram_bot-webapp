@@ -115,4 +115,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: ${{ github.workflow }} успешно выполнен! http://${{ secrets.DOMAIN_NAME }}/
+        message: ${{ github.workflow }} успешно выполнен! Изменения - ${{ github.event.head_commit.message }} http://${{ secrets.DOMAIN_NAME }}/
