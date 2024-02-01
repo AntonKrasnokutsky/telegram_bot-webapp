@@ -166,7 +166,7 @@ def send_service_info(data: dict, *args, **kwargs):
 
     if response.status_code == HTTPStatus.OK:
         return
-
+    print(response.text)
     response_json = json.loads(response.text)
     response_text = list(map(str, response_json))[0]
     match response_text:

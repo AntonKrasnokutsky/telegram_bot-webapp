@@ -4,8 +4,6 @@ from rest_framework import serializers
 
 from points.models import Points, Services, ServiceMan
 
-from .exceptions import ServiceInfoExistError, ServiceManUnregisteredError
-
 
 class ServicesSerializer(serializers.ModelSerializer):
     point = serializers.CharField(source='point.name')
@@ -43,7 +41,7 @@ class ServicesSerializer(serializers.ModelSerializer):
                 telegram_id=service_man_telegram_id['name']
             )
         except ServiceMan.DoesNotExist:
-            raise ServiceManUnregisteredError(
+            raise serializers.ValidationError(
                 {'serviceman': 'Инженер не зарегистрирован.'}
             )
         date = datetime.strptime(date_query, old_format)
@@ -53,7 +51,7 @@ class ServicesSerializer(serializers.ModelSerializer):
             date__day=date.day,
             point=point
         ).exists():
-            raise ServiceInfoExistError(
+            raise serializers.ValidationError(
                 {
                     'service_exist': 'Информация по обслуживанию точки '
                                      'сегодня уже была добавлена.'
