@@ -362,7 +362,7 @@ async def web_app(message: types.Message):
     date_msk = date_utc.astimezone(tz)
     data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
     if data['type'] == 'service':
-        web_app_service(message, data)
+        await web_app_service(message, data)
     elif data['type'] == 'repair':
         logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
