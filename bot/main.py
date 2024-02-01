@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
-from .exceptions import (
+from exceptions import (
     AnyError,
     ServiceInfoExistError,
     ServiceManUnregisteredError
