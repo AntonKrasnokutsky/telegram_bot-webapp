@@ -30,6 +30,7 @@ URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
 URL_API_SERVICE = os.getenv('URL_API_SERVICE')
 URL_API_AUTH = os.getenv('URL_API_AUTH')
+URL_API_SERVICE_MAN = os.getenv('URL_API_SERVICE_MAN')
 AUTH = {
     'username': os.getenv('API_USER'),
     'password': os.getenv('API_PASSWORD')
@@ -47,6 +48,14 @@ SHEET_REPEAR = os.getenv('SHEET_REPEAR')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICEMAN_RANGE = os.getenv('SERVICEMAN_RANGE')
 
+service_man = {
+    'name': '',
+    'telegram_id': 0,
+    'create': False,
+    'change_activ': False
+}
+
+reg_service_man = {}
 current_point = {}
 
 
@@ -79,19 +88,17 @@ def get_list_points():
 
 def get_user_list():
     logging.debug('Получеие списка инженеров.')
-    results = get_service_sacc().spreadsheets().values().batchGet(
-        spreadsheetId=SPREADSHEET_ID,
-        ranges=SERVICEMAN_RANGE,
-        majorDimension='ROWS',
-        valueRenderOption='FORMATTED_VALUE',
-        dateTimeRenderOption='FORMATTED_STRING'
-    ).execute()
-    sheet_values = results['valueRanges'][0]['values']
-    try:
-        sheet_values.remove('')
-    except ValueError:
-        pass
-    return sheet_values
+    response = requests.get(
+        URL_API_SERVICE_MAN,
+        headers=headers
+    )
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.get(
+            URL_API_SERVICE_MAN,
+            headers=headers
+        )
+    return json.loads(response.text)
 
 
 def append_service_in_table(data: dict):
@@ -166,7 +173,6 @@ def send_service_info(data: dict, *args, **kwargs):
 
     if response.status_code == HTTPStatus.OK:
         return
-    print(response.text)
     response_json = json.loads(response.text)
     response_text = list(map(str, response_json))[0]
     match response_text:
@@ -276,6 +282,226 @@ async def repair(message: types.Message):
     await message.answer('Ремонт', reply_markup=markup)
 
 
+def check_user(user_id, *args, **kwargs):
+    response = requests.get(
+        URL_API_SERVICE_MAN,
+        headers=headers,
+        params=f'telegram_id={user_id}'
+    )
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.get(
+            URL_API_SERVICE_MAN,
+            headers=headers,
+            params=f'telegram_id={user_id}'
+        )
+    try:
+        response_json = json.loads(response.text)[0]
+    except IndexError:
+        return False
+
+    return response_json['activ']
+
+
+@dp.message_handler(commands=['change_activ'])
+async def change_activ(message: types.Message):
+    if check_user(message.from_user.id):
+        logging.info(
+            f'Сотрудник @{message.from_user.username} запросил смену '
+            'статуса сотрудника.'
+        )
+        if not reg_service_man.get(message.from_user.id, False):
+            reg_service_man[message.from_user.id] = service_man.copy()
+        reg_service_man[message.from_user.id]['change_activ'] = True
+        reg_service_man[message.from_user.id]['create'] = False
+        await message.answer(
+            'Введите Telegram ID сотрудника, которому необходимо изменить '
+            'статус'
+        )
+
+
+@dp.message_handler(commands=['staff'])
+async def staff(message: types.Message):
+    if check_user(message.from_user.id):
+        logging.info(
+            f'Сотрудник @{message.from_user.username} запросил регистрацию '
+            'нового сотрудника.'
+        )
+        if not reg_service_man.get(message.from_user.id, False):
+            reg_service_man[message.from_user.id] = service_man.copy()
+        reg_service_man[message.from_user.id]['create'] = True
+        reg_service_man[message.from_user.id]['name'] = ''
+        reg_service_man[message.from_user.id]['telegram_id'] = ''
+
+        reg_service_man[message.from_user.id]['change_activ'] = False
+        await message.answer(
+            'Для регистрации нового сотудника введите его имя'
+        )
+
+
+def service_man_get_id(telegram_id, *args, **kwargs):
+    response = requests.get(
+        URL_API_SERVICE_MAN,
+        headers=headers,
+        params=f'telegram_id={telegram_id}'
+    )
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.get(
+            URL_API_SERVICE_MAN,
+            headers=headers,
+            params=f'telegram_id={telegram_id}'
+        )
+    try:
+        response_json = json.loads(response.text)[0]
+    except IndexError:
+        return False
+
+    return response_json.get('id', False)
+
+
+def service_man_change_activ(service_man_id, *args, **kwargs):
+    url = f'{URL_API_SERVICE_MAN}{service_man_id}/change_activ/'
+    response = requests.post(
+        url,
+        headers=headers
+    )
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.post(
+            url,
+            headers=headers
+        )
+    if response.status_code == HTTPStatus.OK:
+        return json.loads(response.text)
+
+    return False
+
+
+async def service_man_change(message: types.Message):
+    reg_service_man[message.from_user.id]['change_activ'] = False
+    try:
+        telegram_id = int(message.text)
+    except ValueError:
+        logging.info(
+            'Изменение статуса сотрудника. Не верный Telegram ID'
+        )
+        return
+    service_man_id = service_man_get_id(telegram_id)
+    logging.info(
+        'Изменение статуса сотрудника.'
+    )
+    if service_man_id:
+        service_man_after_change = service_man_change_activ(
+            service_man_id
+        )
+        if service_man_after_change:
+            if service_man_after_change['activ']:
+                status = 'Работает'
+            else:
+                status = 'Уволен'
+            answer = (
+                f'Статус сотрудника {telegram_id} изменён на: {status}'
+                f'сотрудником @{message.from_user.username}'
+            )
+            logging.info(answer)
+            await message.answer(f'Статус не изменен на: {status}')
+            await bot.send_message(
+                chat_id=CHAT_ID,
+                text=answer
+            )
+        else:
+            logging.info(
+                f'Статус сотрудника {telegram_id} не изменён.'
+            )
+            await message.answer('Статус не изменен')
+        return
+    logging.info(f'Сотрудник с ID {telegram_id} не найден')
+    await message.answer('Сотрудник не найден.')
+
+
+def registr_man(user_id, *args, **kwargs):
+    body = {
+        'name': reg_service_man[user_id]['name'],
+        'telegram_id': reg_service_man[user_id]['telegram_id']
+    }
+    response = requests.post(
+        URL_API_SERVICE_MAN,
+        data=body,
+        headers=headers
+    )
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        get_token()
+        response = requests.post(
+            URL_API_SERVICE_MAN,
+            data=body,
+            headers=headers
+        )
+    if response.status_code == HTTPStatus.CREATED:
+        print(json.loads(response.text))
+        return json.loads(response.text)
+    return False
+
+
+async def registr_service_man(message: types.Message):
+    user_id = message.from_user.id
+    if reg_service_man[user_id]['name'] == '':
+        logging.info(
+            f'Сотрудник @{message.from_user.username} указал имя '
+            f'нового сотрудника: {message.text}'
+        )
+        reg_service_man[user_id]['name'] = message.text
+        await message.answer('Введите telegram ID нового сотрудника')
+    elif reg_service_man[user_id]['telegram_id'] == '':
+        reg_service_man[user_id]['create'] = False
+        try:
+            reg_service_man[user_id]['telegram_id'] = int(message.text)
+        except ValueError:
+            logging.info(
+                f'Сотрудник @{message.from_user.username} указал неверный '
+                f'Telegram ID новго сотрудника: {message.text}'
+            )
+            reg_service_man[user_id]['create'] = False
+            return
+        registr = registr_man(user_id)
+        if registr:
+            answer = (
+                f'Новый пользователь {reg_service_man[user_id]["name"]} '
+                f'Telegram ID {reg_service_man[user_id]["telegram_id"]} '
+                f'зарегистрирован сотрудником @{message.from_user.username}'
+            )
+            logging.info(answer)
+            await message.answer('Пользователь зарегистрирован.')
+            await bot.send_message(
+                chat_id=CHAT_ID,
+                text=answer
+            )
+            return
+        logging.info('Новый пользователь не зарегистрирован')
+        await message.answer('Новый пользователь не зарегистрирован')
+
+
+@dp.message_handler()
+async def any_message(message: types.Message):
+    if reg_service_man.get(message.from_user.id, False):
+        if (
+            check_user(message.from_user.id)
+            and reg_service_man[message.from_user.id].get(
+                'change_activ',
+                False
+            )
+        ):
+            await service_man_change(message)
+        elif (
+            check_user(message.from_user.id)
+            and reg_service_man[message.from_user.id].get(
+                'create',
+                False
+            )
+        ):
+            await registr_service_man(message)
+
+
 def make_messagedata(data, *args, **kwargs):
     logging.debug('Подготовка ответного сообщения.')
     result = ''
@@ -303,6 +529,16 @@ def make_messagedata(data, *args, **kwargs):
     return result
 
 
+# Убрать после вступления в силу изменений API
+def user_data(user_id, data):
+    users = get_user_list()
+    for user in users:
+        if int(user_id) == int(user['telegram_id']):
+            data['fio'] = user['name']
+            break
+# end
+
+
 async def web_app_service(message: types.Message, data):
     logging.debug('Данны по обслжуиванию.')
     data['syrup_caramel'] = 1 if data['syrup_caramel'] else 0
@@ -316,7 +552,7 @@ async def web_app_service(message: types.Message, data):
     except ServiceManUnregisteredError:
         answer = (
             'Попытка внести данные незарегистрированным '
-            f'инженером: {message.from_user.username}'
+            f'инженером: @{message.from_user.username}'
         )
         logging.critical(answer)
         await bot.send_message(
@@ -334,12 +570,9 @@ async def web_app_service(message: types.Message, data):
         # answer = f'Данные не сохранены. Ответ сервера: {e.args}'
         pass
 
-    users = get_user_list()
-    for user in users:
-        if int(message.from_user.id) == int(user[2]):
-            data['email'] = user[0]
-            data['fio'] = user[1]
-            break
+    # Убрать после вступления в силу изменений API
+    user_data(message.from_user.id, data)
+    # end
     current_point[message.from_user.id] = (
         f'Вид работ: {data["type"]}\n'
         f'Точка: {data["point"]}\n'
@@ -347,7 +580,12 @@ async def web_app_service(message: types.Message, data):
     )
     append_service_in_table(data)
     logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
-    await message.answer(make_messagedata(data))
+    answer = make_messagedata(data)
+    await message.answer(answer)
+    await bot.send_message(
+        chat_id=CHAT_ID,
+        text=answer
+    )
 
 
 @dp.message_handler(content_types=['web_app_data'])
@@ -366,12 +604,9 @@ async def web_app(message: types.Message):
     elif data['type'] == 'repair':
         logging.debug('Данны по ремонту.')
         data['type'] = 'Ремонт'
-        users = get_user_list()
-        for user in users:
-            if int(message.from_user.id) == int(user[2]):
-                data['email'] = user[0]
-                data['fio'] = user[1]
-                break
+        # Убрать после вступления в силу изменений API
+        user_data(message.from_user.id, data)
+        # end
         append_repair_in_table(data)
         current_point[message.from_user.id] = (
             f'Вид работ: {data["type"]}\n'
@@ -385,11 +620,14 @@ async def web_app(message: types.Message):
 @dp.message_handler(content_types=types.ContentType.PHOTO)
 async def forward_photo(message: types.Message):
     logging.debug('Пересылка фотографии.')
-    await bot.send_photo(
-        chat_id=CHAT_ID,
-        photo=message.photo[-1].file_id,
-        caption=current_point[message.from_user.id]
-    )
+    if current_point.get(message.from_user.id, False):
+        await bot.send_photo(
+            chat_id=CHAT_ID,
+            photo=message.photo[-1].file_id,
+            caption=current_point[message.from_user.id]
+        )
+    else:
+        await message.answer('Сначала нужно внести данные об обслуживании.')
 
 
 if __name__ == "__main__":

@@ -7,13 +7,16 @@ from http import HTTPStatus
 
 import httplib2
 from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from points.models import Points
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, permissions, viewsets, status
+from rest_framework.decorators import action
 
-from points.models import Services
-from .serialises import ServicesSerializer
+from points.models import Services, ServiceMan
+from .serialises import ServicesSerializer, ServiceManSerializer
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
@@ -176,7 +179,6 @@ class PointsViewSet(viewsets.ModelViewSet):
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-        # Points.objects.all().delete()
         self.__deactivate_points()
         for name in points:
             try:
@@ -281,3 +283,42 @@ class RepairViewASet(viewsets.GenericViewSet,
             ),
             status=HTTPStatus.OK
         )
+
+
+class ServiceManViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
+    permission_classes = [permissions.IsAuthenticated, ]
+    http_method_names = ['get', 'post']
+    serializer_class = ServiceManSerializer
+    queryset = ServiceMan.objects.all()
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ['telegram_id', ]
+
+    @property
+    def service_man(self):
+        return get_object_or_404(ServiceMan, pk=self.kwargs.get('pk'))
+
+    @action(
+        methods=['post'],
+        # serializer_class=ShoppingCartSerializer,
+        detail=True,
+        url_path='change_activ'
+    )
+    def change_activ(self, *args, **kwargs):
+        print('Go')
+        service_man = self.service_man
+        service_man.activ = not service_man.activ
+        service_man.save()
+
+        serializer = ServiceManSerializer(data={
+            'id': service_man.id,
+            'name': service_man.name,
+            'telegram_id': service_man.telegram_id,
+            'activ': service_man.activ
+        })
+
+        serializer.is_valid()
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)

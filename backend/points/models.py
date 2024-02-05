@@ -12,7 +12,7 @@ class Points(models.Model):
 
 class ServiceMan(models.Model):
     name = models.TextField()
-    telegram_id = models.BigIntegerField()
+    telegram_id = models.BigIntegerField(unique=True)
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):

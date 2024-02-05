@@ -98,10 +98,11 @@ jobs:
             echo REPAIRS=${{ secrets.REPAIRS }} >> .env
 
             echo URL_API_SERVICE=${{ secrets.URL_API_SERVICE }} >> .env
+            echo URL_API_SERVICE_MAN=${{ secrets.URL_API_SERVICE_MAN }} >> .env
             echo URL_API_AUTH=${{ secrets.URL_API_AUTH }} >> .env
             echo API_USER=${{ secrets.API_USER }} >> .env
             echo API_PASSWORD=${{ secrets.API_PASSWORD }} >> .env
-
+            
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/coffee_bot_backend
             sudo docker compose up -d

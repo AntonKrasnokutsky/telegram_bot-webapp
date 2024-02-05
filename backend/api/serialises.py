@@ -44,6 +44,10 @@ class ServicesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'serviceman': 'Инженер не зарегистрирован.'}
             )
+        if not service_man.activ:
+            raise serializers.ValidationError(
+                {'serviceman': 'Инженер уволен.'}
+            )
         date = datetime.strptime(date_query, old_format)
         if Services.objects.filter(
             date__year=date.year,
@@ -65,3 +69,9 @@ class ServicesSerializer(serializers.ModelSerializer):
             service_man=service_man,
             date=date
         )
+
+
+class ServiceManSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceMan
+        fields = ['id', 'name', 'telegram_id', 'activ',]
