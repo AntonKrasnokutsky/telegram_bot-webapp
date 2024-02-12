@@ -16,6 +16,7 @@ from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action
 
 from points.models import Services, ServiceMan
+from .filters import ServicesFilter
 from .serialises import ServicesSerializer, ServiceManSerializer
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
@@ -152,7 +153,7 @@ def extract_date(request, *args, **kwargs):
     except json.decoder.JSONDecodeError:
         logging.info(
             'API: Поиск ограничений по дате в запросе. '
-            'Выдём список без ограничения.'
+            'Выдаём список без ограничения.'
         )
     logging.info('API: Поиск ограничений по дате в запросе. Даты выбраны.')
     return result
@@ -253,8 +254,29 @@ class ServicesViewASet(
 ):
     permission_classes = [permissions.IsAuthenticated, ]
     http_method_names = ['get', 'post']
-    queryset = Services.objects.all()
     serializer_class = ServicesSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = ServicesFilter
+
+    def get_queryset(self):
+        date_range = extract_date(self.request)
+        if len(date_range) != 0:
+            if (
+                'frome_date' in date_range.keys()
+                and 'before_date' in date_range.keys()
+            ):
+                return Services.objects.filter(
+                    date__gte=date_range['frome_date'],
+                    date__lte=date_range['before_date']
+                )
+            if 'frome_date' in date_range.keys():
+                return Services.objects.filter(
+                    date__gte=date_range['frome_date']
+                )
+            return Services.objects.filter(
+                date__lte=date_range['before_date']
+            )
+        return Services.objects.all()
 
 
 class RepairViewASet(viewsets.GenericViewSet,
@@ -303,12 +325,10 @@ class ServiceManViewSet(
 
     @action(
         methods=['post'],
-        # serializer_class=ShoppingCartSerializer,
         detail=True,
         url_path='change_activ'
     )
     def change_activ(self, *args, **kwargs):
-        print('Go')
         service_man = self.service_man
         service_man.activ = not service_man.activ
         service_man.save()

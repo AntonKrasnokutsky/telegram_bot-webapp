@@ -401,11 +401,11 @@ async def service_man_change(message: types.Message):
             else:
                 status = 'Уволен'
             answer = (
-                f'Статус сотрудника {telegram_id} изменён на: {status}'
+                f'Статус сотрудника {telegram_id} изменён на: {status} '
                 f'сотрудником @{message.from_user.username}'
             )
             logging.info(answer)
-            await message.answer(f'Статус не изменен на: {status}')
+            await message.answer(f'Статус изменен на: {status}')
             await bot.send_message(
                 chat_id=CHAT_ID,
                 text=answer
@@ -509,7 +509,7 @@ def make_messagedata(data, *args, **kwargs):
     result += f'Инженер: {data["fio"]}\n'
     result += f'Точка обслуживания: {data["point"]}\n'
     if data['type'] == 'Обслуживание':
-        result += f'Инкачация: ₽\xa0 {data["collection"]}\n'
+        result += f'Инкасация: ₽\xa0 {data["collection"]}\n'
         result += f'Кофе: {data["coffee"]}\n'
         result += f'Сливки: {data["cream"]}\n'
         result += f'Шоколад: {data["chocolate"]}\n'
