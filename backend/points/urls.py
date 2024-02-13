@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SomeTemplateView
+from .views import ServicesTemplateView, SomeTemplateView
 
 app_name = 'points'
 
@@ -13,5 +13,10 @@ urlpatterns = [
         'repair/',
         SomeTemplateView.as_view(template_name='points/repair.html')
     ),
+    path(
+        'services_list/',
+        ServicesTemplateView.as_view(),
+        name='services_list'
+    )
 
 ]

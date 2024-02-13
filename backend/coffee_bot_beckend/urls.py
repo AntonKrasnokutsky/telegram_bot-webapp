@@ -17,9 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+handler404 = 'core.views.page_not_found'
+handler403 = 'core.views.csrf_failure'
+handler500 = 'core.views.internal_error'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-    path('', include('points.urls')),
+    path('api/', include('api.urls', namespace='api')),
+    path('', include('points.urls', namespace='points')),
+    path('auth/', include('users.urls', namespace='users')),
+    path('auth/', include('django.contrib.auth.urls')),
 
 ]

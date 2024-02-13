@@ -1,0 +1,13 @@
+th {
+  background-color: #fff;
+  color: #333;
+}
+
+tbody tr:hover {
+  background: #e7e7e7;
+  color: #333;
+}
+
+.text-center {
+  text-align: center;
+}

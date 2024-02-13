@@ -20,20 +20,20 @@ class ServiceMan(models.Model):
 
 
 class Services(models.Model):
-    date = models.DateTimeField(verbose_name='Дата обслуживания')
+    date = models.DateTimeField(verbose_name='Дата время')
     service_man = models.ForeignKey(
         'ServiceMan',
         on_delete=models.PROTECT,
-        verbose_name='Инженер'
+        verbose_name='Исполнитель'
     )
     point = models.ForeignKey(
         'Points',
         on_delete=models.PROTECT,
-        verbose_name='Место'
+        verbose_name='Точка'
     )
     collection = models.PositiveIntegerField(
         default=0,
-        verbose_name='Сумма инкасации'
+        verbose_name='Инкасация'
     )
     coffee = models.PositiveSmallIntegerField(
         default=0,
@@ -41,7 +41,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(2)
         ],
-        verbose_name='Кофе'
+        verbose_name='Кофе, кг'
     )
     cream = models.PositiveSmallIntegerField(
         default=0,
@@ -49,7 +49,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(2)
         ],
-        verbose_name='Сливки'
+        verbose_name='Сливки, кг'
     )
     chocolate = models.PositiveSmallIntegerField(
         default=0,
@@ -57,7 +57,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(2)
         ],
-        verbose_name='Шоколад'
+        verbose_name='Шоколад, кг'
     )
     raf = models.PositiveSmallIntegerField(
         default=0,
@@ -65,7 +65,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(2)
         ],
-        verbose_name='Раф'
+        verbose_name='Раф, кг'
     )
     sugar = models.PositiveSmallIntegerField(
         default=0,
@@ -73,7 +73,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(250)
         ],
-        verbose_name='Сахар'
+        verbose_name='Сахар, шт'
     )
     syrup_caramel = models.PositiveSmallIntegerField(
         default=0,
@@ -81,7 +81,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(1)
         ],
-        verbose_name='Сироп Солёная карамель'
+        verbose_name='Сироп "Соленая карамель", шт'
     )
     syrup_nut = models.PositiveSmallIntegerField(
         default=0,
@@ -89,7 +89,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(1)
         ],
-        verbose_name='Сироп Лесной орех'
+        verbose_name='Сироп "Лесной орех", шт'
     )
     syrup_other = models.PositiveSmallIntegerField(
         default=0,
@@ -97,7 +97,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(1)
         ],
-        verbose_name='Сироп Другой'
+        verbose_name='Сироп ДРУГОЙ, шт'
     )
     glasses = models.PositiveSmallIntegerField(
         default=0,
@@ -105,7 +105,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(250)
         ],
-        verbose_name='Стаканы'
+        verbose_name='Стаканы, шт'
     )
     covers = models.PositiveSmallIntegerField(
         default=0,
@@ -113,7 +113,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(100)
         ],
-        verbose_name='Крышки'
+        verbose_name='Крышки, шт'
     )
     stirrer = models.PositiveSmallIntegerField(
         default=0,
@@ -121,7 +121,7 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(500)
         ],
-        verbose_name='Размешиватели'
+        verbose_name='Размешиватели, шт'
     )
     straws = models.PositiveSmallIntegerField(
         default=0,
@@ -129,8 +129,11 @@ class Services(models.Model):
             MinValueValidator(0),
             MaxValueValidator(150)
         ],
-        verbose_name='Трубочки'
+        verbose_name='Трубочки, шт'
     )
+
+    class Meta:
+        ordering = ['date', ]
 
     def __str__(self, *args, **kwargs):
         return str(self.date)

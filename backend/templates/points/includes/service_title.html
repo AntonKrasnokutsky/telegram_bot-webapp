@@ -1,0 +1,55 @@
+{% load verbose_name %}
+<tr>
+    <th width="2%" >
+        №<br/>
+        п/п
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "date" %}
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "service_man" %}
+    </th>
+    <th width="33%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "point" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "collection" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "coffee" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "cream" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "chocolate" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "raf" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "sugar" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "syrup_caramel" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "syrup_nut" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "syrup_other" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "glasses" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "covers" %}
+    </th>
+    <th width="4%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "stirrer" %}
+    </th>
+    <th width="3%" style="word-wrap:break-word">
+        {% get_verbose_field_name service "straws" %}
+    </th>
+</tr>
