@@ -41,7 +41,6 @@ class ServicesTemplateView(TemplateView):
         services_list = Services.objects.all()
         paginator = Paginator(services_list, 20)
         page_number = self.request.GET.get('page', paginator.num_pages)
-        print(page_number)
         page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
         return context
