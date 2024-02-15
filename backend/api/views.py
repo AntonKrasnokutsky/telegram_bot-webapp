@@ -22,8 +22,8 @@ from .serialises import ServicesSerializer, ServiceManSerializer
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
-SERVICES = os.getenv('SERVICES')
-REPAIRS = os.getenv('REPAIRS')
+SERVICES = os.getenv('SHEET_SERVICE')
+REPAIRS = os.getenv('SHEET_REPAIRS')
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -197,7 +197,7 @@ class PointsViewSet(viewsets.ModelViewSet):
 
 class ServicesViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin):
-    # permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
         logging.info('API: Запрос списка обслуживний.')
@@ -223,7 +223,7 @@ class ServicesViewSet(viewsets.GenericViewSet,
 
 class RepairViewSet(viewsets.GenericViewSet,
                     mixins.ListModelMixin):
-    # permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request, *args, **kwargs):
         logging.info('API: Запрос списка ремонтров.')

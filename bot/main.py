@@ -42,11 +42,10 @@ api_token = ''
 headers = {"Authorization": f"Token {api_token}"}
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
-SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
-SHEET_SERVICE = os.getenv('SHEET_SERVICE')
-SHEET_REPEAR = os.getenv('SHEET_REPEAR')
-POINTS_RANGE = os.getenv('POINTS_RANGE')
-SERVICEMAN_RANGE = os.getenv('SERVICEMAN_RANGE')
+SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')    # удалит при отключении google
+SHEET_SERVICE = os.getenv('SHEET_SERVICE')  # удалит при отключении google
+SHEET_REPEAR = os.getenv('SHEET_REPEAR')    # удалит при отключении google
+
 
 service_man = {
     'name': '',
@@ -70,66 +69,20 @@ def get_service_sacc():
     return build('sheets', 'v4', http=creds_service)
 
 
-def get_list_points():
-    results = get_service_sacc().spreadsheets().values().batchGet(
-        spreadsheetId=SPREADSHEET_ID,
-        ranges=POINTS_RANGE,
-        majorDimension='COLUMNS',
-        valueRenderOption='FORMATTED_VALUE',
-        dateTimeRenderOption='FORMATTED_STRING'
-    ).execute()
-    sheet_values = results['valueRanges'][0]['values'][0]
-    try:
-        sheet_values.remove('')
-    except ValueError:
-        pass
-    return sheet_values
+def requst_api_services_man(*args, **kwargs):
+    return requests.get(
+        URL_API_SERVICE_MAN,
+        headers=headers
+    )
 
 
 def get_user_list():
     logging.debug('Получеие списка инженеров.')
-    response = requests.get(
-        URL_API_SERVICE_MAN,
-        headers=headers
-    )
+    response = requst_api_services_man()
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         get_token()
-        response = requests.get(
-            URL_API_SERVICE_MAN,
-            headers=headers
-        )
+        response = requst_api_services_man()
     return json.loads(response.text)
-
-
-def append_service_in_table(data: dict):
-    body = {
-        'values':
-        [[
-            data['date'],
-            data['email'],
-            data['fio'],
-            data['point'],
-            f'₽\xa0 {data["collection"]}',
-            data['coffee'],
-            data['cream'],
-            data['chocolate'],
-            data['raf'],
-            data['sugar'],
-            data['syrup_caramel'],
-            data['syrup_nut'],
-            data['syrup_other'],
-            data['glasses'],
-            data['covers'],
-            data['stirrer'],
-            data['straws'],
-        ]]}
-
-    get_service_sacc().spreadsheets().values().append(
-        spreadsheetId=SPREADSHEET_ID,
-        range=SHEET_SERVICE,
-        valueInputOption="USER_ENTERED",
-        body=body
-    ).execute()
 
 
 def get_token(*args, **kwargs):
@@ -144,6 +97,10 @@ def get_token(*args, **kwargs):
     if response.status_code != HTTPStatus.OK:
         logging.info(f'Обновление токена. Status: {response.text}')
     return response.status_code
+
+
+def request_api_service(body, *args, **kwargs):
+    return requests.post(URL_API_SERVICE, data=body, headers=headers)
 
 
 def send_service_info(data: dict, *args, **kwargs):
@@ -165,11 +122,11 @@ def send_service_info(data: dict, *args, **kwargs):
         'stirrer': data['stirrer'],
         'straws': data['straws']
     }
-    response = requests.post(URL_API_SERVICE, data=body, headers=headers)
+    response = request_api_service(body)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         logging.info('Требуется обновление токена')
         get_token()
-        response = requests.post(URL_API_SERVICE, data=body, headers=headers)
+        response = request_api_service(body)
 
     if response.status_code == HTTPStatus.OK:
         return
@@ -578,7 +535,6 @@ async def web_app_service(message: types.Message, data):
         f'Точка: {data["point"]}\n'
         f'Инженер: {data["fio"]}'
     )
-    append_service_in_table(data)
     logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
     answer = make_messagedata(data)
     await message.answer(answer)

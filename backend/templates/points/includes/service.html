@@ -1,9 +1,12 @@
+{% load tz %}
 <tr>
     <td align="center">
         {{ forloop.counter }}
     </td>
     <td>
-        {{ service.date }}
+        {% timezone None %}
+            {{ service.date }}
+        {% endtimezone %}
     </td>
     <td>
         {{ service.service_man }}

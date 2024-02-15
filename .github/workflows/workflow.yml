@@ -89,8 +89,6 @@ jobs:
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
             echo SHEET_SERVICE=${{ secrets.SHEET_SERVICE }} >> .env
             echo SHEET_REPEAR=${{ secrets.SHEET_REPEAR }} >> .env
-            echo POINTS_RANGE=${{ secrets.POINTS_RANGE }} >> .env
-            echo SERVICEMAN_RANGE=${{ secrets.SERVICEMAN_RANGE }} >> .env
             echo HOST_IP=${{ secrets.HOST }} >> .env
             echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> .env
             echo CHAT_ID=${{ secrets.CHAT_ID }} >> .env

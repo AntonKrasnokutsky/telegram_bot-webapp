@@ -43,28 +43,26 @@ URL_SERVICE=https://{domain}/service/
 URL_REPAIR=https://{domain}/repair/
 CREDENTIALS_FILE=json_доступа_сервисного аккаунта
 SPREADSHEET_ID=ID_таблицы_google
-SHEET_SERVICE=страница_сохранения_данных_обслуживания
 SHEET_REPEAR=страница_сохранения_данных_ремонта
 URL_API_POINTS=https://{domain}/api/points/
-POINTS_RANGE=Страница_и_диапазон_ячеек_с_точками
-SERVICEMAN_RANGE=Страница_и_диапазон_ячеек_c_инженерами
 CHAT_ID=id_чата_для_пересылки_фото
+API_USER=пользоватль
+API_PASSWORD=пароль
+DB_ENGINE=django.db.backends.postgresql
+DB_HOST=адрес БД, например localhost
+DB_PORT=порт БД
+DOMAIN_NAME=доменное имя
+POSTGRES_DB=название базы
+POSTGRES_PASSWORD=пароль базы
+POSTGRES_USER=пользователь базы
+SECRET_KEY=секретный ключ Django
+URL_API_AUTH=пусть для авторизации
+URL_API_POINTS=путь обновления точек
+URL_API_SERVICE=путь к эндроинту обслуживания
+URL_API_SERVICE_MAN= путь к эндпоинту сотрудников
 ```
 
-Создать и активировать виртуально окружение:
-```
-python3.11 -m venv venv
-. venv/bin/activate
-```
-
-Обновить пакетный менеджер и установить зависимости:
-```
-pip install -U pip
-pip install -r backend/requirements.txt
-pip install -r bot/requirements.txt
-```
-
-Запустить контейнеры с БД и ботом
+Запустить контейнеры
 ```
 cd infra
 sudo docker compose up -d
@@ -72,17 +70,18 @@ sudo docker compose up -d
 
 Выполнить миграции БД, сбор статики и запустить backned:
 ```
-cd ../backend
-python manage.py migrate
-python manage.py collectstatic
-python manage.py runserver
+docker compose exec -it backend python /app/manage.py migrate
 ```
 
+Собрать статику
+```
+docker compose exec -it backend python /app/manage.py collectstatic
+```
 
 API
 
 Получение токена
-POST: `localhost:8000/api/auth/token/login/`
+POST: `https://<domainname>/api/auth/token/login/`
 ```
 {
     "password": "password",
@@ -99,7 +98,7 @@ POST: `localhost:8000/api/auth/token/login/`
 
 Только для авторизованных запросов
 Получение списка проведенных обслуживаний
-GET: `localhost:8000/api/services/`
+GET: `https://<domainname>/api/v2/services/`
 Дополнительные параметры в запросе (не обязательно):
 ```
 {
@@ -107,10 +106,12 @@ GET: `localhost:8000/api/services/`
     "before_date": "01.11.2023" # ответ должен содержать записи по даты (включительно)
 }
 ```
+или GET: `https://<domainname>/api/v2/services/?date_after=<гггг-мм-дд>&date_before=<гггг-мм-дд>`
+
 при наличии только одного параметра в ответе будут содержаться данные от или до даты указанной в запросе
 
 Получение списка проведенных ремонтов
-GET: `localhost:8000/api/repairs/`
+GET: `https://<domainname>/api/repairs/`
 Дополнительные параметры в запросе (не обязательно):
 ```
 {
@@ -120,5 +121,18 @@ GET: `localhost:8000/api/repairs/`
 ```
 при наличии только одного параметра в ответе будут содержаться данные от или до даты указанной в запросе
 
+
+Эндпоинт работы с сотрудникам(доступно только зарегистрированным инженерам)
+`https://<domainname>/api/v2/serviceman/`
+get запрос возвращает список сотрудников
+POST регистрирует сотрдника
+```
+{
+    "name": "Имя",
+    "telegram_id": <ID нового сотрудника в telegram>
+}
+```
+Post с указанием Id записи в БД инвертирует статус сотрудника работает/уволен
+
 Обновление списка точек обслуживания
-GET: `localhost:8000/api/points/`
+GET: `https://<domainname>/api/points/`
