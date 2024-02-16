@@ -4,9 +4,9 @@
         {{ forloop.counter }}
     </td>
     <td>
-        {% timezone None %}
-            {{ service.date }}
-        {% endtimezone %}
+        {% localtime on %}
+        {{ service.date }}
+        {% endlocaltime %}
     </td>
     <td>
         {{ service.service_man }}
