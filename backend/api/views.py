@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 
 import httplib2
@@ -24,6 +24,7 @@ SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICES = os.getenv('SHEET_SERVICE')
 REPAIRS = os.getenv('SHEET_REPAIRS')
+days_to_subtract = 7
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -138,11 +139,10 @@ def extract_date(request, *args, **kwargs):
         request_body = json.loads(request.body)
         if 'frome_date' in request_body.keys():
             result['frome_date'] = (
-                (
-                    datetime.strptime(
-                        request_body['frome_date'],
-                        '%d.%m.%Y'
-                    ).date()))
+                datetime.strptime(
+                    request_body['frome_date'],
+                    '%d.%m.%Y'
+                ).date())
         if 'before_date' in request_body.keys():
             result['before_date'] = (
                 (
@@ -151,9 +151,13 @@ def extract_date(request, *args, **kwargs):
                         '%d.%m.%Y'
                     ).date()))
     except json.decoder.JSONDecodeError:
+        result['frome_date'] = (
+            datetime.today()
+            - timedelta(days=days_to_subtract)
+        )
         logging.info(
             'API: Поиск ограничений по дате в запросе. '
-            'Выдаём список без ограничения.'
+            'Выдаём список за 7 дней.'
         )
     logging.info('API: Поиск ограничений по дате в запросе. Даты выбраны.')
     return result
