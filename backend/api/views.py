@@ -51,6 +51,9 @@ def get_list_points():
         valueRenderOption='FORMATTED_VALUE',
         dateTimeRenderOption='FORMATTED_STRING'
     ).execute()
+    logging.info(f'keys {results.keys()}')
+    logging.info(f'len valueRanges {len(results["valueRanges"])}')
+    logging.info(f'keys valueRanges {results["valueRanges"][0].keys()}')
     sheet_values = results['valueRanges'][0]['values'][0]
     try:
         sheet_values.remove('')
