@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from http import HTTPStatus
 
 import httplib2
@@ -15,16 +15,17 @@ from points.models import Points
 from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action
 
-from points.models import Services, ServiceMan
+from points.models import Repairs, Services, ServiceMan
 from .filters import ServicesFilter
-from .serialises import ServicesSerializer, ServiceManSerializer
+from .serialises import (
+    RepairsSerializer, ServicesSerializer, ServiceManSerializer
+)
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 POINTS_RANGE = os.getenv('POINTS_RANGE')
 SERVICES = os.getenv('SHEET_SERVICE')
 REPAIRS = os.getenv('SHEET_REPAIRS')
-days_to_subtract = 7
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -137,12 +138,18 @@ def extract_date(request, *args, **kwargs):
     result = {}
     try:
         request_body = json.loads(request.body)
+        logging.info(
+            'API: Поиск ограничений по дате в запросе. '
+        )
         if 'frome_date' in request_body.keys():
             result['frome_date'] = (
                 datetime.strptime(
                     request_body['frome_date'],
                     '%d.%m.%Y'
                 ).date())
+            logging.info(
+                f'Окраничение по дате с: {result["frome_date"]}'
+            )
         if 'before_date' in request_body.keys():
             result['before_date'] = (
                 (
@@ -150,15 +157,14 @@ def extract_date(request, *args, **kwargs):
                         request_body['before_date'],
                         '%d.%m.%Y'
                     ).date()))
+            logging.info(
+                f'Окраничение по дате по: {result["before_date"]}'
+            )
     except json.decoder.JSONDecodeError:
-        result['frome_date'] = (
-            datetime.today()
-            - timedelta(days=days_to_subtract)
-        )
-        logging.info(
-            'API: Поиск ограничений по дате в запросе. '
-            'Выдаём список за 7 дней.'
-        )
+        if len(result) == 0:
+            logging.info(
+                'Выдаём список за без ограничений.'
+            )
     logging.info('API: Поиск ограничений по дате в запросе. Даты выбраны.')
     return result
 
@@ -177,8 +183,11 @@ class PointsViewSet(viewsets.ModelViewSet):
         logging.info('API: Обновление списка точек.')
         try:
             points = get_list_points()
-        except Exception:
-            logging.error('API: Обновление списка точек. Google недоступен.')
+        except Exception as e:
+            logging.error(
+                'API: Обновление списка точек. Google недоступен.'
+                f'{str(e)}'
+            )
             return JsonResponse(
                 {'error': 'Список не обновлен'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
@@ -283,32 +292,36 @@ class ServicesViewASet(
         return Services.objects.all()
 
 
-class RepairViewASet(viewsets.GenericViewSet,
-                     mixins.ListModelMixin):
+class RepairViewASet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     permission_classes = [permissions.IsAuthenticated, ]
+    http_method_names = ['get', 'post']
+    serializer_class = RepairsSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = ServicesFilter
 
-    def list(self, request, *args, **kwargs):
-        logging.info('API(авторизация): Запрос списка ремонтров.')
-        try:
-            repairs = get_list_services_and_repair(REPAIRS)
-        except Exception:
-            logging.error(
-                'API(авторизация): Запрос списка ремонтров. Google недоступен.'
+    def get_queryset(self):
+        date_range = extract_date(self.request)
+        if len(date_range) != 0:
+            if (
+                'frome_date' in date_range.keys()
+                and 'before_date' in date_range.keys()
+            ):
+                return Repairs.objects.filter(
+                    date__gte=date_range['frome_date'],
+                    date__lte=date_range['before_date']
+                )
+            if 'frome_date' in date_range.keys():
+                return Repairs.objects.filter(
+                    date__gte=date_range['frome_date']
+                )
+            return Repairs.objects.filter(
+                date__lte=date_range['before_date']
             )
-            return JsonResponse(
-                {'error': 'Спиосок не получен. Попробуйте позже'},
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
-
-        logging.info('API(авторизация): Запрос списка ремонтров. Успешно.')
-        return JsonResponse(
-            create_answer(
-                repairs,
-                'repairs',
-                extract_date(request)
-            ),
-            status=HTTPStatus.OK
-        )
+        return Repairs.objects.all()
 
 
 class ServiceManViewSet(

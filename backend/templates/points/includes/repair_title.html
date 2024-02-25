@@ -1,0 +1,25 @@
+{% load verbose_name %}
+<tr>
+    <th width="2%" >
+        №<br/>
+        п/п
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "date" %}
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "service_man" %}
+    </th>
+    <th width="33%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "point" %}
+    </th>
+    <th width="15%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "category" %}
+    </th>
+    <th width="15%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "repair" %}
+    </th>
+    <th width="15%" style="word-wrap:break-word">
+        {% get_verbose_field_name repair "comments" %}
+    </th>
+</tr>

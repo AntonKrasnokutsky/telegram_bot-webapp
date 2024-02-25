@@ -20,9 +20,21 @@ router.register(
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('points/', PointsViewSet.as_view({'get': 'list'})),
-    path('services/', ServicesViewSet.as_view({'get': 'list'})),
-    path('repairs/', RepairViewSet.as_view({'get': 'list'})),
+    path(
+        'points/',
+        PointsViewSet.as_view({'get': 'list'}),
+        name='points'
+    ),
+    path(
+        'services/',
+        ServicesViewSet.as_view({'get': 'list'}),
+        name='services'
+    ),
+    path(
+        'repairs/',
+        RepairViewSet.as_view({'get': 'list'}),
+        name='repairs'
+    ),
     path(
         'v2/services/',
         ServicesViewASet.as_view(
@@ -32,7 +44,15 @@ urlpatterns = [
             }),
         name='services_v2'
     ),
-    path('v2/repairs/', RepairViewASet.as_view({'get': 'list'})),
+    path(
+        'v2/repairs/',
+        RepairViewASet.as_view(
+            {
+                'get': 'list',
+                'post': 'create'
+            }),
+        name='repairs_v2'
+    ),
     path('auth/', include('djoser.urls.authtoken')),
 
 ]

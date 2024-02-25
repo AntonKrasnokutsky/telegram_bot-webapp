@@ -1,0 +1,26 @@
+{% load tz %}
+<tr>
+    <td align="center">
+        {{ forloop.counter }}
+    </td>
+    <td>
+        {% localtime off %}
+        {{ repair.date }}
+        {% endlocaltime %}
+    </td>
+    <td>
+        {{ repair.service_man }}
+    </td>
+    <td>
+        {{ repair.point }}
+    </td>
+    <td align="center">
+        {{ repair.category }}
+    </td>
+    <td align="center">
+        {{ repair.repair }}
+    </td>
+    <td align="center">
+        {{ repair.comments }}
+    </td>
+</tr>

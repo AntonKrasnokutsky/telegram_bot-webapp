@@ -19,3 +19,8 @@ class ServiceInfoExistError(Exception):
     """Исключение возникающее при сохранении второго обслуживания за день."""
 
     pass
+
+
+class PontExistError(Exception):
+    """Исключение возникающее если точки нет в базе"""
+    pass

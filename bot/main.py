@@ -1,6 +1,5 @@
 import logging
 import sys
-import httplib2
 import json
 import requests
 import os
@@ -11,11 +10,10 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.web_app_info import WebAppInfo
 from dotenv import load_dotenv
-from googleapiclient.discovery import build
-from oauth2client.service_account import ServiceAccountCredentials
 
 from exceptions import (
     AnyError,
+    PontExistError,
     ServiceInfoExistError,
     ServiceManUnregisteredError
 )
@@ -29,6 +27,7 @@ URL_SERVICE = os.getenv('URL_SERVICE')
 URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
 URL_API_SERVICE = os.getenv('URL_API_SERVICE')
+URL_API_REPAIR = os.getenv('URL_API_REPAIR')
 URL_API_AUTH = os.getenv('URL_API_AUTH')
 URL_API_SERVICE_MAN = os.getenv('URL_API_SERVICE_MAN')
 AUTH = {
@@ -41,12 +40,6 @@ dp = Dispatcher(bot)
 api_token = ''
 headers = {"Authorization": f"Token {api_token}"}
 
-CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
-SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')    # удалит при отключении google
-SHEET_SERVICE = os.getenv('SHEET_SERVICE')  # удалит при отключении google
-SHEET_REPEAR = os.getenv('SHEET_REPEAR')    # удалит при отключении google
-
-
 service_man = {
     'name': '',
     'telegram_id': 0,
@@ -58,30 +51,20 @@ reg_service_man = {}
 current_point = {}
 
 
-def get_service_sacc():
-    creds_json = os.path.dirname(__file__) + '/' + CREDENTIALS_FILE
-    scopes = ['https://www.googleapis.com/auth/spreadsheets']
-
-    creds_service = ServiceAccountCredentials.from_json_keyfile_name(
-        creds_json,
-        scopes
-    ).authorize(httplib2.Http())
-    return build('sheets', 'v4', http=creds_service)
-
-
-def requst_api_services_man(*args, **kwargs):
+def requst_api_services_man(user_id, *args, **kwargs):
     return requests.get(
         URL_API_SERVICE_MAN,
-        headers=headers
+        headers=headers,
+        params={'telegram_id': user_id}
     )
 
 
-def get_user_list():
+def get_user(user_id):
     logging.debug('Получеие списка инженеров.')
-    response = requst_api_services_man()
+    response = requst_api_services_man(user_id)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         get_token()
-        response = requst_api_services_man()
+        response = requst_api_services_man(user_id)
     return json.loads(response.text)
 
 
@@ -100,6 +83,7 @@ def get_token(*args, **kwargs):
 
 
 def request_api_service(body, *args, **kwargs):
+    print(URL_API_SERVICE)
     return requests.post(URL_API_SERVICE, data=body, headers=headers)
 
 
@@ -122,16 +106,20 @@ def send_service_info(data: dict, *args, **kwargs):
         'stirrer': data['stirrer'],
         'straws': data['straws']
     }
+    print(body)
     response = request_api_service(body)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         logging.info('Требуется обновление токена')
         get_token()
         response = request_api_service(body)
 
-    if response.status_code == HTTPStatus.OK:
+    if response.status_code == HTTPStatus.CREATED:
         return
-    response_json = json.loads(response.text)
-    response_text = list(map(str, response_json))[0]
+    try:
+        response_json = json.loads(response.text)
+        response_text = list(map(str, response_json))[0]
+    except json.decoder.JSONDecodeError:
+        response_text = response.text
     match response_text:
         case 'serviceman':
             raise ServiceManUnregisteredError(
@@ -141,30 +129,55 @@ def send_service_info(data: dict, *args, **kwargs):
             raise ServiceInfoExistError(
                 'Уже сохранено'
             )
+        case 'point_not_exist':
+            raise PontExistError(
+                'Обновите список точек.'
+            )
         case _:
             raise AnyError(
                 response.text
             )
 
 
-def append_repair_in_table(data: dict):
+def request_api_repair(body):
+    return requests.post(URL_API_REPAIR, data=body, headers=headers)
+
+
+def send_repairs_info(data: dict, *args, **kwargs):
     body = {
-        'values':
-        [[
-            data['date'],
-            data['email'],
-            data['fio'],
-            data['point'],
-            data['category'],
-            data['repair'],
-            data['description'],
-        ]]}
-    get_service_sacc().spreadsheets().values().append(
-        spreadsheetId=SPREADSHEET_ID,
-        range=SHEET_REPEAR,
-        valueInputOption="USER_ENTERED",
-        body=body
-    ).execute()
+        'date': data['date'],
+        'serviceman': data['fio'],
+        'point': data['point'],
+        'category': data['category'],
+        'repair': data['repair'],
+        'comments': data['description'],
+    }
+    response = request_api_repair(body)
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        logging.info('Требуется обновление токена')
+        get_token()
+        response = request_api_repair(body)
+    if response.status_code == HTTPStatus.CREATED:
+        return
+    response_json = json.loads(response.text)
+    response_text = list(map(str, response_json))[0]
+    match response_text:
+        case 'serviceman':
+            raise ServiceManUnregisteredError(
+                'Не зарегистрирован'
+            )
+        case 'repair_exist':
+            raise ServiceInfoExistError(
+                'Уже сохранено'
+            )
+        case 'point_not_exist':
+            raise PontExistError(
+                'Обновите список точек.'
+            )
+        case _:
+            raise AnyError(
+                response.text
+            )
 
 
 def update_points(*args, **kwargs):
@@ -380,7 +393,8 @@ async def service_man_change(message: types.Message):
 def registr_man(user_id, *args, **kwargs):
     body = {
         'name': reg_service_man[user_id]['name'],
-        'telegram_id': reg_service_man[user_id]['telegram_id']
+        'telegram_id': reg_service_man[user_id]['telegram_id'],
+        'activ': True
     }
     response = requests.post(
         URL_API_SERVICE_MAN,
@@ -486,14 +500,9 @@ def make_messagedata(data, *args, **kwargs):
     return result
 
 
-# Убрать после вступления в силу изменений API
 def user_data(user_id, data):
-    users = get_user_list()
-    for user in users:
-        if int(user_id) == int(user['telegram_id']):
-            data['fio'] = user['name']
-            break
-# end
+    users = get_user(user_id)
+    data['fio'] = users[0]['name']
 
 
 async def web_app_service(message: types.Message, data):
@@ -519,17 +528,71 @@ async def web_app_service(message: types.Message, data):
         await message.answer('Данные не сохранены')
         return
     except ServiceInfoExistError:
-        answer = 'Данные об обслуживании сегодня уже были сохранены'
+        answer = 'Данные об обслуживании точки сегодня уже были сохранены'
         logging.info(answer)
         await message.answer(answer)
         return
-    except AnyError:
-        # answer = f'Данные не сохранены. Ответ сервера: {e.args}'
-        pass
+    except PontExistError:
+        answer = 'Неизвестная точка, обновте список точек'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+    except AnyError as e:
+        answer = f'Данные не сохранены. Ответ сервера: {e.args}'
+        logging.info(answer)
+        await message.answer(answer)
+        return
 
-    # Убрать после вступления в силу изменений API
     user_data(message.from_user.id, data)
-    # end
+    current_point[message.from_user.id] = (
+        f'Вид работ: {data["type"]}\n'
+        f'Точка: {data["point"]}\n'
+        f'Инженер: {data["fio"]}'
+    )
+    logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
+    answer = make_messagedata(data)
+    await message.answer(answer)
+    await bot.send_message(
+        chat_id=CHAT_ID,
+        text=answer
+    )
+
+
+async def web_app_repairs(message: types.Message, data):
+    logging.debug('Данны по ремонту.')
+    data['type'] = 'Ремонт'
+    data['fio'] = message.from_user.id
+
+    try:
+        send_repairs_info(data)
+        logging.info('Данные по ремоту отправлены.')
+    except ServiceManUnregisteredError:
+        answer = (
+            'Попытка внести данные незарегистрированным '
+            f'инженером: @{message.from_user.username}'
+        )
+        logging.critical(answer)
+        await bot.send_message(
+            chat_id=CHAT_ID,
+            text=answer
+        )
+        await message.answer('Данные не сохранены')
+        return
+    except ServiceInfoExistError:
+        answer = 'Данные о ремонте точки сегодня уже были сохранены'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+    except PontExistError:
+        answer = 'Неизвестная точка, обновте список точек'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+    except AnyError as e:
+        answer = f'Данные не сохранены. Ответ сервера: {e.args}'
+        return
+
+    user_data(message.from_user.id, data)
     current_point[message.from_user.id] = (
         f'Вид работ: {data["type"]}\n'
         f'Точка: {data["point"]}\n'
@@ -558,19 +621,7 @@ async def web_app(message: types.Message):
     if data['type'] == 'service':
         await web_app_service(message, data)
     elif data['type'] == 'repair':
-        logging.debug('Данны по ремонту.')
-        data['type'] = 'Ремонт'
-        # Убрать после вступления в силу изменений API
-        user_data(message.from_user.id, data)
-        # end
-        append_repair_in_table(data)
-        current_point[message.from_user.id] = (
-            f'Вид работ: {data["type"]}\n'
-            f'Точка: {data["point"]}\n'
-            f'Инженер: {data["fio"]}'
-        )
-        logging.debug('Отправка сообщения с инфораацией о выполненной работе.')
-        await message.answer(make_messagedata(data))
+        await web_app_repairs(message, data)
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)

@@ -150,7 +150,6 @@ STATICFILES_DIRS = [
     os.path.join(TEMPLATES_DIR, STATIC_URL),
 
 ]
-print(STATICFILES_DIRS)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -173,5 +172,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 CSRF_TRUSTED_ORIGINS = [f'https://{os.getenv("DOMAIN_NAME")}', ]
 
-LOGIN_REDIRECT_URL = '/services_list/'
-ACCOUNT_LOGOUT_REDIRECT = '/services_list/'
+LOGIN_REDIRECT_URL = 'points:services_list'
+ACCOUNT_LOGOUT_REDIRECT = 'points:services_list'

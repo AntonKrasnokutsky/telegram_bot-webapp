@@ -137,3 +137,23 @@ class Services(models.Model):
 
     def __str__(self, *args, **kwargs):
         return str(self.date)
+
+
+class Repairs(models.Model):
+    date = models.DateTimeField(verbose_name='Дата время')
+    service_man = models.ForeignKey(
+        'ServiceMan',
+        on_delete=models.PROTECT,
+        verbose_name='Исполнитель'
+    )
+    point = models.ForeignKey(
+        'Points',
+        on_delete=models.PROTECT,
+        verbose_name='Точка'
+    )
+    category = models.TextField(verbose_name='Категория')
+    repair = models.TextField(blank=True, verbose_name='Замена')
+    comments = models.TextField(verbose_name='Комментарий')
+
+    class Meta:
+        ordering = ['date', ]

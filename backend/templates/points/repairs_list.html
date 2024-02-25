@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Последние обновления на сайте{% endblock %}
+{% block content %}
+
+<div >
+  <table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
+    {% for repair in page_obj %}
+      {% if forloop.first %}
+        {% include 'points/includes/repair_title.html' %}
+      {% endif %}
+      {% include 'points/includes/repair.html' %}
+    {% endfor %}
+  </table>
+
+    {% include 'points/includes/paginator.html' %}
+</div>
+{% endblock %}
