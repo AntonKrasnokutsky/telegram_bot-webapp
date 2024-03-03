@@ -44,18 +44,18 @@ class RepairsSerializer(serializers.ModelSerializer):
                 {'serviceman': 'Инженер уволен.'}
             )
         date = datetime.strptime(date_query, old_format)
-        if Repairs.objects.filter(
-            date__year=date.year,
-            date__month=date.month,
-            date__day=date.day,
-            point=point
-        ).exists():
-            raise serializers.ValidationError(
-                {
-                    'repair_exist': 'Информация по ремонту точки '
-                                    'сегодня уже была добавлена.'
-                }
-            )
+        # if Repairs.objects.filter(
+        #     date__year=date.year,
+        #     date__month=date.month,
+        #     date__day=date.day,
+        #     point=point
+        # ).exists():
+        #     raise serializers.ValidationError(
+        #         {
+        #             'repair_exist': 'Информация по ремонту точки '
+        #                             'сегодня уже была добавлена.'
+        #         }
+        #     )
         date = date.strftime(new_format)
 
         return Repairs.objects.create(
@@ -113,18 +113,18 @@ class ServicesSerializer(serializers.ModelSerializer):
                 {'serviceman': 'Инженер уволен.'}
             )
         date = datetime.strptime(date_query, old_format)
-        if Services.objects.filter(
-            date__year=date.year,
-            date__month=date.month,
-            date__day=date.day,
-            point=point
-        ).exists():
-            raise serializers.ValidationError(
-                {
-                    'service_exist': 'Информация по обслуживанию точки '
-                                     'сегодня уже была добавлена.'
-                }
-            )
+        # if Services.objects.filter(
+        #     date__year=date.year,
+        #     date__month=date.month,
+        #     date__day=date.day,
+        #     point=point
+        # ).exists():
+        #     raise serializers.ValidationError(
+        #         {
+        #             'service_exist': 'Информация по обслуживанию точки '
+        #                              'сегодня уже была добавлена.'
+        #         }
+        #     )
         date = date.strftime(new_format)
 
         return Services.objects.create(

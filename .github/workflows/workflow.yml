@@ -87,6 +87,7 @@ jobs:
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
             echo SPREADSHEET_ID=${{ secrets.SPREADSHEET_ID }} >> .env
+            echo POINTS_RANGE=${{ secrets.POINTS_RANGE }} >> .env
             echo SHEET_SERVICE=${{ secrets.SHEET_SERVICE }} >> .env
             echo SHEET_REPEAR=${{ secrets.SHEET_REPEAR }} >> .env
             echo HOST_IP=${{ secrets.HOST }} >> .env
