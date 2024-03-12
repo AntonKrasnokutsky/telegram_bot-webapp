@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class Points(models.Model):
     name = models.TextField()
     activ = models.BooleanField(default=True)
+    tax = models.PositiveIntegerField(default=0)
 
     def __str__(self, *args, **kwargs):
         return str(self.name)

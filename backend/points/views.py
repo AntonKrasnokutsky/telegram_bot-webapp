@@ -36,13 +36,22 @@ class ServicesTemplateView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         logging.info('Запрос страницы просмотра обслуживаний.')
-
+        # point = self.request.GET.get('point')
+        # print(point)
+        # print(self.request.GET)
         context = super().get_context_data(**kwargs)
         services_list = Services.objects.all()
         paginator = Paginator(services_list, 20)
         page_number = self.request.GET.get('page', paginator.num_pages)
         page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
+        context['data'] = [
+            {
+                'id': obj.id,
+                'value': obj.name,
+            }
+            for obj in Points.objects.filter(activ=True)
+        ]
         return context
 
 

@@ -13,6 +13,17 @@ class RepairsSerializer(serializers.ModelSerializer):
     serviceman = serializers.CharField(source='service_man.name')
     date = serializers.SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if (
+            'view' in self.context
+            and self.context['view'].action == 'list'
+        ):
+            self.fields.update(
+                {
+                    "tax": serializers.IntegerField(source='point.tax')
+                })
+
     class Meta:
         model = Repairs
         fields = [
@@ -30,7 +41,13 @@ class RepairsSerializer(serializers.ModelSerializer):
         point_name = self.validated_data.pop('point')
         date_query = self.initial_data.get('date')
 
-        point = Points.objects.get(name=point_name['name'])
+        try:
+            point = Points.objects.get(name=point_name['name'], activ=True)
+            print('Поиск точки', point_name['name'])
+        except Points.DoesNotExist:
+            raise serializers.ValidationError(
+                {'point_not_exist': 'Обновите список точек.'}
+            )
         try:
             service_man = ServiceMan.objects.get(
                 telegram_id=service_man_telegram_id['name']
@@ -74,6 +91,17 @@ class ServicesSerializer(serializers.ModelSerializer):
     syrupnut = serializers.CharField(source='syrup_nut')
     syrupother = serializers.CharField(source='syrup_other')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if (
+            'view' in self.context
+            and self.context['view'].action == 'list'
+        ):
+            self.fields.update(
+                {
+                    "tax": serializers.IntegerField(source='point.tax')
+                })
+
     class Meta:
         model = Services
         fields = [
@@ -93,9 +121,8 @@ class ServicesSerializer(serializers.ModelSerializer):
         date_query = self.initial_data.get('date')
 
         try:
-            point = Points.objects.get(name=point_name['name'])
+            point = Points.objects.get(name=point_name['name'], activ=True)
             print('Поиск точки', point_name['name'])
-            print(point.name)
         except Points.DoesNotExist:
             raise serializers.ValidationError(
                 {'point_not_exist': 'Обновите список точек.'}

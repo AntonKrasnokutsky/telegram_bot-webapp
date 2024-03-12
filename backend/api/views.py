@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from datetime import datetime
+from dotenv import load_dotenv
 from http import HTTPStatus
 
 import httplib2
@@ -20,6 +21,9 @@ from .filters import ServicesFilter
 from .serialises import (
     RepairsSerializer, ServicesSerializer, ServiceManSerializer
 )
+
+load_dotenv()
+
 
 CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
@@ -44,17 +48,15 @@ def get_service_sacc():
 
 def get_list_points():
     logging.info('API: Получение списка точек обслуживания.')
+    print(POINTS_RANGE)
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
         ranges=POINTS_RANGE,
-        majorDimension='COLUMNS',
+        majorDimension='ROWS',
         valueRenderOption='FORMATTED_VALUE',
         dateTimeRenderOption='FORMATTED_STRING'
     ).execute()
-    logging.info(f'keys {results.keys()}')
-    logging.info(f'len valueRanges {len(results["valueRanges"])}')
-    logging.info(f'keys valueRanges {results["valueRanges"][0].keys()}')
-    sheet_values = results['valueRanges'][0]['values'][0]
+    sheet_values = results['valueRanges'][0]['values']
     try:
         sheet_values.remove('')
     except ValueError:
@@ -195,15 +197,14 @@ class PointsViewSet(viewsets.ModelViewSet):
                 {'error': 'Список не обновлен'},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-
         self.__deactivate_points()
         for name in points:
             try:
-                point = Points.objects.get(name=name)
+                point = Points.objects.get(name=name[0])    # , tax=name[1]
                 point.activ = True
                 point.save()
             except Points.DoesNotExist:
-                Points.objects.create(name=name)
+                Points.objects.create(name=name[0], tax=name[1])
         logging.info('API: Обновление списка точек. Список точек обновлён.')
         return JsonResponse(
             {'message': 'Список точек обновлен'},
