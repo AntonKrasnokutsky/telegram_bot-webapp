@@ -199,10 +199,11 @@ class PointsViewSet(viewsets.ModelViewSet):
         self.__deactivate_points()
         for name in points:
             try:
-                point = Points.objects.filter(name=name[0])    # , tax=name[1])
-                point[0].activ = True
-                point[0].tax = name[1]
-                point[0].save()
+                points = Points.objects.filter(name=name[0])    # , tax=name[1]
+                for point in points:
+                    point.activ = True
+                    point.tax = name[1]
+                    point.save()
             except Points.DoesNotExist:
                 Points.objects.create(name=name[0], tax=name[1])
         logging.info('API: Обновление списка точек. Список точек обновлён.')
