@@ -199,7 +199,7 @@ class PointsViewSet(viewsets.ModelViewSet):
         self.__deactivate_points()
         for name in points:
             try:
-                points = Points.objects.filter(name=name[0], tax=name[1])
+                points = Points.objects.filter(name=name[0])    # , tax=name[1]
                 for point in points:
                     logging.info(f'Тариф {name[1]}')
                     point.activ = True
