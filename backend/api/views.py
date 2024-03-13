@@ -200,7 +200,7 @@ class PointsViewSet(viewsets.ModelViewSet):
         self.__deactivate_points()
         for name in points:
             try:
-                point = Points.objects.get(name=name[0])    # , tax=name[1]
+                point = Points.objects.get(name=name[0], tax=name[1])
                 point.activ = True
                 point.save()
             except Points.DoesNotExist:
