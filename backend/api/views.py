@@ -48,7 +48,6 @@ def get_service_sacc():
 
 def get_list_points():
     logging.info('API: Получение списка точек обслуживания.')
-    print(POINTS_RANGE)
     results = get_service_sacc().spreadsheets().values().batchGet(
         spreadsheetId=SPREADSHEET_ID,
         ranges=POINTS_RANGE,
@@ -200,9 +199,10 @@ class PointsViewSet(viewsets.ModelViewSet):
         self.__deactivate_points()
         for name in points:
             try:
-                point = Points.objects.get(name=name[0], tax=name[1])
-                point.activ = True
-                point.save()
+                point = Points.objects.filter(name=name[0])    # , tax=name[1])
+                point[0].activ = True
+                point[0].tax = name[1]
+                point[0].save()
             except Points.DoesNotExist:
                 Points.objects.create(name=name[0], tax=name[1])
         logging.info('API: Обновление списка точек. Список точек обновлён.')
