@@ -201,6 +201,7 @@ class PointsViewSet(viewsets.ModelViewSet):
             try:
                 points = Points.objects.filter(name=name[0], tax=name[1])
                 for point in points:
+                    logging.info(f'Тариф {name[1]}')
                     point.activ = True
                     point.tax = name[1]
                     point.save()
