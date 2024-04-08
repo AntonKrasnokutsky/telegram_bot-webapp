@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Points, Repairs, Services, ServiceMan
+from .models import (
+    FuelCompensation,
+    Points,
+    Repairs,
+    ServiceMan,
+    Services,
+    TypeWorkRepairs
+)
 
 
 class ServiceManAdmin(admin.ModelAdmin):
@@ -18,3 +25,5 @@ admin.site.register(Points)
 admin.site.register(Repairs)
 admin.site.register(Services)
 admin.site.register(ServiceMan, ServiceManAdmin)
+admin.site.register(TypeWorkRepairs)
+admin.site.register(FuelCompensation)

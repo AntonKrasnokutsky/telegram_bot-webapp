@@ -1,13 +1,24 @@
 {% load static %}
 {% with request.resolver_match.view_name as view_name %}
 
-<header >
   <nav class="navbar navbar-light">
       <ul class="nav nav-pills">
         {% if user.is_authenticated %}
         <li class="nav-item"> 
           <a class="nav-link"
           href="{% url 'points:services_list' %}">Обслуживания</a>
+        </li>
+        <li class="nav-item"> 
+          <a class="nav-link"
+          href="{% url 'points:service_list' %}">Обслуживания (фильтр)</a>
+        </li>
+        <li class="nav-item"> 
+          <a class="nav-link"
+          href="{% url 'points:repairs_list' %}">Ремонт</a>
+        </li>
+        <li class="nav-item"> 
+          <a class="nav-link"
+          href="{% url 'points:typeworkrepairs' %}">Виды ремонтных работ</a>
         </li>
         <li class="nav-item"> 
           <a class="nav-link link-light"
@@ -21,5 +32,4 @@
         {% endif %}
       </ul>
   </nav>   
-</header>
 {% endwith %}

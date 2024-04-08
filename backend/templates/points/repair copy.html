@@ -19,16 +19,8 @@
             <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
             <datalist id="points">
             </datalist>
-            <datalist id="list_work">
-            </datalist>
             <div style="color: red;" id="error_point"></div>
         </div>
-        <p>Выполненная работа</p>
-        <div id="typework">
-
-        </div>
-        <input class="input btn-add" id="add_typework" onclick="btn_add_typework()" value="Добавить" readonly>
-
         <div>
             <div style="padding-bottom: 30px;" id="div_category">
                 <p>Катеогрия ремонта</p>
@@ -71,7 +63,6 @@
         let point = document.getElementById("point")
         let category = document.getElementById("category")
         let description = document.getElementById("description")
-        let work = 0
 
         tg.expand();
         tg.MainButton.text = "Завершить ремонт";
@@ -79,41 +70,13 @@
 
         function onstart() {
             var options = '';
-            {% for item in points %}
+            {% for item in data %}
                 options += '<option value="' + "{{ item.value }}" + '" />';
             {% endfor %};
             document.getElementById('points').innerHTML = options;
-
-            var options = '';
-            {% for item in typework %}
-                options += '<option value="' + "{{ item.value }}" + '" />';
-            {% endfor %};
-            document.getElementById('list_work').innerHTML = options;
         };
 
         onstart();
-
-        function btn_add_typework(id, min, step) {
-            console.log("Нажата кнопка");
-            place = document.getElementById("typework");
-            if (work != 0)
-            {
-                values = []
-                for (let i = 1; i <= work; i++)
-                {
-                    values.push(document.getElementById("id_work_" + i).value);
-                }
-            }
-            work ++;
-            place.innerHTML += '<input class="input input_long" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
-            if (work > 1)
-            {
-                for (let i = 1; i < work; i++)
-                {
-                    document.getElementById("id_work_" + i).value = values[i-1];
-                }
-            }
-        };
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             document.getElementById("error_point").innerText = "";

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Последние обновления на сайте{% endblock %}
+{% block content %}
+
+<a href="{% url "points:typeworkrepairsadd" %}">Добавить/изменить</a>
+
+<div >
+  <table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
+    {% for typework in page_obj %}
+    {% if forloop.first %}
+      {% include 'points/includes/typework_title.html' %}
+    {% endif %}
+    {% include 'points/includes/typework.html' %}
+    {% endfor %}
+  </table>
+
+  {% include 'points/includes/paginator.html' %}
+</div>
+
+<a href="{% url "points:typeworkrepairsadd" %}">Добавить/изменить</a>
+
+{% endblock %}

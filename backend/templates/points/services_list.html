@@ -2,11 +2,6 @@
 {% block title %}Последние обновления на сайте{% endblock %}
 {% block content %}
 
-<input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required>
-<datalist id="points">
-</datalist>
-
-
 <div >
   <table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
     {% for service in page_obj %}
@@ -20,22 +15,4 @@
     {% include 'points/includes/paginator.html' %}
 </div>
 
-<script>
-  let point = document.getElementById("point")
-
-  point.addEventListener("change", ()=> {
-    console.log({% url 'points:services_list' %})
-    window.location.replace("{% url 'points:services_list' %}");
-  })
-  
-  function onstart() {
-    var options = '';
-    {% for item in data %}
-        options += '<option value="' + "{{ item.value }}" + '" />';
-    {% endfor %};
-    document.getElementById('points').innerHTML = options;
-  };
-
-  onstart();
-</script>
 {% endblock %}

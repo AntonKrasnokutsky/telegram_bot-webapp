@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_tables2',
+    'django_filters',
+    'bootstrap3',
     'djoser',
     'core',
     'users',
@@ -172,5 +175,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 CSRF_TRUSTED_ORIGINS = [f'https://{os.getenv("DOMAIN_NAME")}', ]
 
-LOGIN_REDIRECT_URL = 'points:services_list'
-ACCOUNT_LOGOUT_REDIRECT = 'points:services_list'
+LOGIN_REDIRECT_URL = 'users:login'
+ACCOUNT_LOGOUT_REDIRECT = 'users:login'

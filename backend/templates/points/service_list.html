@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load django_tables2 %}
+{% load bootstrap3 %}
+{% load tz %}
+
+{% block title %}Последние обновления на сайте{% endblock %}
+
+{% block content %}
+
+
+
+<div style="text-align: left;">
+  {% if filter %}
+    <form action="" method="get" class="form form-inline">
+        {% bootstrap_form filter.form layout='inline' %}
+        {% bootstrap_button 'Найти' %}
+    </form>
+  {% endif %}
+  {% for format in table.export_formats %}
+    <a href="{% export_url format %}">.{{ format }}</a>
+  {% endfor %}
+</div>
+{% localtime off %}
+{% render_table table %}
+{% endlocaltime %}
+
+{% endblock %}
+

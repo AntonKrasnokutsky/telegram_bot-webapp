@@ -11,4 +11,4 @@ class ServicesFilter(FilterSet):
 
     class Meta:
         model = Services
-        fields = ['date',]
+        fields = ['date', 'service_man', 'point',]
