@@ -294,3 +294,7 @@ class ServiceListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     template_name = 'points/service_list.html'
 
     filterset_class = ServicesFilter
+
+    @method_decorator(login_required(login_url='users:login'))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
