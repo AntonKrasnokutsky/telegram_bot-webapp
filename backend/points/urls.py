@@ -41,7 +41,7 @@ urlpatterns = [
     path(
         'typeworkrepairs/add/',
         TypeWorkRepairsCreateView.as_view(),
-        name='typeworkrepairsadd'
+        name='typeworkrepairs_add'
     ),
     path(
         'service_list/',
@@ -56,6 +56,6 @@ urlpatterns = [
     path(
         'fuel_create/',
         FuelCompensationCreateView.as_view(),
-        name='fuelcompensations_create'
+        name='fuelcompensations_add'
     ),
 ]

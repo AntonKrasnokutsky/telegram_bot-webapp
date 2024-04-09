@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+    <main>
     <div id="main">
         <div id="div_points">
             <p>Точка обслуживания:</p>
@@ -21,41 +22,18 @@
             </datalist>
             <datalist id="list_work">
             </datalist>
+            <datalist id="list_fuelcompensations">
+            </datalist>
             <div style="color: red;" id="error_point"></div>
         </div>
         <p>Выполненная работа</p>
         <div id="typework">
 
         </div>
-        <input class="input btn-add" id="add_typework" onclick="btn_add_typework()" value="Добавить" readonly>
+        <input class="input btn-add" id="add_typework" onclick="btn_add_typework()" value="Добавить работу" readonly>
 
-        <div>
-            <div style="padding-bottom: 30px;" id="div_category">
-                <p>Катеогрия ремонта</p>
-                <select class="input input_long" id="category">
-                    <option disabled selected></option>
-                    <option value="Категория 1">Категория 1</option>
-                    <option value="Категория 2">Категория 2</option>
-                    <option value="Категория 3">Категория 3</option>
-                </select>
-                <div style="color: red;" id="error_category"></div>
-            </div>
-            <div class="bor cb" id="div_replace">
-                <label for="div_replace">Замена:</label>
-                <div class="cb">
-                    <label style="font-size: 20px; font-weight: 500;" for="replace_machine">
-                        <input type="checkbox" id="replace_machine" value="Замена кофемашины">
-                        Замена кофемашины
-                    </label>
-                </div>
-                
-                <div class="cb">
-                    <label style="font-size: 20px; font-weight: 500;" for="replace_cabinet">
-                        <input type="checkbox" id="replace_cabinet" value="Замена тумбы">
-                        Замена тумбы
-                    </label>
-                </div>
-            </div>
+        <div id="div_fuel">
+            <input class="input input_long" id="fuelcompensations" name="fuelcompensations_distance" placeholder="Компенсация ГСМ" list="list_fuelcompensations" >
         </div>
         <div style="padding-top: 20px;" id="div_description">
             <p>Описание работ</p>
@@ -69,7 +47,7 @@
     <script>
         let tg = window.Telegram.WebApp;
         let point = document.getElementById("point")
-        let category = document.getElementById("category")
+        let fuel = document.getElementById("fuelcompensations")
         let description = document.getElementById("description")
         let work = 0
 
@@ -89,6 +67,12 @@
                 options += '<option value="' + "{{ item.value }}" + '" />';
             {% endfor %};
             document.getElementById('list_work').innerHTML = options;
+
+            var options = '';
+            {% for item in fuelcompensations %}
+                options += '<option value="' + "{{ item.value }}" + '" />';
+            {% endfor %};
+            document.getElementById('list_fuelcompensations').innerHTML = options;
         };
 
         onstart();
@@ -116,43 +100,25 @@
         };
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
-            document.getElementById("error_point").innerText = "";
-            document.getElementById("error_category").innerText = "";
-            document.getElementById("error_description").innerText = "";
-
-            if (point.value == "") {
-                document.getElementById("error_point").innerText = "Не выбрана точка";
-                return;
-            }
-
-            if (category.value == "") {
-                document.getElementById("error_category").innerText = "Не выбрана категория";
-                return;
-            }
-
-            if (description.value == "") {
-                document.getElementById("error_description").innerText = "Не внесего описание";
-                return;
-            }
             var repair = "";
 
-            if (document.getElementById("replace_machine").checked) {
-                repair += document.getElementById("replace_machine").value;
-            };
-
-            if (document.getElementById("replace_machine").checked && document.getElementById("replace_cabinet").checked) {
-                repair += ", "
+            if (work != 0)
+            {
+                types_work = []
+                for (let i = 1; i <= work; i++)
+                {
+                    values_work = document.getElementById("id_work_" + i).value;
+                    if (values_work != "") {
+                        types_work.push(values_work);
+                    }
+                }
             }
-
-            if (document.getElementById("replace_cabinet").checked) {
-                repair += document.getElementById("replace_cabinet").value;
-            };
 
             let data = {
                 type: "repair",
                 point: point.value,
-                category: category.value,
-                repair: repair,
+                types_work: types_work,
+                fuel: fuel.value,
                 description: description.value,
             };
 
@@ -161,5 +127,6 @@
         });
 
     </script>
+</main>
 </body>
 </html>

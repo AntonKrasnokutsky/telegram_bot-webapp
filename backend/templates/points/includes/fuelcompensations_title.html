@@ -1,0 +1,13 @@
+{% load verbose_name %}
+<tr>
+    <th width="2%" >
+        №<br/>
+        п/п
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name fuelcompensations "distance" %}
+    </th>
+    <th width="10%" style="word-wrap:break-word">
+        {% get_verbose_field_name fuelcompensations "price" %}
+    </th>
+</tr>

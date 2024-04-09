@@ -2,7 +2,7 @@
 {% block title %}Последние обновления на сайте{% endblock %}
 {% block content %}
 
-<a href="{% url "points:typeworkrepairsadd" %}">Добавить/изменить</a>
+<a href="{% url "points:typeworkrepairs_add" %}">Добавить/изменить</a>
 
 <div >
   <table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
@@ -17,6 +17,6 @@
   {% include 'points/includes/paginator.html' %}
 </div>
 
-<a href="{% url "points:typeworkrepairsadd" %}">Добавить/изменить</a>
+<a href="{% url "points:typeworkrepairs_add" %}">Добавить/изменить</a>
 
 {% endblock %}

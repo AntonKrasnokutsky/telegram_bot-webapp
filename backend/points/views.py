@@ -67,6 +67,15 @@ class RepairsView(TemplateView):
             }
             for obj in TypeWorkRepairs.objects.filter(activ=True)
         ]
+
+        context['fuelcompensations'] = [
+            {
+                'id': obj.id,
+                'value': obj.distance,
+            }
+            for obj in FuelCompensation.objects.filter(activ=True)
+        ]
+
         logging.info('Запрос html страницы. Успешно.')
         return context
 
@@ -197,7 +206,7 @@ class TypeWorkRepairsCreateView(View):
 
 
 class FuelCompensationListView(TemplateView):
-    template_name = 'points/fuel_compensation_list.html'
+    template_name = 'points/fuelcompensation.html'
 
     @method_decorator(login_required(login_url='users:login'))
     def dispatch(self, *args, **kwargs):
@@ -216,7 +225,7 @@ class FuelCompensationListView(TemplateView):
 
 
 class FuelCompensationCreateView(View):
-    template_name = 'points/fuel_compensation_create.html'
+    template = 'points/fuelcompensations_create.html'
 
     @method_decorator(login_required(login_url='users:login'))
     def dispatch(self, *args, **kwargs):
@@ -247,22 +256,22 @@ class FuelCompensationCreateView(View):
         if fuelcompensationform.is_valid():
             try:
                 logging.info('Ищем компенсацию ГСМ')
-                fuelcompensationform = FuelCompensation.objects.get(
+                fuelcompensation = FuelCompensation.objects.get(
                     distance=fuelcompensationform.cleaned_data['distance'],
                     activ=True,
                 )
-                if (fuelcompensationform.price
+                if (fuelcompensation.price
                    != fuelcompensationform.cleaned_data['price']):
                     logging.info('Компенсация уже внесена. Изменение тарифа.')
-                    fuelcompensationform.activ = False
-                    fuelcompensationform.save()
+                    fuelcompensation.activ = False
+                    fuelcompensation.save()
                     logging.info('Добавляем новый тариф компенсации ГСМ')
                 else:
                     logging.info(
                         'Компенсация ГСМ уже внесена. Изменений не требуется.'
                     )
                     return redirect('points:fuelcompensations')
-            except TypeWorkRepairs.DoesNotExist:
+            except FuelCompensation.DoesNotExist:
                 logging.info('Добавляем новую крмпенсацию ГСМ')
             fuelcompensation = fuelcompensationform.save(commit=False)
             fuelcompensation.active = True
@@ -274,7 +283,7 @@ class FuelCompensationCreateView(View):
             self.template,
             {
                 'form': fuelcompensationform,
-                'typework_list': self.__get_fuelcompensationlist(),
+                'fuelcompensation_list': self.__get_fuelcompensationlist(),
             })
 
 
