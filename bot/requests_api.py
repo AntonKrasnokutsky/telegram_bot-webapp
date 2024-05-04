@@ -196,10 +196,13 @@ class Repair():
             'date': data['date'],
             'serviceman': data['fio'],
             'point': data['point'],
-            'typework': data['types_work'],
             'fuelcompensation': data['fuel'],
             'comments': data['description'],
         }
+        try:
+            body['typework'] = data['types_work']
+        except KeyError:
+            pass
         response = self.__request_api_repair(body, auth_api)
         if response.status_code == HTTPStatus.UNAUTHORIZED:
             logging.info('Требуется обновление токена')
