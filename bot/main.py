@@ -243,7 +243,10 @@ def make_messagedata(data, *args, **kwargs):
         result += f'Размешиватели: {data["stirrer"]}\n'
         result += f'Трубочки: {data["straws"]}'
     elif data['type'] == 'Ремонт':
-        result += f'Виды работ: {data["types_work"]}\n'
+        try:
+            result += f'Виды работ: {data["types_work"]}\n'
+        except KeyError:
+            pass
         result += f'Компенсация ГСМ: {data["fuel"]}\n'
         result += f'Комментарий: {data["description"]}'
     return result
