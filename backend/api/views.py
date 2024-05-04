@@ -17,9 +17,9 @@ from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action
 
 from points.models import Repairs, Services, ServiceMan
-from .filters import ServicesFilter
+from .filters import RepairsFilter, ServicesFilter
 from .serialises import (
-    RepairsSerializer, ServicesSerializer, ServiceManSerializer
+    RepairsSerializer, ServicesSerializer, ServiceManSerializer,
 )
 
 load_dotenv()
@@ -304,7 +304,7 @@ class RepairViewASet(
     http_method_names = ['get', 'post']
     serializer_class = RepairsSerializer
     filter_backends = (DjangoFilterBackend, )
-    filterset_class = ServicesFilter
+    filterset_class = RepairsFilter
 
     def get_queryset(self):
         date_range = extract_date(self.request)

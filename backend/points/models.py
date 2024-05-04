@@ -150,11 +150,25 @@ class Repairs(models.Model):
     point = models.ForeignKey(
         'Points',
         on_delete=models.PROTECT,
-        verbose_name='Точка'
+        verbose_name='Точка',
     )
-    category = models.TextField(verbose_name='Категория')
-    repair = models.TextField(blank=True, verbose_name='Замена')
-    comments = models.TextField(verbose_name='Комментарий')
+    typework = models.ManyToManyField(
+        'TypeWorkRepairs',
+        verbose_name='Вид работ',
+        blank=True,
+    )
+    fuelcompensation = models.ForeignKey(
+        'FuelCompensation',
+        on_delete=models.PROTECT,
+        verbose_name='Компенчация ГСМ',
+        blank=True,
+        null=True,
+    )
+    comments = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Комментарий',
+    )
 
     class Meta:
         ordering = ['date', ]

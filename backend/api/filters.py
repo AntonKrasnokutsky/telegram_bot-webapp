@@ -3,7 +3,7 @@ from django_filters.rest_framework import (
     FilterSet
 )
 
-from points.models import Services
+from points.models import Repairs, Services
 
 
 class ServicesFilter(FilterSet):
@@ -11,4 +11,12 @@ class ServicesFilter(FilterSet):
 
     class Meta:
         model = Services
+        fields = ['date', 'service_man', 'point',]
+
+
+class RepairsFilter(FilterSet):
+    date = DateFromToRangeFilter()
+
+    class Meta:
+        model = Repairs
         fields = ['date', 'service_man', 'point',]

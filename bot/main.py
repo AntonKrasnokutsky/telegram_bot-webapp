@@ -1,44 +1,25 @@
-import logging
-import sys
 import json
-import requests
+import logging
 import os
+import sys
 from datetime import datetime, timezone
 from http import HTTPStatus
-from pathlib import Path
 
+import buttons
+import requests
+import requests_api
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types.web_app_info import WebAppInfo
 from dotenv import load_dotenv
-
-from exceptions import (
-    AnyError,
-    PontExistError,
-    ServiceInfoExistError,
-    ServiceManUnregisteredError
-)
+from exceptions import (AnyError, PontExistError, ServiceInfoExistError,
+                        ServiceManUnregisteredError)
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent
-
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-URL_SERVICE = os.getenv('URL_SERVICE')
-URL_REPAIR = os.getenv('URL_REPAIR')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
-URL_API_SERVICE = os.getenv('URL_API_SERVICE')
-URL_API_REPAIR = os.getenv('URL_API_REPAIR')
-URL_API_AUTH = os.getenv('URL_API_AUTH')
-URL_API_SERVICE_MAN = os.getenv('URL_API_SERVICE_MAN')
-AUTH = {
-    'username': os.getenv('API_USER'),
-    'password': os.getenv('API_PASSWORD')
-}
 CHAT_ID = os.getenv('CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
-api_token = ''
-headers = {"Authorization": f"Token {api_token}"}
 
 service_man = {
     'name': '',
@@ -51,140 +32,11 @@ reg_service_man = {}
 current_point = {}
 
 
-def requst_api_services_man(user_id, *args, **kwargs):
-    return requests.get(
-        URL_API_SERVICE_MAN,
-        headers=headers,
-        params={'telegram_id': user_id}
-    )
-
-
-def get_user(user_id):
-    logging.debug('Получеие списка инженеров.')
-    response = requst_api_services_man(user_id)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requst_api_services_man(user_id)
-    return json.loads(response.text)
-
-
-def get_token(*args, **kwargs):
-    global api_token
-    global headers
-    response = requests.post(URL_API_AUTH, data=AUTH)
-    if response.status_code == HTTPStatus.OK:
-        logging.info('Обновление токена')
-        api_token = json.loads(response.text)['auth_token']
-        headers = {"Authorization": f"Token {api_token}"}
-    logging.info(f'Обновление токена. Status: {response.status_code}')
-    if response.status_code != HTTPStatus.OK:
-        logging.info(f'Обновление токена. Status: {response.text}')
-    return response.status_code
-
-
-def request_api_service(body, *args, **kwargs):
-    print(URL_API_SERVICE)
-    return requests.post(URL_API_SERVICE, data=body, headers=headers)
-
-
-def send_service_info(data: dict, *args, **kwargs):
-    body = {
-        'date': data['date'],
-        'serviceman': data['fio'],
-        'point': data['point'],
-        'collection': data['collection'],
-        'coffee': data['coffee'],
-        'cream': data['cream'],
-        'chocolate': data['chocolate'],
-        'raf': data['raf'],
-        'sugar': data['sugar'],
-        'syrupcaramel': data['syrup_caramel'],
-        'syrupnut': data['syrup_nut'],
-        'syrupother': data['syrup_other'],
-        'glasses': data['glasses'],
-        'covers': data['covers'],
-        'stirrer': data['stirrer'],
-        'straws': data['straws']
-    }
-    print(body)
-    response = request_api_service(body)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        logging.info('Требуется обновление токена')
-        get_token()
-        response = request_api_service(body)
-
-    if response.status_code == HTTPStatus.CREATED:
-        return
-    try:
-        response_json = json.loads(response.text)
-        response_text = list(map(str, response_json))[0]
-    except json.decoder.JSONDecodeError:
-        response_text = response.text
-    match response_text:
-        case 'serviceman':
-            raise ServiceManUnregisteredError(
-                'Не зарегистрирован'
-            )
-        case 'service_exist':
-            raise ServiceInfoExistError(
-                'Уже сохранено'
-            )
-        case 'point_not_exist':
-            raise PontExistError(
-                'Обновите список точек.'
-            )
-        case _:
-            raise AnyError(
-                response.text
-            )
-
-
-def request_api_repair(body):
-    return requests.post(URL_API_REPAIR, data=body, headers=headers)
-
-
-def send_repairs_info(data: dict, *args, **kwargs):
-    body = {
-        'date': data['date'],
-        'serviceman': data['fio'],
-        'point': data['point'],
-        'category': data['category'],
-        'repair': data['repair'],
-        'comments': data['description'],
-    }
-    response = request_api_repair(body)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        logging.info('Требуется обновление токена')
-        get_token()
-        response = request_api_repair(body)
-    if response.status_code == HTTPStatus.CREATED:
-        return
-    response_json = json.loads(response.text)
-    response_text = list(map(str, response_json))[0]
-    match response_text:
-        case 'serviceman':
-            raise ServiceManUnregisteredError(
-                'Не зарегистрирован'
-            )
-        case 'repair_exist':
-            raise ServiceInfoExistError(
-                'Уже сохранено'
-            )
-        case 'point_not_exist':
-            raise PontExistError(
-                'Обновите список точек.'
-            )
-        case _:
-            raise AnyError(
-                response.text
-            )
-
-
 def update_points(*args, **kwargs):
-    response = requests.get(URL_API_POINTS, headers=headers)
+    response = requests.get(URL_API_POINTS, headers=auth_api.headers)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requests.get(URL_API_POINTS, headers=headers)
+        auth_api.get_token()
+        response = requests.get(URL_API_POINTS, headers=auth_api.headers)
     if response.status_code == HTTPStatus.OK:
         logging.info('Список точек обновлен')
         return True
@@ -198,18 +50,10 @@ def update_points(*args, **kwargs):
 async def start(message: types.Message):
     await message.answer('Запуск бота.')
     if update_points():
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        markup.add(
-            types.KeyboardButton(
-                'Обслуживание',
-                web_app=WebAppInfo(url=URL_SERVICE)
-            ))
-        markup.add(
-            types.KeyboardButton(
-                'Ремонт',
-                web_app=WebAppInfo(url=URL_REPAIR)
-            ))
-        await message.answer('Бот готов к работе.', reply_markup=markup)
+        await message.answer(
+            'Бот готов к работе.',
+            reply_markup=buttons.start_buttons,
+        )
     else:
         await message.answer(
             'Список точек не обновлен, нажмите "/update_points" ещё раз'
@@ -231,51 +75,18 @@ async def update_points_command(message: types.Message):
 @dp.message_handler(commands=['service'])
 async def service(message: types.Message):
     logging.debug('Отображение кнопки "Обслуживание".')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(
-        types.KeyboardButton(
-            'Обслуживание',
-            web_app=WebAppInfo(url=URL_SERVICE)
-        ))
-    await message.answer('Обслуживание', reply_markup=markup)
+    await message.answer('Обслуживание', reply_markup=buttons.service_button)
 
 
 @dp.message_handler(commands=['repair'])
 async def repair(message: types.Message):
     logging.debug('Отображение кнопки "Ремонт".')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(
-        types.KeyboardButton(
-            'Ремонт',
-            web_app=WebAppInfo(url=URL_REPAIR)
-        ))
-    await message.answer('Ремонт', reply_markup=markup)
-
-
-def check_user(user_id, *args, **kwargs):
-    response = requests.get(
-        URL_API_SERVICE_MAN,
-        headers=headers,
-        params=f'telegram_id={user_id}'
-    )
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requests.get(
-            URL_API_SERVICE_MAN,
-            headers=headers,
-            params=f'telegram_id={user_id}'
-        )
-    try:
-        response_json = json.loads(response.text)[0]
-    except IndexError:
-        return False
-
-    return response_json['activ']
+    await message.answer('Ремонт', reply_markup=buttons.repair_button)
 
 
 @dp.message_handler(commands=['change_activ'])
 async def change_activ(message: types.Message):
-    if check_user(message.from_user.id):
+    if user.check_user(message.from_user.id, auth_api):
         logging.info(
             f'Сотрудник @{message.from_user.username} запросил смену '
             'статуса сотрудника.'
@@ -292,7 +103,7 @@ async def change_activ(message: types.Message):
 
 @dp.message_handler(commands=['staff'])
 async def staff(message: types.Message):
-    if check_user(message.from_user.id):
+    if user.check_user(message.from_user.id, auth_api):
         logging.info(
             f'Сотрудник @{message.from_user.username} запросил регистрацию '
             'нового сотрудника.'
@@ -309,45 +120,6 @@ async def staff(message: types.Message):
         )
 
 
-def service_man_get_id(telegram_id, *args, **kwargs):
-    response = requests.get(
-        URL_API_SERVICE_MAN,
-        headers=headers,
-        params=f'telegram_id={telegram_id}'
-    )
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requests.get(
-            URL_API_SERVICE_MAN,
-            headers=headers,
-            params=f'telegram_id={telegram_id}'
-        )
-    try:
-        response_json = json.loads(response.text)[0]
-    except IndexError:
-        return False
-
-    return response_json.get('id', False)
-
-
-def service_man_change_activ(service_man_id, *args, **kwargs):
-    url = f'{URL_API_SERVICE_MAN}{service_man_id}/change_activ/'
-    response = requests.post(
-        url,
-        headers=headers
-    )
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requests.post(
-            url,
-            headers=headers
-        )
-    if response.status_code == HTTPStatus.OK:
-        return json.loads(response.text)
-
-    return False
-
-
 async def service_man_change(message: types.Message):
     reg_service_man[message.from_user.id]['change_activ'] = False
     try:
@@ -357,13 +129,14 @@ async def service_man_change(message: types.Message):
             'Изменение статуса сотрудника. Не верный Telegram ID'
         )
         return
-    service_man_id = service_man_get_id(telegram_id)
+    service_man_id = user.service_man_get_id(telegram_id, auth_api)
     logging.info(
         'Изменение статуса сотрудника.'
     )
     if service_man_id:
-        service_man_after_change = service_man_change_activ(
-            service_man_id
+        service_man_after_change = user.service_man_change_activ(
+            service_man_id,
+            auth_api,
         )
         if service_man_after_change:
             if service_man_after_change['activ']:
@@ -390,30 +163,6 @@ async def service_man_change(message: types.Message):
     await message.answer('Сотрудник не найден.')
 
 
-def registr_man(user_id, *args, **kwargs):
-    body = {
-        'name': reg_service_man[user_id]['name'],
-        'telegram_id': reg_service_man[user_id]['telegram_id'],
-        'activ': True
-    }
-    response = requests.post(
-        URL_API_SERVICE_MAN,
-        data=body,
-        headers=headers
-    )
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        get_token()
-        response = requests.post(
-            URL_API_SERVICE_MAN,
-            data=body,
-            headers=headers
-        )
-    if response.status_code == HTTPStatus.CREATED:
-        print(json.loads(response.text))
-        return json.loads(response.text)
-    return False
-
-
 async def registr_service_man(message: types.Message):
     user_id = message.from_user.id
     if reg_service_man[user_id]['name'] == '':
@@ -434,7 +183,7 @@ async def registr_service_man(message: types.Message):
             )
             reg_service_man[user_id]['create'] = False
             return
-        registr = registr_man(user_id)
+        registr = user.registr_man(reg_service_man[user_id])
         if registr:
             answer = (
                 f'Новый пользователь {reg_service_man[user_id]["name"]} '
@@ -456,7 +205,7 @@ async def registr_service_man(message: types.Message):
 async def any_message(message: types.Message):
     if reg_service_man.get(message.from_user.id, False):
         if (
-            check_user(message.from_user.id)
+            user.check_user(message.from_user.id, auth_api)
             and reg_service_man[message.from_user.id].get(
                 'change_activ',
                 False
@@ -464,7 +213,7 @@ async def any_message(message: types.Message):
         ):
             await service_man_change(message)
         elif (
-            check_user(message.from_user.id)
+            user.check_user(message.from_user.id, auth_api)
             and reg_service_man[message.from_user.id].get(
                 'create',
                 False
@@ -494,14 +243,14 @@ def make_messagedata(data, *args, **kwargs):
         result += f'Размешиватели: {data["stirrer"]}\n'
         result += f'Трубочки: {data["straws"]}'
     elif data['type'] == 'Ремонт':
-        result += f'Категория: {data["category"]}\n'
-        result += f'Замена: {data["repair"]}\n'
+        result += f'Виды работ: {data["types_work"]}\n'
+        result += f'Компенсация ГСМ: {data["fuel"]}\n'
         result += f'Комментарий: {data["description"]}'
     return result
 
 
 def user_data(user_id, data):
-    users = get_user(user_id)
+    users = user.user(user_id, auth_api)
     data['fio'] = users[0]['name']
 
 
@@ -513,7 +262,7 @@ async def web_app_service(message: types.Message, data):
     data['type'] = 'Обслуживание'
     data['fio'] = message.from_user.id
     try:
-        send_service_info(data)
+        services.send_service_info(data, auth_api)
         logging.info('Данные по обслуживанию отправлены.')
     except ServiceManUnregisteredError:
         answer = (
@@ -559,12 +308,12 @@ async def web_app_service(message: types.Message, data):
 
 
 async def web_app_repairs(message: types.Message, data):
-    logging.debug('Данны по ремонту.')
+    logging.debug('Данные по ремонту.')
     data['type'] = 'Ремонт'
     data['fio'] = message.from_user.id
 
     try:
-        send_repairs_info(data)
+        repairs.send_repairs_info(data, auth_api)
         logging.info('Данные по ремоту отправлены.')
     except ServiceManUnregisteredError:
         answer = (
@@ -584,7 +333,7 @@ async def web_app_repairs(message: types.Message, data):
         await message.answer(answer)
         return
     except PontExistError:
-        answer = 'Неизвестная точка, обновте список точек'
+        answer = 'Неизвестная точка, обновите список точек'
         logging.info(answer)
         await message.answer(answer)
         return
@@ -639,5 +388,21 @@ async def forward_photo(message: types.Message):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    auth_api = requests_api.AuthAPI(
+        url_api_auth=os.getenv('URL_API_AUTH'),
+        user=os.getenv('API_USER'),
+        password=os.getenv('API_PASSWORD'),
+    )
+    auth_api.get_token()
 
+    user = requests_api.ServiceMan(
+        url_api_service_man=os.getenv('URL_API_SERVICE_MAN')
+    )
+
+    services = requests_api.Service(
+        url_api_service=os.getenv('URL_API_SERVICE')
+    )
+    repairs = requests_api.Repair(
+        url_api_repair=os.getenv('URL_API_REPAIR')
+    )
     executor.start_polling(dp)

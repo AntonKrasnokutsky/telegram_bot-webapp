@@ -89,7 +89,7 @@
                 }
             }
             work ++;
-            place.innerHTML += '<input class="input input_long" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
+            place.innerHTML += '<input class="input input_long" type="search" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
             if (work > 1)
             {
                 for (let i = 1; i < work; i++)
@@ -100,7 +100,21 @@
         };
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            document.getElementById("error_point").innerText = "";
+
+            if (point.value == "") {
+                document.getElementById("error_point").innerText = "Не выбрана точка";
+                return;
+            }
+
             var repair = "";
+
+            let data = {
+                type: "repair",
+                point: point.value,
+                fuel: fuel.value,
+                description: description.value,
+            };
 
             if (work != 0)
             {
@@ -112,15 +126,8 @@
                         types_work.push(values_work);
                     }
                 }
+                data["types_work"] = types_work
             }
-
-            let data = {
-                type: "repair",
-                point: point.value,
-                types_work: types_work,
-                fuel: fuel.value,
-                description: description.value,
-            };
 
             tg.sendData(JSON.stringify(data));
             tg.close();

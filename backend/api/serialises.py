@@ -1,11 +1,29 @@
 from datetime import datetime
 
+from points.models import (
+    FuelCompensation,
+    Points,
+    Repairs,
+    ServiceMan,
+    Services,
+    TypeWorkRepairs
+)
 from rest_framework import serializers
-
-from points.models import Points, Repairs, Services, ServiceMan
 
 new_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 old_format = '%d.%m.%Y %H:%M:%S'
+
+
+class TypeWorkRepairsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypeWorkRepairs
+        fields = ['typework', 'price', ]
+
+
+class FuelCompensationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FuelCompensation
+        fields = ['distance', 'price', ]
 
 
 class RepairsSerializer(serializers.ModelSerializer):
@@ -15,35 +33,71 @@ class RepairsSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if (
-            'view' in self.context
-            and self.context['view'].action == 'list'
-        ):
-            self.fields.update(
-                {
-                    "tax": serializers.IntegerField(source='point.tax')
-                })
+        if 'view' in self.context:
+            if self.context['view'].action == 'list':
+                self.fields.update(
+                    {
+                        "tax": serializers.IntegerField(source='point.tax'),
+                        "typework": TypeWorkRepairsSerializer(
+                            many=True,
+                            required=False
+                        ),
+                        "fuelcompensation": FuelCompensationSerializer(
+                            required=False
+                        ),
+                    })
+            if self.context['view'].action == 'create':
+                self.fields.update(
+                    {
+                        "typework": serializers.ListField(required=False),
+                        "fuelcompensation": serializers.CharField(
+                            required=False
+                        ),
+                    })
 
     class Meta:
         model = Repairs
-        fields = [
-            'date', 'point', 'serviceman',
-            'category', 'repair', 'comments'
-        ]
+        fields = ['date', 'point', 'serviceman', 'comments',]
 
     def get_date(self, obj, *args, **kwargs):
         if isinstance(obj.date, str):
             return datetime.strptime(obj.date, new_format).strftime(old_format)
         return obj.date.strftime(old_format)
 
+    def __get_works(self, *args, **kwargs):
+        try:
+            typework = self.validated_data.pop('typework')
+        except KeyError:
+            return None
+        type_works = []
+        for work in typework:
+            try:
+                type_works.append(TypeWorkRepairs.objects.get(
+                    typework=work,
+                    activ=True,
+                ))
+            except TypeWorkRepairs.DoesNotExist:
+                raise serializers.ValidationError(
+                    {'type_works': f'Тип работ не добавлен: {work}'}
+                )
+        return type_works
+
     def create(self, *args, **kwargs):
         service_man_telegram_id = self.validated_data.pop('service_man')
         point_name = self.validated_data.pop('point')
         date_query = self.initial_data.get('date')
+        try:
+            fuel_compensation = self.validated_data.pop('fuelcompensation')
+            fuelcompensation = FuelCompensation.objects.get(
+                distance=fuel_compensation
+            )
+        except KeyError:
+            fuelcompensation = None
+        except FuelCompensation.DoesNotExist:
+            fuelcompensation = None
 
         try:
             point = Points.objects.get(name=point_name['name'], activ=True)
-            print('Поиск точки', point_name['name'])
         except Points.DoesNotExist:
             raise serializers.ValidationError(
                 {'point_not_exist': 'Обновите список точек.'}
@@ -61,26 +115,27 @@ class RepairsSerializer(serializers.ModelSerializer):
                 {'serviceman': 'Инженер уволен.'}
             )
         date = datetime.strptime(date_query, old_format)
-        # if Repairs.objects.filter(
-        #     date__year=date.year,
-        #     date__month=date.month,
-        #     date__day=date.day,
-        #     point=point
-        # ).exists():
-        #     raise serializers.ValidationError(
-        #         {
-        #             'repair_exist': 'Информация по ремонту точки '
-        #                             'сегодня уже была добавлена.'
-        #         }
-        #     )
         date = date.strftime(new_format)
-
-        return Repairs.objects.create(
+        typework = self.__get_works()
+        repairs = Repairs.objects.create(
             **self.validated_data,
             point=point,
             service_man=service_man,
-            date=date
+            date=date,
+            fuelcompensation=fuelcompensation,
         )
+        if typework:
+            repairs.typework.set(typework)
+        self.fields.update(
+            {
+                "tax": serializers.IntegerField(source='point.tax'),
+                "typework": TypeWorkRepairsSerializer(
+                    many=True,
+                    required=False
+                ),
+                "fuelcompensation": FuelCompensationSerializer(required=False),
+            })
+        return repairs
 
 
 class ServicesSerializer(serializers.ModelSerializer):
@@ -122,7 +177,6 @@ class ServicesSerializer(serializers.ModelSerializer):
 
         try:
             point = Points.objects.get(name=point_name['name'], activ=True)
-            print('Поиск точки', point_name['name'])
         except Points.DoesNotExist:
             raise serializers.ValidationError(
                 {'point_not_exist': 'Обновите список точек.'}
@@ -140,18 +194,6 @@ class ServicesSerializer(serializers.ModelSerializer):
                 {'serviceman': 'Инженер уволен.'}
             )
         date = datetime.strptime(date_query, old_format)
-        # if Services.objects.filter(
-        #     date__year=date.year,
-        #     date__month=date.month,
-        #     date__day=date.day,
-        #     point=point
-        # ).exists():
-        #     raise serializers.ValidationError(
-        #         {
-        #             'service_exist': 'Информация по обслуживанию точки '
-        #                              'сегодня уже была добавлена.'
-        #         }
-        #     )
         date = date.strftime(new_format)
 
         return Services.objects.create(
