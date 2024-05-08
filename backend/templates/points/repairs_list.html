@@ -1,17 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Последние обновления на сайте{% endblock %}
+
+{% load django_tables2 %}
+{% load bootstrap3 %}
+{% load tz %}
+
+{% block title %}Ремонты{% endblock %}
+
 {% block content %}
 
-<div >
-  <table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
-    {% for repair in page_obj %}
-      {% if forloop.first %}
-        {% include 'points/includes/repair_title.html' %}
-      {% endif %}
-      {% include 'points/includes/repair.html' %}
-    {% endfor %}
-  </table>
 
-    {% include 'points/includes/paginator.html' %}
+
+<div style="text-align: left;">
+  {% if filter %}
+    <form action="" method="get" class="form form-inline">
+      {% bootstrap_form filter.form layout='inline' %}
+      {% bootstrap_button 'Найти' %}
+    </form>
+  {% endif %}
+  {% for format in table.export_formats %}
+    <a href="{% export_url format %}">.{{ format }}</a>
+  {% endfor %}
 </div>
+
+{% render_table table %}
+
+
 {% endblock %}

@@ -3,9 +3,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Points(models.Model):
-    name = models.TextField()
+    name = models.TextField(verbose_name='Название')
     activ = models.BooleanField(default=True)
-    tax = models.PositiveIntegerField(default=0)
+    tax = models.PositiveIntegerField(default=0, verbose_name='Тариф')
+
+    class Meta:
+        ordering = ['name', ]
 
     def __str__(self, *args, **kwargs):
         return str(self.name)
@@ -160,7 +163,7 @@ class Repairs(models.Model):
     fuelcompensation = models.ForeignKey(
         'FuelCompensation',
         on_delete=models.PROTECT,
-        verbose_name='Компенчация ГСМ',
+        verbose_name='Компенсация ГСМ',
         blank=True,
         null=True,
     )
@@ -173,20 +176,23 @@ class Repairs(models.Model):
     class Meta:
         ordering = ['date', ]
 
+    def __str__(self, *args, **kwargs):
+        return f'{self.date} {self.point}'
+
 
 class TypeWorkRepairs(models.Model):
     typework = models.CharField(max_length=200, verbose_name='Вид работ')
-    price = models.PositiveIntegerField(default=0)
+    price = models.PositiveIntegerField(default=0, verbose_name='Тариф')
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):
-        return str(self.typework)
+        return f'{str(self.typework)} Тариф: {self.price}'
 
 
 class FuelCompensation(models.Model):
     distance = models.CharField(max_length=255, verbose_name='Компенсация ГСМ')
-    price = models.PositiveIntegerField(default=0)
+    price = models.PositiveIntegerField(default=0, verbose_name='Тариф')
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):
-        return str(self.distance)
+        return f'{str(self.distance)} Тариф: {self.price}'

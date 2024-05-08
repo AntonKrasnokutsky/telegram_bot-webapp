@@ -11,7 +11,7 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from django_tables2.export.views import ExportMixin
 
-from api.filters import ServicesFilter
+from api.filters import RepairsFilter, ServicesFilter
 
 from .forms import FuelCompensationForm, TypeWorkRepairsForm
 from .models import (
@@ -21,7 +21,7 @@ from .models import (
     Services,
     TypeWorkRepairs,
 )
-from .tables import ServiceTable
+from .tables import RepairsTable, ServiceTable
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -102,25 +102,6 @@ class ServicesListView(TemplateView):
             }
             for obj in Points.objects.filter(activ=True)
         ]
-        return context
-
-
-class RepairsListView(TemplateView):
-    template_name = 'points/repairs_list.html'
-
-    @method_decorator(login_required(login_url='users:login'))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        logging.info('Запрос страницы просмотра ремонтов.')
-
-        context = super().get_context_data(**kwargs)
-        services_list = Repairs.objects.all()
-        paginator = Paginator(services_list, 20)
-        page_number = self.request.GET.get('page', paginator.num_pages)
-        page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
         return context
 
 
@@ -294,6 +275,19 @@ class ServiceListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     template_name = 'points/service_list.html'
 
     filterset_class = ServicesFilter
+
+    @method_decorator(login_required(login_url='users:login'))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+
+class RepairsListFilteredView(ExportMixin, SingleTableMixin, FilterView):
+    model = Repairs
+    table_class = RepairsTable
+    export_name = 'repairs_assistance'
+    template_name = 'points/repairs_list.html'
+
+    filterset_class = RepairsFilter
 
     @method_decorator(login_required(login_url='users:login'))
     def dispatch(self, *args, **kwargs):

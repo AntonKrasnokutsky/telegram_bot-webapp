@@ -2,12 +2,13 @@ from django_filters.rest_framework import (
     DateFromToRangeFilter,
     FilterSet
 )
+from django_filters.widgets import RangeWidget
 
 from points.models import Repairs, Services
 
 
 class ServicesFilter(FilterSet):
-    date = DateFromToRangeFilter()
+    date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
 
     class Meta:
         model = Services
@@ -15,7 +16,7 @@ class ServicesFilter(FilterSet):
 
 
 class RepairsFilter(FilterSet):
-    date = DateFromToRangeFilter()
+    date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
 
     class Meta:
         model = Repairs

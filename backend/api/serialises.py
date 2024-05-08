@@ -37,7 +37,6 @@ class RepairsSerializer(serializers.ModelSerializer):
             if self.context['view'].action == 'list':
                 self.fields.update(
                     {
-                        "tax": serializers.IntegerField(source='point.tax'),
                         "typework": TypeWorkRepairsSerializer(
                             many=True,
                             required=False

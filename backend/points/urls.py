@@ -3,12 +3,12 @@ from django.urls import path
 from .views import (
     FuelCompensationListView,
     FuelCompensationCreateView,
-    RepairsListView,
     ServicesListView,
     ServicesView,
     RepairsView,
     TypeWorkRepairsListView,
     TypeWorkRepairsCreateView,
+    RepairsListFilteredView,
     ServiceListFilteredView,
 )
 
@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     path(
         'repairs_list/',
-        RepairsListView.as_view(),
+        RepairsListFilteredView.as_view(),
         name='repairs_list'
     ),
     path(
