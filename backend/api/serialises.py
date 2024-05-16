@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from rest_framework import serializers
+
 from points.models import (
     FuelCompensation,
     Points,
@@ -8,7 +10,6 @@ from points.models import (
     Services,
     TypeWorkRepairs
 )
-from rest_framework import serializers
 
 new_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 old_format = '%d.%m.%Y %H:%M:%S'

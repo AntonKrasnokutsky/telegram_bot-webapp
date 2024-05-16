@@ -3,24 +3,22 @@ import logging
 import os
 import sys
 from datetime import datetime
-from dotenv import load_dotenv
 from http import HTTPStatus
 
 import httplib2
 from django.http import JsonResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from points.models import Points
-from rest_framework import mixins, permissions, viewsets, status
+from points.models import Points, Repairs, ServiceMan, Services
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 
-from points.models import Repairs, Services, ServiceMan
 from .filters import RepairsFilter, ServicesFilter
-from .serialises import (
-    RepairsSerializer, ServicesSerializer, ServiceManSerializer,
-)
+from .serialises import (RepairsSerializer, ServiceManSerializer,
+                         ServicesSerializer)
 
 load_dotenv()
 
@@ -271,7 +269,8 @@ class ServicesViewASet(
     permission_classes = [permissions.IsAuthenticated, ]
     http_method_names = ['get', 'post']
     serializer_class = ServicesSerializer
-    filter_backends = (DjangoFilterBackend, )
+    # filter_backends = (DjangoFilterBackend, )
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = ServicesFilter
 
     def get_queryset(self):

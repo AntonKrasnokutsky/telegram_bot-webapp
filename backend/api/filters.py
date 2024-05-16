@@ -7,8 +7,14 @@ from django_filters.widgets import RangeWidget
 from points.models import Repairs, Services
 
 
+class DurationRangeWidget(RangeWidget):
+    suffixes = ['after', 'before']
+
+
 class ServicesFilter(FilterSet):
-    date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
+    date = DateFromToRangeFilter(
+        widget=DurationRangeWidget(attrs={'type': 'date'})
+    )
 
     class Meta:
         model = Services
@@ -16,7 +22,9 @@ class ServicesFilter(FilterSet):
 
 
 class RepairsFilter(FilterSet):
-    date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
+    date = DateFromToRangeFilter(
+        widget=DurationRangeWidget(attrs={'type': 'date'})
+    )
 
     class Meta:
         model = Repairs
