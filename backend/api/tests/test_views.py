@@ -8,7 +8,14 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from points.models import Points, Services, ServiceMan
+from points.models import (
+    FuelCompensation,
+    Points,
+    Repairs,
+    Services,
+    ServiceMan,
+    TypeWorkRepairs
+)
 
 User = get_user_model()
 client_authenticate = APIClient()
@@ -56,7 +63,7 @@ class ServiceManTestCase(TestCase):
                 'api:serviceman-list'
             ))
         self.assertEqual(request.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(self.service_mans), len(request.data))
+        self.assertEqual(ServiceMan.objects.all().count(), len(request.data))
 
         request = client_not_authenticate.get(
             reverse(
@@ -173,7 +180,7 @@ class ServicesTestCase(TestCase):
         super().setUpClass()
         cls.test_user = User.objects.create(
             email='a@a.ru',
-            username='test_user',
+            username='test_user_service',
             first_name='test_first_name',
             last_name='test_last_name',
             password='testPassword123',
@@ -236,7 +243,7 @@ class ServicesTestCase(TestCase):
         ]
         date = datetime.strptime('15.05.2024 10:44:09', '%d.%m.%Y %H:%M:%S')
         service = Services.objects.create(
-            date=datetime.now(),
+            date=date,
             service_man=cls.service_man,
             point=cls.point_two,
             collection=20,
@@ -327,6 +334,7 @@ class ServicesTestCase(TestCase):
             ))
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         request_answer = json.loads(request.content)
+        self.assertEqual(Services.objects.all().count(), len(request_answer))
 
         for service in range(len(self.services)):
             for field, value in self.services[service].items():
@@ -383,3 +391,94 @@ class ServicesTestCase(TestCase):
             }
         )
         self.assertEqual(len(json.loads(request.content)), 1)
+
+
+class RepairsTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.test_user = User.objects.create(
+            email='a@a.ru',
+            username='test_user_repairs',
+            first_name='test_first_name',
+            last_name='test_last_name',
+            password='testPassword123',
+        )
+        client_authenticate.force_authenticate(cls.test_user)
+        cls.service_man = ServiceMan.objects.create(
+            name='Имя',
+            telegram_id=12345,
+            activ=True
+        )
+        cls.point_one = Points.objects.create(
+            name='Тестовая точка 1',
+            tax=1,
+            activ=True
+        )
+        cls.point_two = Points.objects.create(
+            name='Тестоваяточка2',
+            tax=2,
+            activ=True
+        )
+        date = datetime.strptime('10.01.2024 12:02:23', '%d.%m.%Y %H:%M:%S')
+        cls.type_work = TypeWorkRepairs.objects.create(
+            typework='Работа ремонта',
+            price=10,
+            activ=True
+        )
+        cls.fuelcompensation = FuelCompensation.objects.create(
+            distance='Расстояние',
+            price=500,
+            activ=True,
+        )
+        repair = Repairs.objects.create(
+            date=date,
+            service_man=cls.service_man,
+            point=cls.point_one,
+            # typework=cls.type_work,
+            fuelcompensation=cls.fuelcompensation,
+            comments='Коментарий'
+        )
+        repair.typework.add(cls.type_work)
+        cls.repairs = [{
+            'date': repair.date.strftime("%d.%m.%Y %H:%M:%S"),
+            'serviceman': repair.service_man.name,
+            'point': repair.point.name,
+            'typework': [rep.typework for rep in repair.typework.all()],
+            'fuelcompensation': {
+                'distance': 'Расстояние',
+                'price': 500
+            }
+        }, ]
+
+    def test_repairs_list(self, *args, **kwargs):
+        answer = [
+            {
+                'date': '10.01.2024 12:02:23',
+                'point': 'Тестовая точка 1',
+                'serviceman': 'Имя',
+                'comments': 'Коментарий',
+                'typework':
+                [
+                    {
+                        'typework': 'Работа ремонта',
+                        'price': 10
+                    }],
+                'fuelcompensation':
+                {
+                    'distance': 'Расстояние',
+                    'price': 500
+                }}]
+        request = client_not_authenticate.get(
+            reverse(
+                'api:repairs_v2'
+            ))
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        request = client_authenticate.get(
+            reverse(
+                'api:repairs_v2'
+            ))
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        request_answer = json.loads(request.content)
+        self.assertEqual(request_answer, answer)
