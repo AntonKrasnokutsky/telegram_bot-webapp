@@ -135,6 +135,13 @@ class Services(models.Model):
         ],
         verbose_name='Трубочки, шт'
     )
+    fuelcompensation = models.ForeignKey(
+        'FuelCompensation',
+        on_delete=models.PROTECT,
+        verbose_name='Компенсация ГСМ',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         ordering = ['date', ]

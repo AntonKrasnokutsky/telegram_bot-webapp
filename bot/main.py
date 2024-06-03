@@ -18,6 +18,7 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
 CHAT_ID = os.getenv('CHAT_ID')
+REPAIR_CHAT_ID = os.getenv('REPAIR_CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -354,7 +355,7 @@ async def web_app_repairs(message: types.Message, data):
     answer = make_messagedata(data)
     await message.answer(answer)
     await bot.send_message(
-        chat_id=CHAT_ID,
+        chat_id=REPAIR_CHAT_ID,
         text=answer
     )
 
@@ -380,11 +381,18 @@ async def web_app(message: types.Message):
 async def forward_photo(message: types.Message):
     logging.debug('Пересылка фотографии.')
     if current_point.get(message.from_user.id, False):
-        await bot.send_photo(
-            chat_id=CHAT_ID,
-            photo=message.photo[-1].file_id,
-            caption=current_point[message.from_user.id]
-        )
+        if 'Обслуживание' in current_point[message.from_user.id]:
+            await bot.send_photo(
+                chat_id=CHAT_ID,
+                photo=message.photo[-1].file_id,
+                caption=current_point[message.from_user.id]
+            )
+        if 'Ремонт' in current_point[message.from_user.id]:
+            await bot.send_photo(
+                chat_id=REPAIR_CHAT_ID,
+                photo=message.photo[-1].file_id,
+                caption=current_point[message.from_user.id]
+            )
     else:
         await message.answer('Сначала нужно внести данные об обслуживании.')
 

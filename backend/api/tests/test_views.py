@@ -241,6 +241,11 @@ class ServicesTestCase(TestCase):
                 'tax': service1.point.tax
             }
         ]
+        cls.fuelcompensation = FuelCompensation.objects.create(
+            distance='Расстояние',
+            price=500,
+            activ=True,
+        )
         date = datetime.strptime('15.05.2024 10:44:09', '%d.%m.%Y %H:%M:%S')
         service = Services.objects.create(
             date=date,
@@ -258,7 +263,8 @@ class ServicesTestCase(TestCase):
             glasses=100,
             covers=100,
             stirrer=100,
-            straws=50
+            straws=50,
+            fuelcompensation=cls.fuelcompensation,
         )
         cls.services.append(
             {
@@ -278,7 +284,11 @@ class ServicesTestCase(TestCase):
                 'covers': service.covers,
                 'stirrer': service.stirrer,
                 'straws': service.straws,
-                'tax': service.point.tax
+                'tax': service.point.tax,
+                'fuelcompensation': {
+                    'distance': 'Расстояние',
+                    'price': 500
+                }
             }
         )
 
@@ -317,6 +327,20 @@ class ServicesTestCase(TestCase):
         data['serviceman'] = self.service_man.name
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
 
+        for field, value in data.items():
+            with self.subTest(value=value):
+                self.assertEqual(str(request.data[field]), str(value))
+
+        data['serviceman'] = self.service_man.telegram_id,
+        data['fuelcompensation'] = self.fuelcompensation.distance
+        request = client_authenticate.post(
+            reverse(
+                'api:services_v2'
+            ),
+            data=data)
+        data['serviceman'] = self.service_man.name
+        data['fuelcompensation'] = self.fuelcompensation
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
         for field, value in data.items():
             with self.subTest(value=value):
                 self.assertEqual(str(request.data[field]), str(value))

@@ -21,9 +21,13 @@
             <input class="input input_long" id="point" name="points_name" placeholder="Точка обслуживания" list="points" required >
             <datalist id="points">
             </datalist>
+            <datalist id="list_fuelcompensations">
+            </datalist>
             <div style="color: red;" id="error_point"></div>
         </div>
-
+        <div id="div_fuel">
+            <input class="input input_long" id="fuelcompensations" name="fuelcompensations_distance" placeholder="Компенсация ГСМ" list="list_fuelcompensations" >
+        </div>
         <div>
             <div class="ib bor" id="div_coffee">
                 <p >Кофе</p>
@@ -143,10 +147,16 @@
 
         function onstart() {
             var options = '';
-            {% for item in data %}
+            {% for item in points %}
                 options += '<option value="' + "{{ item.value }}" + '" />';
             {% endfor %};
             document.getElementById('points').innerHTML = options;
+
+            var options = '';
+            {% for item in fuelcompensations %}
+                options += '<option value="' + "{{ item.value }}" + '" />';
+            {% endfor %};
+            document.getElementById('list_fuelcompensations').innerHTML = options;
         };
 
         onstart();
@@ -261,6 +271,7 @@
                 stirrer: stirrer.value,
                 collection: collection.value,
                 straws: straws.value,
+                fuel: fuel.value,
             };
 
             tg.sendData(JSON.stringify(data));

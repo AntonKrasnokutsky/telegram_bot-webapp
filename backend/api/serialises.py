@@ -148,14 +148,22 @@ class ServicesSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if (
-            'view' in self.context
-            and self.context['view'].action == 'list'
-        ):
-            self.fields.update(
-                {
-                    "tax": serializers.IntegerField(source='point.tax')
-                })
+        if 'view' in self.context:
+            if self.context['view'].action == 'list':
+                self.fields.update(
+                    {
+                        "tax": serializers.IntegerField(source='point.tax'),
+                        "fuelcompensation": FuelCompensationSerializer(
+                            required=False
+                        ),
+                    })
+            if self.context['view'].action == 'create':
+                self.fields.update(
+                    {
+                        "fuelcompensation": serializers.CharField(
+                            required=False
+                        ),
+                    })
 
     class Meta:
         model = Services
@@ -174,6 +182,16 @@ class ServicesSerializer(serializers.ModelSerializer):
         service_man_telegram_id = self.validated_data.pop('service_man')
         point_name = self.validated_data.pop('point')
         date_query = self.initial_data.get('date')
+
+        try:
+            fuel_compensation = self.validated_data.pop('fuelcompensation')
+            fuelcompensation = FuelCompensation.objects.get(
+                distance=fuel_compensation
+            )
+        except KeyError:
+            fuelcompensation = None
+        except FuelCompensation.DoesNotExist:
+            fuelcompensation = None
 
         try:
             point = Points.objects.get(name=point_name['name'], activ=True)
@@ -200,7 +218,8 @@ class ServicesSerializer(serializers.ModelSerializer):
             **self.validated_data,
             point=point,
             service_man=service_man,
-            date=date
+            date=date,
+            fuelcompensation=fuelcompensation,
         )
 
 
