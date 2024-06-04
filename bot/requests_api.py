@@ -146,7 +146,8 @@ class Service():
             'glasses': data['glasses'],
             'covers': data['covers'],
             'stirrer': data['stirrer'],
-            'straws': data['straws']
+            'straws': data['straws'],
+            'fuelcompensation': data['fuel'],
         }
         response = self.__request_api_service(body, auth_api)
         if response.status_code == HTTPStatus.UNAUTHORIZED:

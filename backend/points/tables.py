@@ -31,6 +31,8 @@ class ServiceTable(tables.Table):
             'date',
             'service_man',
             'point',
+            'point__tax',
+            'fuelcompensation',
             'collection',
             'coffee',
             'cream',

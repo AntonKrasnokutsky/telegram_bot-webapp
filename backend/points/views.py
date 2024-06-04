@@ -33,12 +33,20 @@ class ServicesView(TemplateView):
         logging.info('Запрос html страницы.')
         context = super().get_context_data(**kwargs)
 
-        context['data'] = [
+        context['points'] = [
             {
                 'id': obj.id,
                 'value': obj.name,
             }
             for obj in Points.objects.filter(activ=True)
+        ]
+
+        context['fuelcompensations'] = [
+            {
+                'id': obj.id,
+                'value': obj.distance,
+            }
+            for obj in FuelCompensation.objects.filter(activ=True)
         ]
 
         logging.info('Запрос html страницы. Успешно.')
