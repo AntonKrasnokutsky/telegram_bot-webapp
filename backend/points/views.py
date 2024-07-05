@@ -19,6 +19,7 @@ from .models import (
     Points,
     Repairs,
     Services,
+    ServiceMan,
     TypeWorkRepairs,
 )
 from .tables import RepairsTable, ServiceTable
@@ -288,6 +289,12 @@ class ServiceListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['service_mans'] = ServiceMan.objects.all()
+        context['points'] = Points.objects.all()
+        return context
+
 
 class RepairsListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     model = Repairs
@@ -300,3 +307,7 @@ class RepairsListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     @method_decorator(login_required(login_url='users:login'))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+
+class AuditView(TemplateView):
+    template_name = 'points/audit.html'
