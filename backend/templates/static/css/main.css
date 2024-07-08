@@ -65,6 +65,11 @@ input {
   width: 90%;
 }
 
+.input_audit{
+  /* text-align: left; */
+  width: 30%;
+}
+
 select {
   font-size: 20px;
   font-weight: 600;
@@ -103,11 +108,13 @@ select {
   border: 1px solid silver;
   padding: 2px 10px;
 }
+
 .div_size {
   vertical-align: bottom;
   height: 99px;
   width: 175px;
 }
+
 .cb {
   text-align: left;
 }

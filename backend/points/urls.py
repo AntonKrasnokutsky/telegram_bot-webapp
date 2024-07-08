@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    AuditView,
     FuelCompensationListView,
     FuelCompensationCreateView,
     ServicesListView,
@@ -57,5 +58,9 @@ urlpatterns = [
         'fuel_create/',
         FuelCompensationCreateView.as_view(),
         name='fuelcompensations_add'
+    ),
+    path(
+        'audit/',
+        AuditView.as_view()
     ),
 ]

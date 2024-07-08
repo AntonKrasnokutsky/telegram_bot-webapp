@@ -2,6 +2,70 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
+class Audit(models.Model):
+    date = models.DateField(verbose_name='Дата время')
+    service_man = models.ForeignKey(
+        'ServiceMan',
+        on_delete=models.PROTECT,
+        verbose_name='Исполнитель'
+    )
+    coffee = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='01. Кофе зерно',
+    )
+    cream = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=(
+            '02. Заменитель сухих сливок Aristocrat '
+            '"Топпинг" 1000г (8 шт. в коробке)'
+        ),
+    )
+    chocolate = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=(
+            '03. Горячий шоколад Aristocrat '
+            'Классический 1000г (12 шт. в коробке)'
+        ),
+    )
+    raf = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=(
+            '04. Смесь сухая "Rapf-coffe" со '
+            'вкусом кокоса 1000г (12 шт. в коробке)'
+        ),
+    )
+    sugar = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='05. Сахар порционный 5 г. BLACK (500 шт./кор - 2500 г.)',
+    )
+    glasses = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='06. Стакан 350 мл. черный (50 шт/уп.)',
+    )
+    covers = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='07. Крышка для стакана (100 шт./уп.)',
+    )
+    straws = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=(
+            '08. Трубочки коктейльные черные прямые 2*210 (1000 шт./упак)'
+        ),
+    )
+    stirrer = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='09. Размешиватель деревянный 18 см. (250 шт./упак)',
+    )
+    syrup_caramel = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='10. Сироп "Соленая карамель" (пл. 1л.)',
+    )
+    syrup_nut = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='11. Сироп "Лесной орех" (пл. 1л.)',
+    )
+
+
 class Points(models.Model):
     name = models.TextField(verbose_name='Название')
     activ = models.BooleanField(default=True)
@@ -11,7 +75,7 @@ class Points(models.Model):
         ordering = ['name', ]
 
     def __str__(self, *args, **kwargs):
-        return str(self.name)
+        return str('*' + self.name if self.activ else self.name)
 
 
 class ServiceMan(models.Model):
@@ -20,7 +84,7 @@ class ServiceMan(models.Model):
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):
-        return self.name
+        return '*' + self.name if self.activ else self.name
 
 
 class Services(models.Model):

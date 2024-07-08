@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <title>Инвентаризация</title>
+    <style>
+        body {
+            background-image: url('{% static "coffee.jpg" %}');
+        }
+    </style>
+
+</head>
+<body>
+<main>
+    <div id="main">
+        <div class="div_point" id="div_coffee">
+            <label for="coffee">01. Кофе зерно</label></p>
+            <input class="input input_audit" id="coffee">
+            <div style="color: red;" id="error_coffee"></div>
+        </div>
+        <div class="div_point" id="div_cream">
+            <label for="cream" >02. Заменитель сухих сливок Aristocrat "Топпинг" 1000г (8 шт. в коробке)</label></p>
+            <input class="input input_audit" id="cream">
+            <div style="color: red;" id="error_cream"></div>
+        </div>
+        <div class="div_point" id="div_chocolate">
+            <label for="chocolate" >03. Горячий шоколад Aristocrat Классический 1000г (12 шт. в коробке)</label></p>
+            <input class="input input_audit" id="chocolate">
+            <div style="color: red;" id="error_chocolate"></div>
+        </div>
+        <div class="div_point" id="div_raf">
+            <label for="raf" >04. Смесь сухая "Rapf-coffe" со вкусом кокоса 1000г (12 шт. в коробке)</label></p>
+            <input class="input input_audit" id="raf">
+            <div style="color: red;" id="error_raf"></div>
+        </div>
+        <div class="div_point" id="div_sugar">
+            <label for="sugar" >05. Сахар порционный 5 г. BLACK (500 шт./кор - 2500 г.)</label></p>
+            <input class="input input_audit" id="sugar">
+            <div style="color: red;" id="error_sugar"></div>
+        </div>
+        <div class="div_point" id="div_glasses">
+            <label for="glasses" >06. Стакан 350 мл. черный (50 шт/уп.)</label></p>
+            <input class="input input_audit" id="glasses">
+            <div style="color: red;" id="error_glasses"></div>
+        </div>
+        <div class="div_point" id="div_covers">
+            <label for="covers" >07. Крышка для стакана (100 шт./уп.)</label></p>
+            <input class="input input_audit" id="covers">
+            <div style="color: red;" id="error_covers"></div>
+        </div>
+        <div class="div_point" id="div_straws">
+            <label for="straws" >08. Трубочки коктейльные черные прямые 2*210 (1000 шт./упак)</label></p>
+            <input class="input input_audit" id="straws">
+            <div style="color: red;" id="error_straws"></div>
+        </div>
+        <div class="div_point" id="div_stirrer">
+            <label for="stirrer" >09. Размешиватель деревянный 18 см. (250 шт./упак)</label></p>
+            <input class="input input_audit" id="stirrer">
+            <div style="color: red;" id="error_stirrer"></div>
+        </div>
+        <div class="div_point" id="div_syrup_caramel">
+            <label for="syrup_caramel" >10. Сироп "Соленая карамель" (пл. 1л.)</label></p>
+            <input class="input input_audit" id="syrup_caramel">
+            <div style="color: red;" id="error_syrup_caramel"></div>
+        </div>
+        <div class="div_point" id="div_syrup_nut">
+            <label for="syrup_nut" >11. Сироп "Лесной орех" (пл. 1л.)</label></p>
+            <input class="input input_audit" id="syrup_nut">
+            <div style="color: red;" id="error_syrup_nut"></div>
+        </div>
+
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        let coffee = document.getElementById("coffee")
+        let cream = document.getElementById("cream")
+        let chocolate = document.getElementById("chocolate")
+        let raf = document.getElementById("raf")
+        let sugar = document.getElementById("sugar")
+        let syrup_caramel = document.getElementById("syrup_caramel")
+        let syrup_nut = document.getElementById("syrup_nut")
+        let glasses = document.getElementById("glasses")
+        let covers = document.getElementById("covers")
+        let stirrer = document.getElementById("stirrer")
+        let straws = document.getElementById("straws")
+
+        tg.expand();
+        tg.MainButton.text = "Завершить аудит";
+        tg.MainButton.show();
+
+        Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            document.getElementById("error_coffee").innerText = "";
+            document.getElementById("error_cream").innerText = "";
+            document.getElementById("error_chocolate").innerText = "";
+            document.getElementById("error_raf").innerText = "";
+            document.getElementById("error_sugar").innerText = "";
+            document.getElementById("error_syrup_caramel").innerText = "";
+            document.getElementById("error_syrup_nut").innerText = "";
+            document.getElementById("error_glasses").innerText = "";
+            document.getElementById("error_covers").innerText = "";
+            document.getElementById("error_stirrer").innerText = "";
+            document.getElementById("error_straws").innerText = "";
+
+            if (isNaN(parseInt(syrup_caramel.value, 10))) {
+                document.getElementById("error_syrup_caramel").innerText = "Укажите количество сиропа 'Солёная карамель'";
+                return;
+            }
+
+            if (isNaN(parseInt(syrup_nut.value, 10))) {
+                document.getElementById("error_syrup_nut").innerText = "Укажите количество сиропа 'Лесной орех'";
+                return;
+            }
+
+            if (isNaN(parseInt(coffee.value, 10))) {
+                document.getElementById("error_coffee").innerText = "Укажите количество кофе";
+                return;
+            }
+
+            if (isNaN(parseInt(cream.value, 10))) {
+                document.getElementById("error_cream").innerText = "Укажите количество молока";
+                return;
+            }
+
+            if (isNaN(parseInt(chocolate.value, 10))) {
+                document.getElementById("error_chocolate").innerText = "Укажите количество шоколада";
+                return;
+            }
+
+            if (isNaN(parseInt(raf.value, 10))) {
+                document.getElementById("error_raf").innerText = "Укажите количество рафа";
+                return;
+            }
+
+            if (isNaN(parseInt(sugar.value, 10))) {
+                document.getElementById("error_sugar").innerText = "Укажите количество сахара";
+                return;
+            }
+
+            if (isNaN(parseInt(glasses.value, 10))) {
+                document.getElementById("error_glasses").innerText = "Укажите количество стаканов";
+                return;
+            }
+
+            if (isNaN(parseInt(covers.value, 10))) {
+                document.getElementById("error_covers").innerText = "Укажите количество крышек";
+                return;
+            }
+
+            if (isNaN(parseInt(stirrer.value, 10))) {
+                document.getElementById("error_stirrer").innerText = "Укажите количество размешивателей";
+                return;
+            }
+
+            if (isNaN(parseInt(straws.value, 10))) {
+                document.getElementById("error_straws").innerText = "Укажите количество трубочек";
+                return;
+            }
+
+
+            let data = {
+                type: "audit",
+
+                coffee: coffee.value,
+                cream: cream.value,
+                chocolate: chocolate.value,
+                raf: raf.value,
+                sugar: sugar.value,
+                syrup_caramel: syrup_caramel.checked,
+                syrup_nut: syrup_nut.checked,
+                glasses: glasses.value,
+                covers: covers.value,
+                stirrer: stirrer.value,
+                straws: straws.value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+    </script>
+</main>
+</body>
+</html>
