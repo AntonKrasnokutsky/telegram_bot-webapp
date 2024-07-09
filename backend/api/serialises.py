@@ -3,6 +3,7 @@ from datetime import datetime
 from rest_framework import serializers
 
 from points.models import (
+    Audit,
     FuelCompensation,
     Points,
     Repairs,
@@ -227,3 +228,43 @@ class ServiceManSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceMan
         fields = ['id', 'name', 'telegram_id', 'activ',]
+
+
+class AuditSerializer(serializers.ModelSerializer):
+    serviceman = serializers.CharField(source='service_man.name')
+    date = serializers.DateField(
+        format="%d.%m.%Y",
+        input_formats=['%d.%m.%Y']
+    )
+    syrup_caramel = serializers.CharField()
+    syrup_nut = serializers.CharField()
+
+    class Meta:
+        model = Audit
+        fields = [
+            'date', 'serviceman', 'coffee', 'cream', 'chocolate',
+            'raf', 'sugar', 'glasses', 'covers', 'straws', 'stirrer',
+            'syrup_caramel', 'syrup_nut',
+        ]
+
+    def create(self, *args, **kwargs):
+        service_man_telegram_id = self.validated_data.pop('service_man')
+
+        try:
+            service_man = ServiceMan.objects.get(
+                telegram_id=service_man_telegram_id['name']
+            )
+        except ServiceMan.DoesNotExist:
+            raise serializers.ValidationError(
+                {'serviceman': 'Инженер не зарегистрирован.'}
+            )
+
+        if not service_man.activ:
+            raise serializers.ValidationError(
+                {'serviceman': 'Инженер уволен.'}
+            )
+
+        return Audit.objects.create(
+            **self.validated_data,
+            service_man=service_man,
+        )

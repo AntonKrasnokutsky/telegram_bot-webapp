@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_tables2 %}
+{% load bootstrap3 %}
+{% load tz %}
+
+{% block title %}Последние обновления на сайте{% endblock %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<div style="text-align: left;">
+  {% if filter %}
+    <form action="" method="get" class="form form-inline">
+      {% bootstrap_form filter.form layout='inline' %}
+      {% bootstrap_button 'Найти' %}
+    </form>
+  {% endif %}
+  {% for format in table.export_formats %}
+    <a href="{% export_url format %}">.{{ format }}</a>
+  {% endfor %}
+</div>
+{% localtime off %}
+{% render_table table %}
+{% endlocaltime %}
+
+<script>
+  
+let btn_search = document.getElementById("search")
+$(document).ready(function () {
+   $("select").select2();
+});
+
+
+</script>
+
+
+
+{% endblock %}
+

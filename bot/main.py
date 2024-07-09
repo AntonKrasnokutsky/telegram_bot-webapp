@@ -10,8 +10,12 @@ import requests
 import requests_api
 from aiogram import Bot, Dispatcher, executor, types
 from dotenv import load_dotenv
-from exceptions import (AnyError, PontExistError, ServiceInfoExistError,
-                        ServiceManUnregisteredError)
+from exceptions import (
+    AnyError,
+    PontExistError,
+    ServiceInfoExistError,
+    ServiceManUnregisteredError
+)
 
 load_dotenv()
 
@@ -19,6 +23,7 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 URL_API_POINTS = os.getenv('URL_API_POINTS')
 CHAT_ID = os.getenv('CHAT_ID')
 REPAIR_CHAT_ID = os.getenv('REPAIR_CHAT_ID')
+AUDIT_CHAT_ID = os.getenv('AUDIT_CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -250,6 +255,39 @@ def make_messagedata(data, *args, **kwargs):
             pass
         result += f'Компенсация ГСМ: {data["fuel"]}\n'
         result += f'Комментарий: {data["description"]}'
+    elif data['type'] == 'Ревизия':
+        result += f'01. Кофе зерно: {data["coffee"]}\n'
+        result += (
+            '02. Заменитель сухих сливок Aristocrat "Топпинг" 1000г '
+            f'(8 шт. в коробке): {data["cream"]}\n'
+        )
+        result += (
+            '03. Горячий шоколад Aristocrat Классический 1000г '
+            f'(12 шт. в коробке): {data["chocolate"]}\n'
+        )
+        result += (
+            '04. Смесь сухая "Rapf-coffe" со вкусом кокоса 1000г '
+            f'(12 шт. в коробке): {data["raf"]}\n'
+        )
+        result += (
+            '05. Сахар порционный 5 г. BLACK (500 шт./кор - 2500 г.): '
+            f'{data["sugar"]}\n'
+        )
+        result += f'06. Стакан 350 мл. черный (50 шт/уп.): {data["glasses"]}\n'
+        result += f'07. Крышка для стакана (100 шт./уп.): {data["covers"]}\n'
+        result += (
+            '08. Трубочки коктейльные черные прямые 2*210 '
+            f'(1000 шт./упак): {data["straws"]}'
+        )
+        result += (
+            '09. Размешиватель деревянный 18 см. '
+            f'(250 шт./упак): {data["stirrer"]}\n'
+        )
+        result += (
+            '10. Сироп "Соленая карамель" (пл. 1л.)": '
+            f'{data["syrup_caramel"]}\n'
+        )
+        result += f'11. Сироп "Лесной орех" (пл. 1л.): {data["syrup_nut"]}\n'
     return result
 
 
@@ -326,7 +364,7 @@ async def web_app_repairs(message: types.Message, data):
         )
         logging.critical(answer)
         await bot.send_message(
-            chat_id=CHAT_ID,
+            chat_id=REPAIR_CHAT_ID,
             text=answer
         )
         await message.answer('Данные не сохранены')
@@ -360,6 +398,45 @@ async def web_app_repairs(message: types.Message, data):
     )
 
 
+async def web_app_audit(message: types.Message, data):
+    logging.debug('Данны по ревизии.')
+    data['type'] = 'Ревизия'
+    data['fio'] = message.from_user.id
+    try:
+        services.send_service_info(data, auth_api)
+        logging.info('Данные по ревизии отправлены.')
+    except ServiceManUnregisteredError:
+        answer = (
+            'Попытка внести данные незарегистрированным '
+            f'инженером: @{message.from_user.username}'
+        )
+        logging.critical(answer)
+        await bot.send_message(
+            chat_id=AUDIT_CHAT_ID,
+            text=answer
+        )
+        await message.answer('Данные не сохранены')
+        return
+    except AnyError as e:
+        answer = f'Данные не сохранены. Ответ сервера: {e.args}'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+
+    user_data(message.from_user.id, data)
+    current_point[message.from_user.id] = (
+        f'Вид работ: {data["type"]}\n'
+        f'Инженер: {data["fio"]}'
+    )
+    logging.debug('Отправка сообщения с информацией о ревизии.')
+    answer = make_messagedata(data)
+    await message.answer(answer)
+    await bot.send_message(
+        chat_id=AUDIT_CHAT_ID,
+        text=answer
+    )
+
+
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     logging.debug('WebApp.')
@@ -370,11 +447,16 @@ async def web_app(message: types.Message):
     date_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
-    data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
+    if data['type'] in ['service', 'repair']:
+        data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
+    else:
+        data['date'] = date_msk.strftime("%d.%m.%Y")
     if data['type'] == 'service':
         await web_app_service(message, data)
     elif data['type'] == 'repair':
         await web_app_repairs(message, data)
+    elif data['type'] == 'audit':
+        await web_app_audit(message, data)
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)

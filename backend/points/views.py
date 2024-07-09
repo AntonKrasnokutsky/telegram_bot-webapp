@@ -11,10 +11,11 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from django_tables2.export.views import ExportMixin
 
-from api.filters import RepairsFilter, ServicesFilter
+from api.filters import AuditFilter, RepairsFilter, ServicesFilter
 
 from .forms import FuelCompensationForm, TypeWorkRepairsForm
 from .models import (
+    Audit,
     FuelCompensation,
     Points,
     Repairs,
@@ -22,7 +23,7 @@ from .models import (
     ServiceMan,
     TypeWorkRepairs,
 )
-from .tables import RepairsTable, ServiceTable
+from .tables import AuditTable, RepairsTable, ServiceTable
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -311,3 +312,16 @@ class RepairsListFilteredView(ExportMixin, SingleTableMixin, FilterView):
 
 class AuditView(TemplateView):
     template_name = 'points/audit.html'
+
+
+class AuditListFilteredView(ExportMixin, SingleTableMixin, FilterView):
+    model = Audit
+    table_class = AuditTable
+    export_name = 'audit_assistance'
+    template_name = 'points/audit_list.html'
+
+    filterset_class = AuditFilter
+
+    @method_decorator(login_required(login_url='users:login'))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)

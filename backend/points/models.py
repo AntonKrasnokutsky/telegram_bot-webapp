@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Audit(models.Model):
-    date = models.DateField(verbose_name='Дата время')
+    date = models.DateField(verbose_name='Дата')
     service_man = models.ForeignKey(
         'ServiceMan',
         on_delete=models.PROTECT,

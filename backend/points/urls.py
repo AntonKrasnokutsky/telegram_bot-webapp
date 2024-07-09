@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     AuditView,
+    AuditListFilteredView,
     FuelCompensationListView,
     FuelCompensationCreateView,
     ServicesListView,
@@ -62,5 +63,10 @@ urlpatterns = [
     path(
         'audit/',
         AuditView.as_view()
+    ),
+    path(
+        'audit_list/',
+        AuditListFilteredView.as_view(),
+        name='audit_list'
     ),
 ]

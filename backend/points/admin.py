@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import (
+    Audit,
     FuelCompensation,
     Points,
     Repairs,
@@ -8,6 +9,16 @@ from .models import (
     Services,
     TypeWorkRepairs
 )
+
+
+class AuditAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'service_man',
+        'date',
+    )
+    search_fields = ('service_man', 'date')
+    empty_value_display = '-пусто-'
 
 
 class ServiceManAdmin(admin.ModelAdmin):
@@ -64,6 +75,7 @@ class FuelCompensationAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+admin.site.register(Audit, AuditAdmin)
 admin.site.register(Points, PointsAdmin)
 admin.site.register(Repairs, RepairsAdmin)
 admin.site.register(Services, ServicesAdmin)
