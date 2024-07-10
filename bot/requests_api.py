@@ -230,3 +230,54 @@ class Repair():
                 raise AnyError(
                     response.text
                 )
+
+
+class Audit():
+    def __init__(self, *args, **kwargs):
+        self.__URL_API = kwargs['url_api_audit']
+
+    def __request_api(self, body, auth_api: AuthAPI):
+        return requests.post(
+            self.__URL_API,
+            data=body,
+            headers=auth_api.headers
+        )
+
+    def send_info(self, data: dict, auth_api: AuthAPI):
+        body = {
+            'date': data['date'],
+            'serviceman': data['fio'],
+            'coffee': data['coffee'],
+            'cream': data['cream'],
+            'chocolate': data['chocolate'],
+            'raf': data['raf'],
+            'sugar': data['sugar'],
+            'syrup_caramel': data['syrup_caramel'],
+            'syrup_nut': data['syrup_nut'],
+            'glasses': data['glasses'],
+            'covers': data['covers'],
+            'stirrer': data['stirrer'],
+            'straws': data['straws'],
+        }
+        try:
+            body['typework'] = data['types_work']
+        except KeyError:
+            pass
+        response = self.__request_api(body, auth_api)
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            logging.info('Требуется обновление токена')
+            auth_api.get_token()
+            response = self.__request_api(body, auth_api)
+        if response.status_code == HTTPStatus.CREATED:
+            return
+        response_json = json.loads(response.text)
+        response_text = list(map(str, response_json))[0]
+        match response_text:
+            case 'serviceman':
+                raise ServiceManUnregisteredError(
+                    'Не зарегистрирован'
+                )
+            case _:
+                raise AnyError(
+                    response.text
+                )

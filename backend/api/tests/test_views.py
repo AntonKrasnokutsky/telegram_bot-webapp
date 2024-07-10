@@ -459,7 +459,6 @@ class RepairsTestCase(TestCase):
             date=date,
             service_man=cls.service_man,
             point=cls.point_one,
-            # typework=cls.type_work,
             fuelcompensation=cls.fuelcompensation,
             comments='Коментарий'
         )
