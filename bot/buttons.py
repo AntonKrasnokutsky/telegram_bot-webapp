@@ -23,7 +23,7 @@ repair_button = types.ReplyKeyboardMarkup(resize_keyboard=True).add(
     ))
 audit_button = types.ReplyKeyboardMarkup(resize_keyboard=True).add(
     types.KeyboardButton(
-        'Инвертаризация',
+        'Ревизия',
         web_app=WebAppInfo(url=URL_AUDIT)
     ))
 
@@ -40,6 +40,6 @@ start_buttons.add(
     ))
 start_buttons.add(
     types.KeyboardButton(
-        'Инветаризация',
+        'Ревизия',
         web_app=WebAppInfo(url=URL_AUDIT)
     ))
