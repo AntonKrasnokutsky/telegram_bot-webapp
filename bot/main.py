@@ -54,16 +54,10 @@ def update_points(*args, **kwargs):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await message.answer('Запуск бота.')
-    if update_points():
-        await message.answer(
-            'Бот готов к работе.',
-            reply_markup=buttons.start_buttons,
-        )
-    else:
-        await message.answer(
-            'Список точек не обновлен, нажмите "/update_points" ещё раз'
-        )
+    await message.answer(
+        'Бот готов к работе.',
+        reply_markup=buttons.start_buttons,
+    )
 
 
 @dp.message_handler(commands=['update_points'])

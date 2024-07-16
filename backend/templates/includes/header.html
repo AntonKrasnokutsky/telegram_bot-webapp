@@ -6,11 +6,7 @@
         {% if user.is_authenticated %}
         <li class="nav-item"> 
           <a class="nav-link"
-          href="{% url 'points:services_list' %}">Обслуживания</a>
-        </li>
-        <li class="nav-item"> 
-          <a class="nav-link"
-          href="{% url 'points:service_list' %}">Обслуживания (фильтр)</a>
+          href="{% url 'points:service_list' %}">Обслуживания</a>
         </li>
         <li class="nav-item"> 
           <a class="nav-link"
@@ -23,6 +19,10 @@
         <li class="nav-item"> 
           <a class="nav-link"
           href="{% url 'points:fuelcompensations' %}">Компенсация ГСМ</a>
+        </li>
+        <li class="nav-item"> 
+          <a class="nav-link"
+          href="{% url 'points:audit_list' %}">Ревизия</a>
         </li>
         <li class="nav-item"> 
           <a class="nav-link link-light"

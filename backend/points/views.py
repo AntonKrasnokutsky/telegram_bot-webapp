@@ -13,6 +13,7 @@ from django_tables2.export.views import ExportMixin
 
 from api.filters import AuditFilter, RepairsFilter, ServicesFilter
 
+from .exports import AuditExportMixin
 from .forms import FuelCompensationForm, TypeWorkRepairsForm
 from .models import (
     Audit,
@@ -87,31 +88,6 @@ class RepairsView(TemplateView):
         ]
 
         logging.info('Запрос html страницы. Успешно.')
-        return context
-
-
-class ServicesListView(TemplateView):
-    template_name = 'points/services_list.html'
-
-    @method_decorator(login_required(login_url='users:login'))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        logging.info('Запрос страницы просмотра обслуживаний.')
-        context = super().get_context_data(**kwargs)
-        services_list = Services.objects.all()
-        paginator = Paginator(services_list, 20)
-        page_number = self.request.GET.get('page', paginator.num_pages)
-        page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
-        context['data'] = [
-            {
-                'id': obj.id,
-                'value': obj.name,
-            }
-            for obj in Points.objects.filter(activ=True)
-        ]
         return context
 
 
@@ -314,7 +290,7 @@ class AuditView(TemplateView):
     template_name = 'points/audit.html'
 
 
-class AuditListFilteredView(ExportMixin, SingleTableMixin, FilterView):
+class AuditListFilteredView(AuditExportMixin, SingleTableMixin, FilterView):
     model = Audit
     table_class = AuditTable
     export_name = 'audit_assistance'

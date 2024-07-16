@@ -5,7 +5,6 @@ from .views import (
     AuditListFilteredView,
     FuelCompensationListView,
     FuelCompensationCreateView,
-    ServicesListView,
     ServicesView,
     RepairsView,
     TypeWorkRepairsListView,
@@ -24,11 +23,6 @@ urlpatterns = [
     path(
         'repair/',
         RepairsView.as_view()
-    ),
-    path(
-        'services_list/',
-        ServicesListView.as_view(),
-        name='services_list'
     ),
     path(
         'repairs_list/',
