@@ -37,7 +37,8 @@ class RepairsTable(tables.Table):
             'service_man',
             'point',
             'typework',
-            'fuelcompensation',
+            'fuelcompensation__distance',
+            'fuelcompensation__price',
             'comments',
         )
 

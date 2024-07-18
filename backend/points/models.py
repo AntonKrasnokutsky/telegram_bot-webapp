@@ -253,7 +253,10 @@ class Repairs(models.Model):
 
 class TypeWorkRepairs(models.Model):
     typework = models.CharField(max_length=200, verbose_name='Вид работ')
-    price = models.PositiveIntegerField(default=0, verbose_name='Тариф')
+    price = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Тариф на работу'
+    )
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):
@@ -262,7 +265,7 @@ class TypeWorkRepairs(models.Model):
 
 class FuelCompensation(models.Model):
     distance = models.CharField(max_length=255, verbose_name='Компенсация ГСМ')
-    price = models.PositiveIntegerField(default=0, verbose_name='Тариф')
+    price = models.PositiveIntegerField(default=0, verbose_name='Тариф ГСМ')
     activ = models.BooleanField(default=True)
 
     def __str__(self, *args, **kwargs):
