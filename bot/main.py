@@ -227,7 +227,8 @@ def make_messagedata(data, *args, **kwargs):
     result = ''
     result += f'Вид работ: {data["type"]}\n'
     result += f'Инженер: {data["fio"]}\n'
-    result += f'Точка обслуживания: {data["point"]}\n'
+    if data['type'] == 'Обслуживание' or data['type'] == 'Ремонт':
+        result += f'Точка обслуживания: {data["point"]}\n'
     if data['type'] == 'Обслуживание':
         result += f'Инкасация: ₽\xa0 {data["collection"]}\n'
         result += f'Кофе: {data["coffee"]}\n'
@@ -397,7 +398,7 @@ async def web_app_audit(message: types.Message, data):
     data['type'] = 'Ревизия'
     data['fio'] = message.from_user.id
     try:
-        services.send_service_info(data, auth_api)
+        audit.send_info(data, auth_api)
         logging.info('Данные по ревизии отправлены.')
     except ServiceManUnregisteredError:
         answer = (
@@ -491,5 +492,8 @@ if __name__ == "__main__":
     )
     repairs = requests_api.Repair(
         url_api_repair=os.getenv('URL_API_REPAIR')
+    )
+    audit = requests_api.Audit(
+        url_api_audit=os.getenv('URL_API_AUDIT')
     )
     executor.start_polling(dp)

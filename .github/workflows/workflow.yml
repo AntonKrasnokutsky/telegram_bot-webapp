@@ -102,6 +102,8 @@ jobs:
 
             echo URL_API_SERVICE=${{ secrets.URL_API_SERVICE }} >> .env
             echo URL_API_REPAIR=${{ secrets.URL_API_REPAIR }} >> .env
+            echo URL_API_AUDIT=${{ secrets.URL_API_AUDIT }} >> .env
+            
             echo URL_API_SERVICE_MAN=${{ secrets.URL_API_SERVICE_MAN }} >> .env
             echo URL_API_AUTH=${{ secrets.URL_API_AUTH }} >> .env
             echo API_USER=${{ secrets.API_USER }} >> .env

@@ -9,6 +9,7 @@ telegram_bot-webapp использует ряд технологий:
 - Django 4.2.6
 - Google api python client 2.101.0
 - Django rest framework 3.14.0
+- Django tables2 2.7.0
 
 
 ### Как запустить проект:
@@ -41,6 +42,7 @@ nano bot/.env
 TELEGRAM_BOT_TOKEN=токен_телеграм_бота
 URL_SERVICE=https://{domain}/service/
 URL_REPAIR=https://{domain}/repair/
+URL_AUDIT=https://{domain}/audit/
 CREDENTIALS_FILE=json_доступа_сервисного аккаунта
 SPREADSHEET_ID=ID_таблицы_google
 SHEET_REPEAR=страница_сохранения_данных_ремонта
@@ -56,10 +58,12 @@ POSTGRES_DB=название базы
 POSTGRES_PASSWORD=пароль базы
 POSTGRES_USER=пользователь базы
 SECRET_KEY=секретный ключ Django
-URL_API_AUTH=пусть для авторизации
-URL_API_POINTS=путь обновления точек
-URL_API_SERVICE=путь к эндроинту обслуживания
-URL_API_SERVICE_MAN= путь к эндпоинту сотрудников
+URL_API_AUTH=https://{domain}/api/auth/token/login/
+URL_API_POINTS=https://{domain}/api/points/
+URL_API_SERVICE=https://{domain}/api/v2/services/
+URL_API_REPAIR=https://{domain}/api/v2/repairs/
+URL_API_AUDIT=https://{domain}/api/v2/audit/
+URL_API_SERVICE_MAN= https://{domain}/api/v2/serviceman/
 ```
 
 Запустить контейнеры
