@@ -1,10 +1,12 @@
-from django_tables2.export.views import ExportMixin, TableExport
+from django_tables2.export.views import TableExport
 from tablib import Dataset
+
+from .models import TypeWorkRepairs
 
 
 class AuditTableExport(TableExport):
     def table_to_dataset(self, table, exclude_columns, dataset_kwargs=None):
-        audit_headers = [
+        headers = [
             'Дата',
             'Наименование',
             'Количествоа',
@@ -33,7 +35,7 @@ class AuditTableExport(TableExport):
                         headers_position_data[field] = pos
                     else:
                         headers_position_value[field] = pos
-                dataset.headers = audit_headers
+                dataset.headers = headers
             else:
                 names_value = list(headers_position_value.keys())
                 names_value.sort()
@@ -47,5 +49,43 @@ class AuditTableExport(TableExport):
         return dataset
 
 
-class AuditExportMixin(ExportMixin):
-    export_class = AuditTableExport
+class RepairsTableExport(TableExport):
+    def table_to_dataset(self, table, exclude_columns, dataset_kwargs=None):
+        headers = [
+            'Дата время',
+            'Исполнитель',
+            'Точка',
+            'Вид работ',
+            'Стоимость работ',
+            'Компенсация ГСМ',
+            'Тариф ГСМ',
+            'Комментарий',
+        ]
+        index = None
+        """Transform a table to a tablib dataset."""
+
+        def default_dataset_title():
+            try:
+                return table.Meta.model._meta.verbose_name_plural.title()
+            except AttributeError:
+                return "Export Data"
+
+        kwargs = {"title": default_dataset_title()}
+        kwargs.update(dataset_kwargs or {})
+        dataset = Dataset(**kwargs)
+        for i, row in enumerate(
+            table.as_values(exclude_columns=exclude_columns)
+        ):
+            if i == 0:
+                index = row.index('Вид работ')
+                dataset.headers = headers
+            else:
+                price = 0
+                for work in row[index].split(', '):
+                    price += TypeWorkRepairs.objects.get(
+                        typework=work.split(' Тариф: ')[0],
+                        activ=True
+                    ).price
+                row.insert(index + 1, price)
+                dataset.append(row)
+        return dataset

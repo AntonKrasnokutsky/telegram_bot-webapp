@@ -1,6 +1,6 @@
 from django_filters.rest_framework import (
     DateFromToRangeFilter,
-    FilterSet
+    FilterSet,
 )
 from django_filters.widgets import RangeWidget
 
@@ -32,7 +32,6 @@ class RepairsFilter(FilterSet):
 
 
 class AuditFilter(FilterSet):
-
     class Meta:
         model = Audit
         fields = ['date', 'service_man', ]
