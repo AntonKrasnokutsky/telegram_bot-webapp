@@ -13,7 +13,7 @@ from django_tables2.export.views import ExportMixin
 
 from api.filters import AuditFilter, RepairsFilter, ServicesFilter
 
-from .exports import AuditExportMixin
+from .exports import AuditTableExport, RepairsTableExport
 from .forms import FuelCompensationForm, TypeWorkRepairsForm
 from .models import (
     Audit,
@@ -278,6 +278,7 @@ class RepairsListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     table_class = RepairsTable
     export_name = 'repairs_assistance'
     template_name = 'points/repairs_list.html'
+    export_class = RepairsTableExport
 
     filterset_class = RepairsFilter
 
@@ -290,11 +291,12 @@ class AuditView(TemplateView):
     template_name = 'points/audit.html'
 
 
-class AuditListFilteredView(AuditExportMixin, SingleTableMixin, FilterView):
+class AuditListFilteredView(ExportMixin, SingleTableMixin, FilterView):
     model = Audit
     table_class = AuditTable
     export_name = 'audit_assistance'
     template_name = 'points/audit_list.html'
+    export_class = AuditTableExport
 
     filterset_class = AuditFilter
 
