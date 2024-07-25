@@ -87,6 +87,8 @@ class RepairsTableExport(TableExport):
                             typework=work.split(' Тариф: ')[0],
                             activ=True
                         ).price
-                row.insert(index + 1, price)
+                    row.insert(index + 1, price)
+                else:
+                    row.insert(index + 1, '')
                 dataset.append(row)
         return dataset
