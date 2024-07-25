@@ -81,11 +81,12 @@ class RepairsTableExport(TableExport):
                 dataset.headers = headers
             else:
                 price = 0
-                for work in row[index].split(', '):
-                    price += TypeWorkRepairs.objects.get(
-                        typework=work.split(' Тариф: ')[0],
-                        activ=True
-                    ).price
+                if row[index]:
+                    for work in row[index].split(', '):
+                        price += TypeWorkRepairs.objects.get(
+                            typework=work.split(' Тариф: ')[0],
+                            activ=True
+                        ).price
                 row.insert(index + 1, price)
                 dataset.append(row)
         return dataset
