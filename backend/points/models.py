@@ -13,6 +13,13 @@ class Audit(models.Model):
         default=0,
         verbose_name='01. Кофе зерно',
     )
+    mokko = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=(
+            '031. Капучино Aristocrat Mokka Toffee '
+            '1000г (12 шт. в коробке)'
+        ),
+    )
     cream = models.PositiveSmallIntegerField(
         default=0,
         verbose_name=(
@@ -110,6 +117,14 @@ class Services(models.Model):
             MaxValueValidator(2)
         ],
         verbose_name='Кофе, кг'
+    )
+    mokko = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(2)
+        ],
+        verbose_name='Мокко, кг'
     )
     cream = models.PositiveSmallIntegerField(
         default=0,

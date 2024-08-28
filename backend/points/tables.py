@@ -17,12 +17,13 @@ class AuditTable(tables.Table):
             'chocolate',
             'raf',
             'sugar',
-            'syrup_caramel',
-            'syrup_nut',
             'glasses',
             'covers',
-            'stirrer',
             'straws',
+            'stirrer',
+            'syrup_caramel',
+            'syrup_nut',
+            'mokko',
         )
 
 
@@ -57,6 +58,7 @@ class ServiceTable(tables.Table):
             'fuelcompensation',
             'collection',
             'coffee',
+            'mokko',
             'cream',
             'chocolate',
             'raf',

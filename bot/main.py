@@ -232,6 +232,7 @@ def make_messagedata(data, *args, **kwargs):
     if data['type'] == 'Обслуживание':
         result += f'Инкасация: ₽\xa0 {data["collection"]}\n'
         result += f'Кофе: {data["coffee"]}\n'
+        result += f'Мокко: {data["mokko"]}\n'
         result += f'Сливки: {data["cream"]}\n'
         result += f'Шоколад: {data["chocolate"]}\n'
         result += f'Раф: {data["raf"]}\n'
@@ -252,6 +253,7 @@ def make_messagedata(data, *args, **kwargs):
         result += f'Комментарий: {data["description"]}'
     elif data['type'] == 'Ревизия':
         result += f'01. Кофе зерно: {data["coffee"]}\n'
+        result += f'01. Мокко: {data["mokko"]}\n'
         result += (
             '02. Заменитель сухих сливок Aristocrat "Топпинг" 1000г '
             f'(8 шт. в коробке): {data["cream"]}\n'
