@@ -36,6 +36,13 @@
                 <input class="input btn" id="coffee_inc" onclick="btn_inc('coffee', 2, 1)" value="+" readonly>
                 <div style="color: red;" id="error_coffee"></div>
             </div>
+            <div class="ib bor" id="div_mokko">
+                <p >Мокко</p>
+                <input class="input btn" id="mokko_dec" onclick="btn_dec('mokko', 0, 1)" value="-" readonly>
+                <input id="mokko" step="1" min="0" max="2" readonly value="0">
+                <input class="input btn" id="mokko_inc" onclick="btn_inc('mokko', 2, 1)" value="+" readonly>
+                <div style="color: red;" id="error_mokko"></div>
+            </div>
             <div class="ib bor" id="div_cream">
                 <p>Сливки</p>
                 <input class="input btn" id="cream_dec" onclick="btn_dec('cream', 0, 1)" value="-" readonly>
@@ -129,6 +136,7 @@
         let tg = window.Telegram.WebApp;
         let point = document.getElementById("point")
         let coffee = document.getElementById("coffee")
+        let mokko = document.getElementById("mokko")
         let cream = document.getElementById("cream")
         let chocolate = document.getElementById("chocolate")
         let raf = document.getElementById("raf")
@@ -191,6 +199,7 @@
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             document.getElementById("error_point").innerText = "";
             document.getElementById("error_coffee").innerText = "";
+            document.getElementById("error_mokko").innerText = "";
             document.getElementById("error_cream").innerText = "";
             document.getElementById("error_chocolate").innerText = "";
             document.getElementById("error_raf").innerText = "";
@@ -208,6 +217,11 @@
 
             if (isNaN(parseInt(coffee.value, 10))) {
                 document.getElementById("error_coffee").innerText = "Укажите количество кофе";
+                return;
+            }
+
+            if (isNaN(parseInt(mokko.value, 10))) {
+                document.getElementById("error_mokko").innerText = "Укажите количество мокко";
                 return;
             }
 
@@ -260,6 +274,7 @@
                 type: "service",
                 point: point.value,
                 coffee: coffee.value,
+                mokko: mokko.value,
                 cream: cream.value,
                 chocolate: chocolate.value,
                 raf: raf.value,

@@ -169,8 +169,8 @@ class ServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Services
         fields = [
-            'date', 'point', 'serviceman', 'collection', 'coffee', 'cream',
-            'chocolate', 'raf', 'sugar', 'syrupcaramel', 'syrupnut',
+            'date', 'point', 'serviceman', 'collection', 'coffee', 'mokko',
+            'cream', 'chocolate', 'raf', 'sugar', 'syrupcaramel', 'syrupnut',
             'syrupother', 'glasses', 'covers', 'stirrer', 'straws'
         ]
 
@@ -242,7 +242,7 @@ class AuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audit
         fields = [
-            'date', 'serviceman', 'coffee', 'cream', 'chocolate',
+            'date', 'serviceman', 'coffee', 'mokko', 'cream', 'chocolate',
             'raf', 'sugar', 'glasses', 'covers', 'straws', 'stirrer',
             'syrup_caramel', 'syrup_nut',
         ]

@@ -71,12 +71,18 @@
             <input class="input input_audit" id="syrup_nut">
             <div style="color: red;" id="error_syrup_nut"></div>
         </div>
+        <div class="div_point" id="div_mokko">
+            <label for="mokko">031. Капучино Aristocrat Mokka Toffee 1000г (12 шт. в коробке)</label></p>
+            <input class="input input_audit" id="mokko">
+            <div style="color: red;" id="error_mokko"></div>
+        </div>
 
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         let coffee = document.getElementById("coffee")
+        let mokko = document.getElementById("mokko")
         let cream = document.getElementById("cream")
         let chocolate = document.getElementById("chocolate")
         let raf = document.getElementById("raf")
@@ -94,6 +100,7 @@
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             document.getElementById("error_coffee").innerText = "";
+            document.getElementById("error_mokko").innerText = "";
             document.getElementById("error_cream").innerText = "";
             document.getElementById("error_chocolate").innerText = "";
             document.getElementById("error_raf").innerText = "";
@@ -117,6 +124,11 @@
 
             if (isNaN(parseInt(coffee.value, 10))) {
                 document.getElementById("error_coffee").innerText = "Укажите количество кофе";
+                return;
+            }
+
+            if (isNaN(parseInt(mokko.value, 10))) {
+                document.getElementById("error_mokko").innerText = "Укажите количество мокко";
                 return;
             }
 
@@ -163,8 +175,8 @@
 
             let data = {
                 type: "audit",
-
                 coffee: coffee.value,
+                mokko: mokko.value,
                 cream: cream.value,
                 chocolate: chocolate.value,
                 raf: raf.value,
