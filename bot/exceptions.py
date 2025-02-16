@@ -24,3 +24,9 @@ class ServiceInfoExistError(Exception):
 class PontExistError(Exception):
     """Исключение возникающее если точки нет в базе"""
     pass
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalCompanyExistError(Exception):
+    """Исключение возникающее если компании нет в базе"""
+    pass

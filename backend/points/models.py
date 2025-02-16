@@ -89,6 +89,7 @@ class ServiceMan(models.Model):
     name = models.TextField()
     telegram_id = models.BigIntegerField(unique=True)
     activ = models.BooleanField(default=True)
+    office_engineer = models.BooleanField(default=False)
 
     def __str__(self, *args, **kwargs):
         return '*' + self.name if self.activ else self.name
@@ -285,3 +286,73 @@ class FuelCompensation(models.Model):
 
     def __str__(self, *args, **kwargs):
         return f'{str(self.distance)} Тариф: {self.price}'
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalCompanies(models.Model):
+    company_name = models.CharField(
+        max_length=255,
+        verbose_name='Название компании',
+    )
+    activ = models.BooleanField(
+        default=True,
+        verbose_name='Активна'
+    )
+
+    class Meta:
+        ordering = ['company_name', ]
+        verbose_name = 'Внешняя компания'
+        verbose_name_plural = 'Внешние компании'
+
+    def __str__(self):
+        return self.company_name
+
+
+class ExternalTypeWorkRepairs(models.Model):
+    typework = models.CharField(max_length=200, verbose_name='Вид работ')
+    price = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Тариф на работу',
+    )
+    activ = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['activ', 'typework', ]
+        verbose_name = 'Вид работы для внешних'
+        verbose_name_plural = 'Виды работ для внешних'
+
+    def __str__(self, *args, **kwargs):
+        return f'{str(self.typework)} Тариф: {self.price}'
+
+
+class ExternalRepairs(models.Model):
+    date = models.DateTimeField(verbose_name='Дата время')
+    company = models.ForeignKey(
+        'ExternalCompanies',
+        on_delete=models.PROTECT,
+        verbose_name='Компания',
+    )
+    serial_num_coffe = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Серийный номер кофе',
+    )
+    service_man = models.ForeignKey(
+        'ServiceMan',
+        on_delete=models.PROTECT,
+        verbose_name='Исполнитель'
+    )
+    typework = models.ManyToManyField(
+        'ExternalTypeWorkRepairs',
+        verbose_name='Вид работ',
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ['date', ]
+        verbose_name = 'Выполненная работа для внешних'
+        verbose_name_plural = 'Выполненные работы для внешних'
+
+    def __str__(self, *args, **kwargs):
+        return f'{self.date} {self.company} {self.service_man}'

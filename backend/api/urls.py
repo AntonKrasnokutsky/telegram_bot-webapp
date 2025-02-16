@@ -3,10 +3,9 @@ from rest_framework import routers
 
 from .views import (
     AuditViewSet,
+    ExternalRepairViewASet,
     PointsViewSet,
-    # RepairViewSet,
     RepairViewASet,
-    # ServicesViewSet,
     ServicesViewASet,
     ServiceManViewSet
 )
@@ -18,6 +17,10 @@ router.register(
     'v2/serviceman',
     ServiceManViewSet
 )
+router.register(
+    'v2/externalrepairs',
+    ExternalRepairViewASet,
+)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -26,16 +29,6 @@ urlpatterns = [
         PointsViewSet.as_view({'get': 'list'}),
         name='points'
     ),
-    # path(
-    #     'services/',
-    #     ServicesViewSet.as_view({'get': 'list'}),
-    #     name='services'
-    # ),
-    # path(
-    #     'repairs/',
-    #     RepairViewSet.as_view({'get': 'list'}),
-    #     name='repairs'
-    # ),
     path(
         'v2/services/',
         ServicesViewASet.as_view(
@@ -62,6 +55,15 @@ urlpatterns = [
             }),
         name='audit_v2'
     ),
+    # path(
+    #     'v2/externalrepairs/',
+    #     ExternalRepairViewASet.as_view(
+    #         {
+    #             'get': 'list',
+    #             'post': 'create'
+    #         }),
+    #     name='external_repairs_v2'
+    # ),
     path('auth/', include('djoser.urls.authtoken')),
 
 ]

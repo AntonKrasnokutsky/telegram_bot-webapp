@@ -81,9 +81,12 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
+
             echo URL_SERVICE=${{ secrets.URL_SERVICE }} >> .env
             echo URL_REPAIR=${{ secrets.URL_REPAIR }} >> .env
             echo URL_AUDIT=${{ secrets.URL_AUDIT }} >> .env
+            echo URL_EXTERNAL=${{ secrets.URL_EXTERNAL }} >> .env
+
             echo URL_API_POINTS=${{ secrets.URL_API_POINTS }} >> .env
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
             echo CREDENTIALS_FILE=${{ secrets.CREDENTIALS_FILE }} >> .env
@@ -96,6 +99,7 @@ jobs:
             echo CHAT_ID=${{ secrets.CHAT_ID }} >> .env
             echo REPAIR_CHAT_ID=${{ secrets.REPAIR_CHAT_ID }} >> .env
             echo AUDIT_CHAT_ID=${{ secrets.AUDIT_CHAT_ID }} >> .env
+            echo EXTERNAL_REPAIR_CHAT_ID=${{ secrets.EXTERNAL_REPAIR_CHAT_ID }} >> .env
 
             echo SERVICES=${{ secrets.SERVICES }} >> .env
             echo REPAIRS=${{ secrets.REPAIRS }} >> .env
@@ -103,7 +107,9 @@ jobs:
             echo URL_API_SERVICE=${{ secrets.URL_API_SERVICE }} >> .env
             echo URL_API_REPAIR=${{ secrets.URL_API_REPAIR }} >> .env
             echo URL_API_AUDIT=${{ secrets.URL_API_AUDIT }} >> .env
-            
+            echo URL_API_EXTERNAL_REPAIR=${{ secrets.URL_API_EXTERNAL_REPAIR }} >> .env
+            echo URL_API_EXTERNAL_REPAIR_SALARY=${{ secrets.URL_API_EXTERNAL_REPAIR_SALARY }} >> .env
+
             echo URL_API_SERVICE_MAN=${{ secrets.URL_API_SERVICE_MAN }} >> .env
             echo URL_API_AUTH=${{ secrets.URL_API_AUTH }} >> .env
             echo API_USER=${{ secrets.API_USER }} >> .env

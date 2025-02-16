@@ -1,6 +1,11 @@
 import django_tables2 as tables
 
-from .models import Audit, Repairs, Services
+from .models import (
+    Audit,
+    ExternalRepairs,
+    Repairs,
+    Services,
+)
 
 
 class AuditTable(tables.Table):
@@ -70,4 +75,20 @@ class ServiceTable(tables.Table):
             'covers',
             'stirrer',
             'straws',
+        )
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalRepairsTable(tables.Table):
+    export_formats = ['xls', 'xlsx']
+
+    class Meta:
+        model = ExternalRepairs
+        per_page = 20
+        fields = (
+            'date',
+            'service_man',
+            'company',
+            'typework',
+            'serial_num_coffe',
         )

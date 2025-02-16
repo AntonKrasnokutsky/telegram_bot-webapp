@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load verbose_name %}
+{% block title %}Последние обновления на сайте{% endblock %}
+{% block content %}
+
+<div class="info" style="align-content: center;">
+    <form class="info__login-form" method="post">
+      {% csrf_token %}
+      <div class="info__login-block">
+        <p class="info__login-form-text">{{ form.typework.label_tag }}</p>
+        <div class="info__login-form-error">
+          {% for error in form.typework.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        <input class="input input_long" id="id_typework" name="typework" placeholder="Вид работы" list="typeworklist" required value={{ form.typework.value|default_if_none:"" }}>
+        <datalist id="typeworklist">
+        </datalist>
+
+        <p class="info__login-form-text">{{ form.price.label_tag }}</p>
+        <div class="info__login-form-error">
+          {% for error in form.price.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        <input class="input input_long" type="number" min="0" name="price" required id="id_price" value={{ form.price.value }}>
+
+      </div>
+      <button class="info__button" type="submit">Сохранить</button>
+    </form>
+  </div>
+
+  <script>
+    function onstart() {
+      console.log('Start')
+        var options = '';
+        {% for item in externaltypework_list %}
+          options += '<option value="' + "{{ item.value }}" + '" />';
+        {% endfor %}
+        document.getElementById('typeworklist').innerHTML = options;
+    };
+
+    onstart();
+  </script>
+{% endblock %}

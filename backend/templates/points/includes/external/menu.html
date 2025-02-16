@@ -1,0 +1,21 @@
+{% load static %}
+{% with request.resolver_match.view_name as view_name %}
+
+<ul class="nav nav-pills">
+<a class="nav-link 
+    {% if view_name == 'points:externalcompany' %}
+        active
+    {% endif %}"
+    href="{% url 'points:externalcompany' %}">Компания</a>
+<a class="nav-link
+    {% if view_name == 'points:externaltypeworks_list' %}
+        active
+    {% endif %}"
+    href="{% url 'points:externaltypeworks_list' %}">Виды работ</a>
+<a class="nav-link
+    {% if view_name == 'points:external_repairs_list' %}
+        active
+    {% endif %}" 
+    href="{% url 'points:external_repairs_list' %}">Выполненные работы</a>
+</ul>
+{% endwith %}

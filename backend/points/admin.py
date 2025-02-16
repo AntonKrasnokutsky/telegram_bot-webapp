@@ -2,6 +2,9 @@ from django.contrib import admin
 
 from .models import (
     Audit,
+    ExternalCompanies,
+    ExternalRepairs,
+    ExternalTypeWorkRepairs,
     FuelCompensation,
     Points,
     Repairs,
@@ -82,3 +85,8 @@ admin.site.register(Services, ServicesAdmin)
 admin.site.register(ServiceMan, ServiceManAdmin)
 admin.site.register(TypeWorkRepairs, TypeWorkRepairsAdmin)
 admin.site.register(FuelCompensation, FuelCompensationAdmin)
+
+# Ремонт оборудования сторонних компаний
+admin.site.register(ExternalCompanies)
+admin.site.register(ExternalRepairs)
+admin.site.register(ExternalTypeWorkRepairs)

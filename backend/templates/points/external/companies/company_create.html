@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Добавление компании{% endblock %}
+{% block content %}
+
+<div class="info" style="align-content: center;">
+    <form class="info__login-form" method="post">
+      {% csrf_token %}
+      <div class="info__login-block">
+        <p class="info__login-form-text">{{ form.company_name.label_tag }}</p>
+        <div class="info__login-form-error">
+          {% for error in form.company_name.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        <input class="input input_long" id="id_company_name" 
+          name="company_name" required
+          value={{ form.company_name.value|default_if_none:"" }}
+        >
+
+      </div>
+      <button class="info__button" type="submit">Сохранить</button>
+    </form>
+  </div>
+
+{% endblock %}

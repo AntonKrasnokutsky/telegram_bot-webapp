@@ -3,6 +3,13 @@ from django.urls import path
 from .views import (
     AuditView,
     AuditListFilteredView,
+    ExternalCompaniesChangeActivView,
+    ExternalCompaniesCreateView,
+    ExternalCompaniesListView,
+    ExternalRepairsListFilteredView,
+    ExternalRepairsView,
+    ExternalTypeWorkRepairsCreateView,
+    ExternalTypeWorkRepairsListVies,
     FuelCompensationListView,
     FuelCompensationCreateView,
     ServicesView,
@@ -62,5 +69,45 @@ urlpatterns = [
         'audit_list/',
         AuditListFilteredView.as_view(),
         name='audit_list'
+    ),
+    # Ремонт оборудования сторонних компаний
+    path(
+        'external/company/',
+        ExternalCompaniesListView.as_view(),
+        name='externalcompany',
+    ),
+    path(
+        'external/company/create/',
+        ExternalCompaniesCreateView.as_view(),
+        name='externalcompany_create',
+    ),
+    path(
+        'external/company/changeactiv/<int:company_id>/',
+        ExternalCompaniesChangeActivView.as_view(),
+        name='externalcompany_changeactiv',
+    ),
+    path(
+        'external/typeworks/',
+        ExternalTypeWorkRepairsListVies.as_view(),
+        name='externaltypeworks_list',
+    ),
+    path(
+        'external/typeworks/create/',
+        ExternalTypeWorkRepairsCreateView.as_view(),
+        name='externaltypewrok_create',
+    ),
+    path(
+        'external/works/',
+        ExternalCompaniesListView.as_view(),
+        name='externalworks',
+    ),
+    path(
+        'repairexternal/',
+        ExternalRepairsView.as_view()
+    ),
+    path(
+        'external/repairs_list/',
+        ExternalRepairsListFilteredView.as_view(),
+        name='external_repairs_list'
     ),
 ]

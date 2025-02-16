@@ -12,6 +12,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from dotenv import load_dotenv
 from exceptions import (
     AnyError,
+    ExternalCompanyExistError,
     PontExistError,
     ServiceInfoExistError,
     ServiceManUnregisteredError
@@ -24,6 +25,7 @@ URL_API_POINTS = os.getenv('URL_API_POINTS')
 CHAT_ID = os.getenv('CHAT_ID')
 REPAIR_CHAT_ID = os.getenv('REPAIR_CHAT_ID')
 AUDIT_CHAT_ID = os.getenv('AUDIT_CHAT_ID')
+EXTERNAL_REPAIR_CHAT_ID = os.getenv('EXTERNAL_REPAIR_CHAT_ID')
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot)
 
@@ -34,8 +36,10 @@ service_man = {
     'change_activ': False
 }
 
+service_man_salary = {}
 reg_service_man = {}
 current_point = {}
+current_company = {}
 
 
 def update_points(*args, **kwargs):
@@ -54,34 +58,46 @@ def update_points(*args, **kwargs):
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await message.answer(
-        'Бот готов к работе.',
-        reply_markup=buttons.start_buttons,
-    )
+    if user.user(message.from_user.id, auth_api)[0]['office_engineer']:
+        await message.answer(
+            'Бот готов к работе. Внешний',
+            reply_markup=buttons.repairs_office_button,
+        )
+    else:
+        await message.answer(
+            'Бот готов к работе.',
+            reply_markup=buttons.start_buttons,
+        )
 
 
 @dp.message_handler(commands=['update_points'])
 async def update_points_command(message: types.Message):
-    await message.answer('Обновление списка точек, подождите.')
-    logging.debug('Обновление точек.')
-    if update_points():
-        await message.answer('Список точек обновлён')
-    else:
-        await message.answer(
-            'Список точек не обновлён, нажмите "/update_points" ещё раз'
-        )
+    if not user.user(message.from_user.id, auth_api)[0]['office_engineer']:
+        await message.answer('Обновление списка точек, подождите.')
+        logging.debug('Обновление точек.')
+        if update_points():
+            await message.answer('Список точек обновлён')
+        else:
+            await message.answer(
+                'Список точек не обновлён, нажмите "/update_points" ещё раз'
+            )
 
 
 @dp.message_handler(commands=['service'])
 async def service(message: types.Message):
-    logging.debug('Отображение кнопки "Обслуживание".')
-    await message.answer('Обслуживание', reply_markup=buttons.service_button)
+    if not user.user(message.from_user.id, auth_api)[0]['office_engineer']:
+        logging.debug('Отображение кнопки "Обслуживание".')
+        await message.answer(
+            'Обслуживание',
+            reply_markup=buttons.service_button
+        )
 
 
 @dp.message_handler(commands=['repair'])
 async def repair(message: types.Message):
-    logging.debug('Отображение кнопки "Ремонт".')
-    await message.answer('Ремонт', reply_markup=buttons.repair_button)
+    if not user.user(message.from_user.id, auth_api)[0]['office_engineer']:
+        logging.debug('Отображение кнопки "Ремонт".')
+        await message.answer('Ремонт', reply_markup=buttons.repair_button)
 
 
 @dp.message_handler(commands=['change_activ'])
@@ -118,6 +134,42 @@ async def staff(message: types.Message):
         await message.answer(
             'Для регистрации нового сотудника введите его имя'
         )
+
+
+@dp.message_handler(commands=['Зарплата'])
+async def salary(message: types.Message):
+    service_man = user.user(message.from_user.id, auth_api)[0]
+    if service_man['office_engineer']:
+        await message.answer(
+            'Информация о зарлате',
+            reply_markup=buttons.repairs_office_button_salary,
+        )
+
+
+@dp.message_handler(commands=['all_time'])
+async def salary_all_time(message: types.Message):
+    service_man = user.user(message.from_user.id, auth_api)[0]
+    if service_man['office_engineer']:
+        salary_result = external_repairs.get_salary(
+            auth_api,
+            service_man=service_man['id']
+        )
+        answer = f'Заработано {salary_result} р.'
+        await message.answer(answer)
+
+
+@dp.message_handler(commands=['period'])
+async def salary_period(message: types.Message):
+    service_man = user.user(message.from_user.id, auth_api)[0]
+    if service_man['office_engineer']:
+        salary = {
+            'date_after': None,
+            'date_before': None,
+            'service_man': service_man['id']
+        }
+        service_man_salary[message.from_user.id] = salary
+        answer = 'Укажите дату начала периода: (дд.мм.гггг)'
+        await message.answer(answer)
 
 
 async def service_man_change(message: types.Message):
@@ -203,6 +255,39 @@ async def registr_service_man(message: types.Message):
 
 @dp.message_handler()
 async def any_message(message: types.Message):
+    user_id = message.from_user.id
+    if service_man_salary.get(user_id, False):
+        if service_man_salary[user_id]['date_after'] is None:
+            date = message.text
+            if len(date) == 10 and date[2] == '.' and date[5] == '.':
+                date_correct = f'{date[6:]}-{date[3:5]}-{date[:2]}'
+                service_man_salary[user_id]['date_after'] = date_correct
+                answer = 'Укажите дату конца периода: (дд.мм.гггг)'
+            else:
+                answer = 'Введите правильную дату.'
+            await message.answer(answer)
+        elif service_man_salary[user_id]['date_before'] is None:
+            date = message.text
+            if len(date) == 10 and date[2] == '.' and date[5] == '.':
+                date_correct = f'{date[6:]}-{date[3:5]}-{date[:2]}'
+                service_man_salary[user_id]['date_before'] = date_correct
+                salary = service_man_salary[user_id]
+                salary_result = external_repairs.get_salary(
+                    auth_api,
+                    service_man=salary['service_man'],
+                    date_after=salary['date_after'],
+                    date_before=salary['date_before'],
+                )
+                answer = f'Заработано {salary_result} р.'
+
+                await message.answer(
+                    answer,
+                    reply_markup=buttons.repairs_office_button,
+                )
+            else:
+                answer = 'Введите правильную дату.'
+                await message.answer(answer)
+
     if reg_service_man.get(message.from_user.id, False):
         if (
             user.check_user(message.from_user.id, auth_api)
@@ -224,11 +309,20 @@ async def any_message(message: types.Message):
 
 def make_messagedata(data, *args, **kwargs):
     logging.debug('Подготовка ответного сообщения.')
+    work_type = [
+        'Обслуживание',
+        'Ремонт',
+    ]
+    external_work_type = [
+        'Ремонт для внешних',
+    ]
     result = ''
     result += f'Вид работ: {data["type"]}\n'
     result += f'Инженер: {data["fio"]}\n'
-    if data['type'] == 'Обслуживание' or data['type'] == 'Ремонт':
+    if data['type'] in work_type:
         result += f'Точка обслуживания: {data["point"]}\n'
+    if data['typr'] in external_work_type:
+        result += f'Обслуживаемая компания: {data["company"]}\n'
     if data['type'] == 'Обслуживание':
         result += f'Инкасация: ₽\xa0 {data["collection"]}\n'
         result += f'Кофе: {data["coffee"]}\n'
@@ -285,6 +379,9 @@ def make_messagedata(data, *args, **kwargs):
             f'{data["syrup_caramel"]}\n'
         )
         result += f'11. Сироп "Лесной орех" (пл. 1л.): {data["syrup_nut"]}\n'
+    elif data['type'] == 'Ремонт для внешних':
+        result += f'Виды работ: {data["types_work"]}\n'
+        result += f'Серийныфй номер кофе: {data["serial_num_coffe"]}'
     return result
 
 
@@ -350,7 +447,6 @@ async def web_app_repairs(message: types.Message, data):
     logging.debug('Данные по ремонту.')
     data['type'] = 'Ремонт'
     data['fio'] = message.from_user.id
-
     try:
         repairs.send_repairs_info(data, auth_api)
         logging.info('Данные по ремоту отправлены.')
@@ -434,6 +530,53 @@ async def web_app_audit(message: types.Message, data):
     )
 
 
+async def web_app_external_repair(message: types.Message, data):
+    logging.debug('Данные по внешнему ремонту.')
+    data['type'] = 'Ремонт для внешних'
+    data['fio'] = message.from_user.id
+
+    try:
+        external_repairs.send_extenal_repairs_info(data, auth_api)
+        logging.info('Данные по ремоту внешних компаний отправлены.')
+    except ServiceManUnregisteredError:
+        answer = (
+            'Попытка внести данные незарегистрированным '
+            f'инженером: @{message.from_user.username}'
+        )
+        logging.critical(answer)
+        await bot.send_message(
+            chat_id=REPAIR_CHAT_ID,
+            text=answer
+        )
+        await message.answer('Данные не сохранены')
+        return
+    except ExternalCompanyExistError:
+        answer = 'Неизвестная компания'
+        logging.info(answer)
+        await message.answer(answer)
+        return
+    except AnyError as e:
+        answer = f'Данные не сохранены. Ответ сервера: {e.args}'
+        return
+
+    user_data(message.from_user.id, data)
+    current_company[message.from_user.id] = (
+        f'Вид работ: {data["type"]}\n'
+        f'Компания: {data["company"]}\n'
+        f'Инженер: {data["fio"]}'
+    )
+    logging.debug(
+        'Отправка сообщения с инфораацией о выполненной работе. '
+        'По внешним компаниям.'
+    )
+    answer = make_messagedata(data)
+    await message.answer(answer)
+    await bot.send_message(
+        chat_id=EXTERNAL_REPAIR_CHAT_ID,
+        text=answer
+    )
+
+
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     logging.debug('WebApp.')
@@ -444,7 +587,7 @@ async def web_app(message: types.Message):
     date_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
     tz = datetime.strptime('+0300', '%z').tzinfo
     date_msk = date_utc.astimezone(tz)
-    if data['type'] in ['service', 'repair']:
+    if data['type'] in ['service', 'repair', 'external_repair']:
         data['date'] = date_msk.strftime("%d.%m.%Y %H:%M:%S")
     else:
         data['date'] = date_msk.strftime("%d.%m.%Y")
@@ -454,6 +597,8 @@ async def web_app(message: types.Message):
         await web_app_repairs(message, data)
     elif data['type'] == 'audit':
         await web_app_audit(message, data)
+    elif data['type'] == 'external_repair':
+        await web_app_external_repair(message, data)
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
@@ -497,5 +642,9 @@ if __name__ == "__main__":
     )
     audit = requests_api.Audit(
         url_api_audit=os.getenv('URL_API_AUDIT')
+    )
+    external_repairs = requests_api.ExternalRepair(
+        url_api=os.getenv('URL_API_EXTERNAL_REPAIR'),
+        url_api_salary=os.getenv('URL_API_EXTERNAL_REPAIR_SALARY')
     )
     executor.start_polling(dp)

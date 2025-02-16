@@ -12,13 +12,25 @@ from django_filters.rest_framework import DjangoFilterBackend
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from points.models import Points, Repairs, ServiceMan, Services
+from points.models import (
+    ExternalRepairs,
+    Points,
+    Repairs,
+    ServiceMan,
+    Services,
+)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 
-from .filters import AuditFilter, RepairsFilter, ServicesFilter
+from .filters import (
+    AuditFilter,
+    ExternalRepairsFilter,
+    RepairsFilter,
+    ServicesFilter,
+)
 from .serialises import (
     AuditSerializer,
+    ExternalRepairsSerializer,
     RepairsSerializer,
     ServiceManSerializer,
     ServicesSerializer,
@@ -251,3 +263,33 @@ class AuditViewSet(
     serializer_class = AuditSerializer
     filter_backends = (DjangoFilterBackend, )
     filterset_class = AuditFilter
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalRepairViewASet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
+    queryset = ExternalRepairs.objects.all()
+    permission_classes = [permissions.IsAuthenticated, ]
+    http_method_names = ['get', 'post']
+    serializer_class = ExternalRepairsSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = ExternalRepairsFilter
+
+    @action(
+        methods=['get'],
+        detail=False,
+        url_path=r'salary',
+        permission_classes=[permissions.IsAuthenticated]
+    )
+    def salary(self, *args, **kwargs):
+        salary = 0
+        for external_repair in self.filter_queryset(self.get_queryset()):
+            for work in external_repair.typework.all():
+                salary += work.price
+        data = {
+            'salary': salary
+        }
+        return JsonResponse(data, status=status.HTTP_200_OK)
