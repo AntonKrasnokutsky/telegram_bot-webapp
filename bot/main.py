@@ -321,7 +321,7 @@ def make_messagedata(data, *args, **kwargs):
     result += f'Инженер: {data["fio"]}\n'
     if data['type'] in work_type:
         result += f'Точка обслуживания: {data["point"]}\n'
-    if data['typr'] in external_work_type:
+    if data['type'] in external_work_type:
         result += f'Обслуживаемая компания: {data["company"]}\n'
     if data['type'] == 'Обслуживание':
         result += f'Инкасация: ₽\xa0 {data["collection"]}\n'
