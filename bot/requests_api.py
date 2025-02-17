@@ -6,6 +6,7 @@ from http import HTTPStatus
 
 from exceptions import (
     AnyError,
+    ExternalCompanyExistError,
     PontExistError,
     ServiceInfoExistError,
     ServiceManUnregisteredError
@@ -283,3 +284,78 @@ class Audit():
                 raise AnyError(
                     response.text
                 )
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalRepair():
+    def __init__(self, *args, **kwargs):
+        self.__URL_API_EXTERNAL_REPAIR = kwargs['url_api']
+        self.__URL_API_EXTERNAL_REPAIR_SALARY = kwargs['url_api_salary']
+
+    def __request_api_external_repair(self, body, auth_api: AuthAPI):
+        return requests.post(
+            self.__URL_API_EXTERNAL_REPAIR,
+            data=body,
+            headers=auth_api.headers
+        )
+
+    def __request_api_salary(self, params, auth_api: AuthAPI):
+        return requests.get(
+            self.__URL_API_EXTERNAL_REPAIR_SALARY,
+            headers=auth_api.headers,
+            params=params
+        )
+
+    def send_extenal_repairs_info(self, data: dict, auth_api: AuthAPI):
+        body = {
+            'date': data['date'],
+            'serviceman': data['fio'],
+            'company': data['company'],
+            'comments': data['description'],
+        }
+        try:
+            body['typework'] = data['types_work']
+        except KeyError:
+            pass
+        response = self.__request_api_external_repair(body, auth_api)
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            logging.info('Требуется обновление токена')
+            auth_api.get_token()
+            response = self.__request_api_repair(body, auth_api)
+        if response.status_code == HTTPStatus.CREATED:
+            return
+        response_json = json.loads(response.text)
+        response_text = list(map(str, response_json))[0]
+        match response_text:
+            case 'serviceman':
+                raise ServiceManUnregisteredError(
+                    'Не зарегистрирован'
+                )
+            case 'repair_exist':
+                raise ServiceInfoExistError(
+                    'Уже сохранено'
+                )
+            case 'company_not_exist':
+                raise ExternalCompanyExistError(
+                    'Обновите список точек.'
+                )
+            case _:
+                raise AnyError(
+                    response.text
+                )
+
+    def get_salary(
+        self,
+        auth_api,
+        service_man=None,
+        date_after=None,
+        date_before=None
+    ):
+        params = {
+            'date_after': date_after,
+            'date_before': date_before,
+            'service_man': service_man,
+        }
+        response = self.__request_api_salary(params, auth_api)
+        response_json = json.loads(response.text)
+        return response_json['salary']

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Внешние компании{% endblock %}
+{% block content %}
+{% include 'points/includes/external/menu.html' %}
+<div>
+<a class="button__std" href="{% url 'points:externalcompany_create' %}">
+    Добавить
+</a>
+
+<table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
+    {% for company in page_obj %}
+      {% if forloop.first %}
+        {% include 'points/includes/external/companies/thead.html' %}
+      {% endif %}
+      {% include 'points/includes/external/companies/company.html' %}
+    {% endfor %}
+</table>
+{% include 'points/includes/paginator.html' %}
+</div>
+
+{% endblock %}

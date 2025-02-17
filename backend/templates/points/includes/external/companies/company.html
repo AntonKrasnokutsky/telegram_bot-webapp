@@ -1,0 +1,21 @@
+{% load tz %}
+<tr>
+    <td align="center">
+        {{ forloop.counter }}
+    </td>
+    <td>
+        {{ company.company_name }}
+    </td>
+    <td align="center">
+        <form class="content__form" id="form{{company.id}}" action="{% url 'points:externalcompany_changeactiv' company.id %}" method="post">
+            {% csrf_token %}
+              <input type="checkbox" 
+                {% if company.activ %}
+                  checked
+                {% endif %} 
+                onclick="document.getElementById('form{{company.id}}').submit();"
+              >
+
+          </form>
+    </td>
+</tr>

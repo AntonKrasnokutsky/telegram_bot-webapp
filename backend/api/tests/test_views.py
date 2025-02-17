@@ -9,6 +9,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from points.models import (
+    ExternalCompanies,
+    ExternalRepairs,
+    ExternalTypeWorkRepairs,
     FuelCompensation,
     Points,
     Repairs,
@@ -179,10 +182,10 @@ class ServicesTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.test_user = User.objects.create(
-            email='a@a.ru',
+            email='b@a.ru',
             username='test_user_service',
-            first_name='test_first_name',
-            last_name='test_last_name',
+            first_name='test_first_name1',
+            last_name='test_last_name1',
             password='testPassword123',
         )
         client_authenticate.force_authenticate(cls.test_user)
@@ -509,4 +512,119 @@ class RepairsTestCase(TestCase):
             ))
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         request_answer = json.loads(request.content)
+        self.assertEqual(request_answer, answer)
+
+
+class ExternalRepairsTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        client_authenticate.logout()
+        cls.test_user = User.objects.create(
+            email='a@a.ru',
+            username='test_user',
+            first_name='test_first_name',
+            last_name='test_last_name',
+            password='testPassword123',
+        )
+        client_authenticate.force_authenticate(cls.test_user)
+        cls.service_man = ServiceMan.objects.create(
+            name='Имя',
+            telegram_id=12345,
+            activ=True,
+            office_engineer=True,
+        )
+        cls.company_one = ExternalCompanies.objects.create(
+            company_name='Тестовая компания 1',
+            activ=True
+        )
+        cls.company_two = ExternalCompanies.objects.create(
+            company_name='Тестовая компания 2',
+            activ=True
+        )
+        date = datetime.strptime('10.01.2024 12:02:23', '%d.%m.%Y %H:%M:%S')
+        cls.type_work = ExternalTypeWorkRepairs.objects.create(
+            typework='Работа ремонта',
+            price=10,
+            activ=True
+        )
+        repair = ExternalRepairs.objects.create(
+            date=date,
+            service_man=cls.service_man,
+            company=cls.company_one,
+            serial_num_coffe='Серийный номер кофе'
+        )
+        repair.typework.add(cls.type_work)
+        cls.repairs = [{
+            'date': repair.date.strftime("%d.%m.%Y %H:%M:%S"),
+            'company': repair.company.company_name,
+            'serviceman': repair.service_man.name,
+            'typework': [rep.typework for rep in repair.typework.all()],
+            'serial_num_coffe': 'Серийный номер кофе',
+        }, ]
+
+    def test_external_repairs_list(self, *args, **kwargs):
+        answer = [
+            {
+                'date': '10.01.2024 12:02:23',
+                'company': 'Тестовая компания 1',
+                'serviceman': 'Имя',
+                'serial_num_coffe': 'Серийный номер кофе',
+                'typework':
+                [
+                    {
+                        'typework': 'Работа ремонта',
+                        'price': 10
+                    }],
+            }]
+        request = client_not_authenticate.get(
+            reverse(
+                'api:externalrepairs-list'
+            ))
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        request = client_authenticate.get(
+            reverse(
+                'api:externalrepairs-list'
+            ))
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        request_answer = json.loads(request.content)
+        self.assertEqual(request_answer, answer)
+
+    def test_external_repairs_create(self, *args, **kwargs):
+        data_create = {
+            'date': '10.01.2024 12:02:23',
+            'type': 'Ремонт',
+            'company': self.company_two.company_name,
+            'serial_num_coffe': '1233',
+            'serviceman': 12345,
+            'typework': 'Работа ремонта',
+        }
+        answer = {
+            'date': '10.01.2024 12:02:23',
+            'company': 'Тестовая компания 2',
+            'serviceman': 'Имя',
+            'serial_num_coffe': '1233',
+            'typework':
+            [
+                {
+                    'typework': 'Работа ремонта',
+                    'price': 10
+                }],
+        }
+        request = client_not_authenticate.post(
+            reverse(
+                'api:externalrepairs-list'
+            ),
+            data=data_create)
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        request = client_authenticate.post(
+            reverse(
+                'api:externalrepairs-list'
+            ),
+            data=data_create)
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+        request_answer = json.loads(request.content)
+
         self.assertEqual(request_answer, answer)

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Внешние виды работ{% endblock %}
+{% block content %}
+{% include 'points/includes/external/menu.html' %}
+<div>
+<a class="button__std" href="{% url 'points:externaltypewrok_create' %}">
+    Добавить
+</a>
+
+<table style="table-layout: fixed; width: 100%;" border="1" cellspacing="0">
+    {% for typework in page_obj %}
+      {% if forloop.first %}
+        {% include 'points/includes/external/typework/thead.html' %}
+      {% endif %}
+      {% include 'points/includes/external/typework/typework.html' %}
+    {% endfor %}
+</table>
+{% include 'points/includes/paginator.html' %}
+</div>
+
+{% endblock %}

@@ -4,7 +4,12 @@ from django_filters.rest_framework import (
 )
 from django_filters.widgets import RangeWidget
 
-from points.models import Audit, Repairs, Services
+from points.models import (
+    Audit,
+    ExternalRepairs,
+    Repairs,
+    Services,
+)
 
 
 class DurationRangeWidget(RangeWidget):
@@ -35,3 +40,14 @@ class AuditFilter(FilterSet):
     class Meta:
         model = Audit
         fields = ['date', 'service_man', ]
+
+
+# Ремонт оборудования сторонних компаний
+class ExternalRepairsFilter(FilterSet):
+    date = DateFromToRangeFilter(
+        widget=DurationRangeWidget(attrs={'type': 'date'})
+    )
+
+    class Meta:
+        model = ExternalRepairs
+        fields = ['date', 'service_man', 'company',]
