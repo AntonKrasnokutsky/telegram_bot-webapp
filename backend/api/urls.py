@@ -55,15 +55,6 @@ urlpatterns = [
             }),
         name='audit_v2'
     ),
-    # path(
-    #     'v2/externalrepairs/',
-    #     ExternalRepairViewASet.as_view(
-    #         {
-    #             'get': 'list',
-    #             'post': 'create'
-    #         }),
-    #     name='external_repairs_v2'
-    # ),
     path('auth/', include('djoser.urls.authtoken')),
 
 ]

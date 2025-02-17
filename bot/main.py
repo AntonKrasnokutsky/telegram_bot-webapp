@@ -617,6 +617,12 @@ async def forward_photo(message: types.Message):
                 photo=message.photo[-1].file_id,
                 caption=current_point[message.from_user.id]
             )
+    elif current_company.get(message.from_user.id, False):
+        await bot.send_photo(
+            chat_id=EXTERNAL_REPAIR_CHAT_ID,
+            photo=message.photo[-1].file_id,
+            caption=current_point[message.from_user.id]
+        )
     else:
         await message.answer('Сначала нужно внести данные об обслуживании.')
 
