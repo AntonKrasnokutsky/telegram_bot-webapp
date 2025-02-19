@@ -89,10 +89,11 @@
             }
         };
 
-        Telegram.WebApp.onEvent("mainButtonClicked", () => {
-            document.getElementById("error_point").innerText = "";
 
-            if (point.value == "") {
+        Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            document.getElementById("error_company").innerText = "";
+
+            if (company.value == "") {
                 document.getElementById("error_company").innerText = "Не выбрана компания";
                 return;
             }
@@ -121,6 +122,7 @@
             tg.sendData(JSON.stringify(data));
             tg.close();
         });
+
 
     </script>
 </main>
