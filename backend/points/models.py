@@ -348,6 +348,11 @@ class ExternalRepairs(models.Model):
         verbose_name='Вид работ',
         blank=True,
     )
+    comments = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Комментарий',
+    )
 
     class Meta:
         ordering = ['date', ]

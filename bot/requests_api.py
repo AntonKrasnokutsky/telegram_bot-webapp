@@ -311,6 +311,7 @@ class ExternalRepair():
             'date': data['date'],
             'serviceman': data['fio'],
             'company': data['company'],
+            'comment': data['comment'],
         }
         try:
             body['typework'] = data['types_work']

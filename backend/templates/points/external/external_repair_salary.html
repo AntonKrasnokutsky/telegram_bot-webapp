@@ -1,0 +1,57 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <title>Ремонт</title>
+    <style>
+        body {
+            background-image: url('{% static "coffee.jpg" %}');
+        }
+    </style>
+</head>
+<body>
+    <main>
+    <div id="main">
+        <div style="padding-top: 20px;" id="date_after">
+            <p>Дата с:</p>
+            <input type="date" class="input input_long" id="date_after" maxlength="255">
+            <div style="color: red;" id="error_date_after"></div>
+        </div>
+
+        <div style="padding-top: 20px;" id="date_before">
+            <p>Дата по:</p>
+            <input type="date" class="input input_long" id="date_before" maxlength="255">
+            <div style="color: red;" id="error_date_before"></div>
+        </div>
+    </div>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let date_after = document.getElementById("date_after")
+        let date_before = document.getElementById("date_before")
+
+        tg.expand();
+        tg.MainButton.text = "Завершить";
+        tg.MainButton.show();
+
+        Telegram.WebApp.onEvent("mainButtonClicked", () => {
+            let data = {
+                type: "salary",
+                date_after: date_after.value,
+                date_before: date_before.value,
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        });
+
+
+    </script>
+</main>
+</body>
+</html>
