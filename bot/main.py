@@ -534,7 +534,6 @@ async def web_app_salary(message: types.Message, data):
     user_id = message.from_user.id
     service_man = user.user(user_id, auth_api)[0]
     if service_man['office_engineer']:
-        print(data)
         salary_result = external_repairs.get_salary(
             auth_api,
             service_man=service_man['id'],
@@ -553,7 +552,6 @@ async def web_app_salary(message: types.Message, data):
 async def web_app(message: types.Message):
     logging.debug('WebApp.')
     data = json.loads(message.web_app_data.data)
-    print(data)
     data['email'] = 'Нет данных'
     data['fio'] = 'Нет данных'
 
@@ -573,8 +571,7 @@ async def web_app(message: types.Message):
     elif data['type'] == 'external_repair':
         await web_app_external_repair(message, data)
     elif data['type'] == 'salary':
-        pass
-        # await web_app_salary(message, data)
+        await web_app_salary(message, data)
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
