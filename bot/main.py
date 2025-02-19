@@ -36,7 +36,6 @@ service_man = {
     'change_activ': False
 }
 
-service_man_salary = {}
 reg_service_man = {}
 current_point = {}
 current_company = {}
@@ -155,20 +154,6 @@ async def salary_all_time(message: types.Message):
             service_man=service_man['id']
         )
         answer = f'Заработано {salary_result} р.'
-        await message.answer(answer)
-
-
-@dp.message_handler(commands=['period'])
-async def salary_period(message: types.Message):
-    service_man = user.user(message.from_user.id, auth_api)[0]
-    if service_man['office_engineer']:
-        salary = {
-            'date_after': None,
-            'date_before': None,
-            'service_man': service_man['id']
-        }
-        service_man_salary[message.from_user.id] = salary
-        answer = 'Укажите дату начала периода: (дд.мм.гггг)'
         await message.answer(answer)
 
 
@@ -550,45 +535,25 @@ async def web_app_salary(message: types.Message, data):
     service_man = user.user(user_id, auth_api)[0]
     if service_man['office_engineer']:
         print(data)
-    await message.answer('В разработке')
+        salary_result = external_repairs.get_salary(
+            auth_api,
+            service_man=service_man['id'],
+            date_after=data['date_after'],
+            date_before=data['date_before'],
+        )
+        answer = f'Заработано {salary_result} р.'
 
-    # if service_man_salary.get(user_id, False):
-    #     if service_man_salary[user_id]['date_after'] is None:
-    #         date = message.text
-    #         if len(date) == 10 and date[2] == '.' and date[5] == '.':
-    #             date_correct = f'{date[6:]}-{date[3:5]}-{date[:2]}'
-    #             service_man_salary[user_id]['date_after'] = date_correct
-    #             answer = 'Укажите дату конца периода: (дд.мм.гггг)'
-    #         else:
-    #             answer = 'Введите правильную дату.'
-    #         await message.answer(answer)
-    #     elif service_man_salary[user_id]['date_before'] is None:
-    #         date = message.text
-    #         if len(date) == 10 and date[2] == '.' and date[5] == '.':
-    #             date_correct = f'{date[6:]}-{date[3:5]}-{date[:2]}'
-    #             service_man_salary[user_id]['date_before'] = date_correct
-    #             salary = service_man_salary[user_id]
-    #             salary_result = external_repairs.get_salary(
-    #                 auth_api,
-    #                 service_man=salary['service_man'],
-    #                 date_after=salary['date_after'],
-    #                 date_before=salary['date_before'],
-    #             )
-    #             answer = f'Заработано {salary_result} р.'
-
-    #             await message.answer(
-    #                 answer,
-    #                 reply_markup=buttons.repairs_office_button,
-    #             )
-    #         else:
-    #             answer = 'Введите правильную дату.'
-    #             await message.answer(answer)
+        await message.answer(
+            answer,
+            reply_markup=buttons.repairs_office_button,
+        )
 
 
 @dp.message_handler(content_types=['web_app_data'])
 async def web_app(message: types.Message):
     logging.debug('WebApp.')
     data = json.loads(message.web_app_data.data)
+    print(data)
     data['email'] = 'Нет данных'
     data['fio'] = 'Нет данных'
 
@@ -608,7 +573,8 @@ async def web_app(message: types.Message):
     elif data['type'] == 'external_repair':
         await web_app_external_repair(message, data)
     elif data['type'] == 'salary':
-        await web_app_salary(message, data)
+        pass
+        # await web_app_salary(message, data)
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
