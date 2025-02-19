@@ -529,3 +529,11 @@ class ExternalRepairsListFilteredView(
     @method_decorator(login_required(login_url='users:login'))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+
+class ExternalRepairsSalaryView(TemplateView):
+    template_name = 'points/external/external_repair_salary.html'
+
+    def get_context_data(self, **kwargs):
+        logging.info('Запрос html страницы с датами заплаты. Успешно.')
+        return super().get_context_data(**kwargs)

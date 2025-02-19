@@ -15,7 +15,7 @@
 <body>
     <main>
     <div id="main">
-        <div id="div_points">
+        <div id="div_company">
             <p>Компания:</p>
             <input class="input input_long" id="company" name="company_name" placeholder="Компания" list="list_companies" required >
             <datalist id="list_companies">
@@ -25,10 +25,10 @@
             <div style="color: red;" id="error_company"></div>
         </div>
 
-        <div style="padding-top: 20px;" id="div_description">
+        <div style="padding-top: 20px;" id="div_serial_num_coffe">
             <p>Серийный номер кофе</p>
             <input class="input input_long" id="serial_num_coffe" maxlength="255">
-            <div style="color: red;" id="error_description"></div>
+            <div style="color: red;" id="error_serial_num_coffe"></div>
         </div>
 
         <p>Выполненная работа</p>
@@ -36,6 +36,12 @@
 
         </div>
         <input class="input btn-add" id="add_typework" onclick="btn_add_typework()" value="Добавить работу" readonly>
+
+        <div style="padding-top: 20px;" id="div_comment">
+            <p>Описание работ</p>
+            <textarea class="input input_long" id="comment"  rows="5"></textarea>
+            <div style="color: red;" id="error_comment"></div>
+        </div>
 
     </div>
     
@@ -45,6 +51,7 @@
         let tg = window.Telegram.WebApp;
         let company = document.getElementById("company")
         let serial_num_coffe = document.getElementById("serial_num_coffe")
+        let comment = document.getElementById("comment")
         let work = 0
 
         tg.expand();
@@ -104,6 +111,7 @@
                 type: "external_repair",
                 company: company.value,
                 serial_num_coffe: serial_num_coffe.value,
+                comment: comment.value,
             };
 
             if (work != 0)

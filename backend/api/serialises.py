@@ -305,7 +305,13 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExternalRepairs
-        fields = ['date', 'company', 'serviceman', 'serial_num_coffe',]
+        fields = [
+            'date',
+            'company',
+            'serviceman',
+            'serial_num_coffe',
+            'comments',
+        ]
 
     def get_date(self, obj, *args, **kwargs):
         if isinstance(obj.date, str):

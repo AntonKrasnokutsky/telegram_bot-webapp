@@ -11,6 +11,7 @@ URL_SERVICE = os.getenv('URL_SERVICE')
 URL_REPAIR = os.getenv('URL_REPAIR')
 URL_AUDIT = os.getenv('URL_AUDIT')
 URL_EXTERNAL = os.getenv('URL_EXTERNAL')
+URL_EXTERNAL_SALARY = os.getenv('URL_EXTERNAL_SALARY')
 
 service_button = types.ReplyKeyboardMarkup(resize_keyboard=True).add(
     types.KeyboardButton(
@@ -63,5 +64,6 @@ repairs_office_button_salary.add(
     ))
 repairs_office_button_salary.add(
     types.KeyboardButton(
-        '/period',
+        'За период',
+        web_app=WebAppInfo(url=URL_EXTERNAL_SALARY)
     ))

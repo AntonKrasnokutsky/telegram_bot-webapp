@@ -8,6 +8,7 @@ from .views import (
     ExternalCompaniesListView,
     ExternalRepairsListFilteredView,
     ExternalRepairsView,
+    ExternalRepairsSalaryView,
     ExternalTypeWorkRepairsCreateView,
     ExternalTypeWorkRepairsListVies,
     FuelCompensationListView,
@@ -104,6 +105,10 @@ urlpatterns = [
     path(
         'repairexternal/',
         ExternalRepairsView.as_view()
+    ),
+    path(
+        'repairexternalsalary/',
+        ExternalRepairsSalaryView.as_view()
     ),
     path(
         'external/repairs_list/',

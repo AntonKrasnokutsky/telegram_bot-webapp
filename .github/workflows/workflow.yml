@@ -86,6 +86,7 @@ jobs:
             echo URL_REPAIR=${{ secrets.URL_REPAIR }} >> .env
             echo URL_AUDIT=${{ secrets.URL_AUDIT }} >> .env
             echo URL_EXTERNAL=${{ secrets.URL_EXTERNAL }} >> .env
+            echo URL_EXTERNAL_SALARY=${{ secrets.URL_EXTERNAL_SALARY }} >> .env
 
             echo URL_API_POINTS=${{ secrets.URL_API_POINTS }} >> .env
             echo GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }} >> .env
