@@ -26,7 +26,6 @@
             <input type="date" class="input input_long" id="date_before" maxlength="255">
             <div style="color: red;" id="error_date_before"></div>
         </div>
-        <input class="input btn-add" id="add_typework" onclick="btn_add_typework()" value="Добавить работу" readonly>
     </div>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -39,16 +38,6 @@
         tg.expand();
         tg.MainButton.text = "Завершить";
         tg.MainButton.show();
-
-        function btn_add_typework(id, min, step) {
-            console.log("Нажата кнопка");
-            let data = {
-                type: "salary",
-                date_after: date_after.value,
-                date_before: date_before.value,
-            };
-            console.log(data)
-        };
 
         Telegram.WebApp.onEvent("mainButtonClicked", () => {
             let data = {
