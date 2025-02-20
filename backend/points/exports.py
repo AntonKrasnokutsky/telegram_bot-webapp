@@ -1,7 +1,7 @@
 from django_tables2.export.views import TableExport
 from tablib import Dataset
 
-from .models import TypeWorkRepairs
+from .models import TypeWorkRepairs,ExternalTypeWorkRepairs
 
 
 class AuditTableExport(TableExport):
@@ -127,7 +127,7 @@ class ExtarnalRepairsTableExport(TableExport):
                 price = 0
                 if row[index]:
                     for work in row[index].split(', '):
-                        price += TypeWorkRepairs.objects.get(
+                        price += ExternalTypeWorkRepairs.objects.get(
                             typework=work.split(' Тариф: ')[0],
                             activ=True
                         ).price
