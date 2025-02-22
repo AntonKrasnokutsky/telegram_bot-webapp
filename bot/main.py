@@ -334,7 +334,7 @@ def make_messagedata(data, *args, **kwargs):
         result += f'11. Сироп "Лесной орех" (пл. 1л.): {data["syrup_nut"]}\n'
     elif data['type'] == 'Ремонт для внешних':
         result += f'Виды работ: {data["types_work"]}\n'
-        result += f'Серийныфй номер кофе: {data["serial_num_coffe"]}'
+        result += f'Серийный номер кофе: {data["serial_num_coffe"]}'
     return result
 
 

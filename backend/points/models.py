@@ -325,6 +325,31 @@ class ExternalTypeWorkRepairs(models.Model):
         return f'{str(self.typework)} Тариф: {self.price}'
 
 
+class ExtermalWorkInRepairs(models.Model):
+    external_repair = models.ForeignKey(
+        'ExternalRepairs',
+        on_delete=models.CASCADE,
+        verbose_name='Ремонт',
+        related_name='typework',
+    )
+    external_work = models.ForeignKey(
+        'ExternalTypeWorkRepairs',
+        on_delete=models.PROTECT,
+        verbose_name='Вид работы для внешних',
+    )
+    count = models.PositiveSmallIntegerField(
+        default=1,
+        verbose_name='Количество'
+    )
+
+    class Meta():
+        verbose_name = 'Работа во внешнем ремонте'
+        verbose_name_plural = 'Работы во внешних ремонтах'
+
+    def __str__(self):
+        return f'{self.external_work.__str__()} количество {self.count}'
+
+
 class ExternalRepairs(models.Model):
     date = models.DateTimeField(verbose_name='Дата время')
     company = models.ForeignKey(
@@ -342,11 +367,6 @@ class ExternalRepairs(models.Model):
         'ServiceMan',
         on_delete=models.PROTECT,
         verbose_name='Исполнитель'
-    )
-    typework = models.ManyToManyField(
-        'ExternalTypeWorkRepairs',
-        verbose_name='Вид работ',
-        blank=True,
     )
     comments = models.TextField(
         blank=True,

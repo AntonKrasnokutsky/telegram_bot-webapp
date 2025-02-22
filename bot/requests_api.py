@@ -311,6 +311,7 @@ class ExternalRepair():
             'date': data['date'],
             'serviceman': data['fio'],
             'company': data['company'],
+            'serial_num_coffe': data['serial_num_coffe'],
             'comment': data['comment'],
         }
         try:

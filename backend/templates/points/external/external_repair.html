@@ -80,18 +80,26 @@
             if (work != 0)
             {
                 values = []
+                valu={}
                 for (let i = 1; i <= work; i++)
                 {
-                    values.push(document.getElementById("id_work_" + i).value);
+                    values[i] = {}
+                    values[i]["work"] = document.getElementById("id_work_" + i).value;
+                    values[i]["count"] = document.getElementById("id_work_" + i + "_count").value;
                 }
             }
+            
             work ++;
-            place.innerHTML += '<input class="input input_long" type="search" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
+            place.innerHTML += '<div id="div_work_' + work + '"> </div>';
+            document.getElementById("div_work_" + work).innerHTML += '<input class="input input_long" type="search" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
+            document.getElementById("div_work_" + work).innerHTML += '<input class="input" type="number" id="id_work_' + work + '_count" name="work_' + work + '_count" placeholder="Количество" value="1"/>';
+
             if (work > 1)
             {
                 for (let i = 1; i < work; i++)
                 {
-                    document.getElementById("id_work_" + i).value = values[i-1];
+                    document.getElementById("id_work_" + i).value = values[i]["work"];
+                    document.getElementById("id_work_" + i + "_count").value = values[i]["count"];
                 }
             }
         };
@@ -120,8 +128,13 @@
                 for (let i = 1; i <= work; i++)
                 {
                     values_work = document.getElementById("id_work_" + i).value;
+                    values_work_count = document.getElementById("id_work_" + i + "_count").value;
                     if (values_work != "") {
-                        types_work.push(values_work);
+                        type_work = {
+                            external_work: values_work,
+                            count: values_work_count
+                        }
+                        types_work.push(type_work);
                     }
                 }
                 data["types_work"] = types_work

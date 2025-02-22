@@ -12,6 +12,7 @@ from points.models import (
     ExternalCompanies,
     ExternalRepairs,
     ExternalTypeWorkRepairs,
+    ExtermalWorkInRepairs,
     FuelCompensation,
     Points,
     Repairs,
@@ -554,12 +555,22 @@ class ExternalRepairsTestCase(TestCase):
             company=cls.company_one,
             serial_num_coffe='Серийный номер кофе'
         )
-        repair.typework.add(cls.type_work)
+        ExtermalWorkInRepairs.objects.create(
+            external_repair=repair,
+            external_work=cls.type_work,
+            count=1,
+        )
         cls.repairs = [{
             'date': repair.date.strftime("%d.%m.%Y %H:%M:%S"),
             'company': repair.company.company_name,
             'serviceman': repair.service_man.name,
-            'typework': [rep.typework for rep in repair.typework.all()],
+            'typework': [{
+                'external_work': {
+                    'typework': 'Работа ремонта',
+                    'price': 10
+                },
+                'count': 1
+            }],
             'serial_num_coffe': 'Серийный номер кофе',
         }, ]
 
@@ -573,8 +584,11 @@ class ExternalRepairsTestCase(TestCase):
                 'typework':
                 [
                     {
-                        'typework': 'Работа ремонта',
-                        'price': 10
+                        'external_work': {
+                            'typework': 'Работа ремонта',
+                            'price': 10
+                        },
+                        'count': 1
                     }],
             }]
         request = client_not_authenticate.get(
@@ -587,8 +601,10 @@ class ExternalRepairsTestCase(TestCase):
             reverse(
                 'api:externalrepairs-list'
             ))
+        print(request.status_code)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         request_answer = json.loads(request.content)
+        print(request_answer)
         self.assertEqual(request_answer, answer)
 
     def test_external_repairs_create(self, *args, **kwargs):
@@ -598,7 +614,9 @@ class ExternalRepairsTestCase(TestCase):
             'company': self.company_two.company_name,
             'serial_num_coffe': '1233',
             'serviceman': 12345,
-            'typework': 'Работа ремонта',
+            'typework': [
+                {'external_work': 'Работа ремонта', 'count': '1'}
+            ]
         }
         answer = {
             'date': '10.01.2024 12:02:23',
@@ -608,8 +626,11 @@ class ExternalRepairsTestCase(TestCase):
             'typework':
             [
                 {
-                    'typework': 'Работа ремонта',
-                    'price': 10
+                    'external_work': {
+                        'typework': 'Работа ремонта',
+                        'price': 10
+                    },
+                    'count': 1
                 }],
         }
         request = client_not_authenticate.post(

@@ -288,7 +288,7 @@ class ExternalRepairViewASet(
         salary = 0
         for external_repair in self.filter_queryset(self.get_queryset()):
             for work in external_repair.typework.all():
-                salary += work.price
+                salary += work.external_work.price * work.count
         data = {
             'salary': salary
         }
