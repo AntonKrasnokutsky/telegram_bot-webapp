@@ -74,6 +74,30 @@
 
         onstart();
 
+        function btn_inc(id, max, step) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            if (isNaN(result)) {
+                result = -step;
+            };
+            result = result + step;
+            if(result>max){
+                result = max;
+            };
+            document.getElementById(id).value = result;
+        };
+
+        function btn_dec(id, min, step) {
+            var result = parseInt(document.getElementById(id).value, 10)
+            if (isNaN(result)) {
+                result = step;
+            };
+            result = result - step
+            if(result<min){
+                result = min
+            }
+            document.getElementById(id).value = result
+        };
+
         function btn_add_typework(id, min, step) {
             console.log("Нажата кнопка");
             place = document.getElementById("typework");
@@ -92,7 +116,9 @@
             work ++;
             place.innerHTML += '<div id="div_work_' + work + '"> </div>';
             document.getElementById("div_work_" + work).innerHTML += '<input class="input input_long" type="search" id="id_work_' + work + '" name="work_' + work + '" placeholder="Выполненная работа" list="list_work" />';
+            document.getElementById("div_work_" + work).innerHTML += '<input class="input btn" id="id_work_' + work + '_count_dec" onclick="btn_dec(' + "'" + 'id_work_' + work + '_count' + "'" + ', 0, 1)" value="-" readonly>';
             document.getElementById("div_work_" + work).innerHTML += '<input class="input" type="number" id="id_work_' + work + '_count" name="work_' + work + '_count" placeholder="Количество" value="1"/>';
+            document.getElementById("div_work_" + work).innerHTML += '<input class="input btn" id="id_work_' + work + '_count_inc" onclick="btn_inc(' + "'" + 'id_work_' + work + '_count' + "'" + ', 100000, 1)" value="+" readonly>';
 
             if (work > 1)
             {
