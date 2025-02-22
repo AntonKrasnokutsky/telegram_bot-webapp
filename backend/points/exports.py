@@ -1,7 +1,7 @@
 from django_tables2.export.views import TableExport
 from tablib import Dataset
 
-from .models import TypeWorkRepairs,ExternalTypeWorkRepairs
+from .models import TypeWorkRepairs, ExternalTypeWorkRepairs
 
 
 class AuditTableExport(TableExport):
@@ -121,16 +121,20 @@ class ExtarnalRepairsTableExport(TableExport):
             table.as_values(exclude_columns=exclude_columns)
         ):
             if i == 0:
-                index = row.index('Вид работ')
+                index = row.index('Ремонт')
                 dataset.headers = headers
             else:
                 price = 0
                 if row[index]:
-                    for work in row[index].split(', '):
-                        price += ExternalTypeWorkRepairs.objects.get(
-                            typework=work.split(' Тариф: ')[0],
-                            activ=True
-                        ).price
+                    for work in row[index].split('\n'):
+                        typework = work.split(' Тариф: ')
+                        if typework[0]:
+                            prof = ExternalTypeWorkRepairs.objects.get(
+                                typework=typework[0],
+                                activ=True
+                            ).price
+                            count = typework[1].split(' Количество: ')
+                            price += prof * int(count[1])
                     row.insert(index + 1, price)
                 else:
                     row.insert(index + 1, '')

@@ -80,6 +80,8 @@ class ServiceTable(tables.Table):
 
 # Ремонт оборудования сторонних компаний
 class ExternalRepairsTable(tables.Table):
+    typework = tables.Column()
+
     export_formats = ['xls', 'xlsx']
 
     class Meta:
@@ -92,3 +94,10 @@ class ExternalRepairsTable(tables.Table):
             'typework',
             'serial_num_coffe',
         )
+
+    def render_typework(self, value):
+        result = ''
+        for work in value.all():
+            result += str(work.external_work)
+            result += f' Количество: {work.count}\n'
+        return result

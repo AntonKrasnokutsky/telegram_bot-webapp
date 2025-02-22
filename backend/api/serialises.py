@@ -7,6 +7,7 @@ from points.models import (
     ExternalCompanies,
     ExternalRepairs,
     ExternalTypeWorkRepairs,
+    ExtermalWorkInRepairs,
     FuelCompensation,
     Points,
     Repairs,
@@ -280,6 +281,14 @@ class ExternalTypeWorkRepairsSerializer(serializers.ModelSerializer):
         fields = ['typework', 'price', ]
 
 
+class ExtermalWorkInRepairsSerializer(serializers.ModelSerializer):
+    external_work = TypeWorkRepairsSerializer()
+
+    class Meta:
+        model = ExtermalWorkInRepairs
+        fields = ['external_work', 'count', ]
+
+
 class ExternalRepairsSerializer(serializers.ModelSerializer):
     company = serializers.CharField(source='company.company_name')
     serviceman = serializers.CharField(source='service_man.name')
@@ -291,7 +300,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             if self.context['view'].action == 'list':
                 self.fields.update(
                     {
-                        "typework": ExternalTypeWorkRepairsSerializer(
+                        "typework": ExtermalWorkInRepairsSerializer(
                             many=True,
                             required=False
                         ),
@@ -318,23 +327,38 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             return datetime.strptime(obj.date, new_format).strftime(old_format)
         return obj.date.strftime(old_format)
 
-    def __get_works(self, *args, **kwargs):
+    def __get_external_works(self, *args, **kwargs):
         try:
-            typework = self.validated_data.pop('typework')
+            typeworks = self.validated_data.pop('typework')
         except KeyError:
             return None
         type_works = []
-        for work in typework:
+        for typework in typeworks:
             try:
-                type_works.append(ExternalTypeWorkRepairs.objects.get(
-                    typework=work,
+                work = ExternalTypeWorkRepairs.objects.get(
+                    typework=typework['external_work'],
                     activ=True,
-                ))
+                )
+                type_works.append(
+                    {
+                        'typework': work,
+                        'count': typework['count'],
+                    }
+                )
             except ExternalTypeWorkRepairs.DoesNotExist:
                 raise serializers.ValidationError(
-                    {'external_type_works': f'Тип работ не добавлен: {work}'}
+                    {'external_type_works': 'Тип работ не добавлен: '
+                                            f'{typework["external_work"]}'}
                 )
         return type_works
+
+    def __add_type_works(self, repairs, typeworks, *args, **kwargs):
+        for typework in typeworks:
+            work_in_repair = ExtermalWorkInRepairs()
+            work_in_repair.external_repair = repairs
+            work_in_repair.external_work = typework['typework']
+            work_in_repair.count = typework['count']
+            work_in_repair.save()
 
     def create(self, *args, **kwargs):
         service_man_telegram_id = self.validated_data.pop('service_man')
@@ -370,21 +394,22 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             )
         date = datetime.strptime(date_query, old_format)
         date = date.strftime(new_format)
-        typework = self.__get_works()
+        typeworks = self.__get_external_works()
         repairs = ExternalRepairs.objects.create(
             **self.validated_data,
             company=company,
             service_man=service_man,
             date=date,
         )
-        if typework:
-            repairs.typework.set(typework)
+        if typeworks:
+            self.__add_type_works(repairs, typeworks)
         self.fields.update(
             {
-                "typework": ExternalTypeWorkRepairsSerializer(
+                "typework": ExtermalWorkInRepairsSerializer(
                     many=True,
                     required=False
                 ),
+
             })
 
         return repairs

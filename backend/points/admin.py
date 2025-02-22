@@ -5,6 +5,7 @@ from .models import (
     ExternalCompanies,
     ExternalRepairs,
     ExternalTypeWorkRepairs,
+    ExtermalWorkInRepairs,
     FuelCompensation,
     Points,
     Repairs,
@@ -90,3 +91,4 @@ admin.site.register(FuelCompensation, FuelCompensationAdmin)
 admin.site.register(ExternalCompanies)
 admin.site.register(ExternalRepairs)
 admin.site.register(ExternalTypeWorkRepairs)
+admin.site.register(ExtermalWorkInRepairs)
