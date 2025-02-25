@@ -80,7 +80,7 @@ class ServiceTable(tables.Table):
 
 # Ремонт оборудования сторонних компаний
 class ExternalRepairsTable(tables.Table):
-    typework = tables.Column()
+    types_work = tables.Column()
 
     export_formats = ['xls', 'xlsx']
 
@@ -91,11 +91,11 @@ class ExternalRepairsTable(tables.Table):
             'date',
             'service_man',
             'company',
-            'typework',
+            'types_work',
             'serial_num_coffe',
         )
 
-    def render_typework(self, value):
+    def render_types_work(self, value):
         result = ''
         for work in value.all():
             result += str(work.external_work)

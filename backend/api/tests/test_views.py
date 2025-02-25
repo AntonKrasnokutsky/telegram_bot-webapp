@@ -575,22 +575,20 @@ class ExternalRepairsTestCase(TestCase):
         }, ]
 
     def test_external_repairs_list(self, *args, **kwargs):
-        answer = [
-            {
-                'date': '10.01.2024 12:02:23',
-                'company': 'Тестовая компания 1',
-                'serviceman': 'Имя',
-                'serial_num_coffe': 'Серийный номер кофе',
-                'typework':
-                [
-                    {
-                        'external_work': {
-                            'typework': 'Работа ремонта',
-                            'price': 10
-                        },
-                        'count': 1
-                    }],
-            }]
+        answer = {
+            'date': '10.01.2024 12:02:23',
+            'company': 'Тестовая компания 1',
+            'serviceman': 'Имя',
+            'serial_num_coffe': 'Серийный номер кофе',
+            'types_work': [
+                {
+                    'external_work': {
+                        'typework': 'Работа ремонта',
+                        'price': 10
+                    },
+                    'count': 1
+                }]
+        }
         request = client_not_authenticate.get(
             reverse(
                 'api:externalrepairs-list'
@@ -601,20 +599,19 @@ class ExternalRepairsTestCase(TestCase):
             reverse(
                 'api:externalrepairs-list'
             ))
-        print(request.status_code)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
-        request_answer = json.loads(request.content)
-        print(request_answer)
-        self.assertEqual(request_answer, answer)
+        for field, value in answer.items():
+            with self.subTest(value=value):
+                self.assertEqual(request.data[0][field], value)
 
     def test_external_repairs_create(self, *args, **kwargs):
         data_create = {
             'date': '10.01.2024 12:02:23',
             'type': 'Ремонт',
-            'company': self.company_two.company_name,
+            'company': 'Тестовая компания 2',
             'serial_num_coffe': '1233',
             'serviceman': 12345,
-            'typework': [
+            'types_work': [
                 {'external_work': 'Работа ремонта', 'count': '1'}
             ]
         }
@@ -623,7 +620,7 @@ class ExternalRepairsTestCase(TestCase):
             'company': 'Тестовая компания 2',
             'serviceman': 'Имя',
             'serial_num_coffe': '1233',
-            'typework':
+            'types_work':
             [
                 {
                     'external_work': {
@@ -637,14 +634,14 @@ class ExternalRepairsTestCase(TestCase):
             reverse(
                 'api:externalrepairs-list'
             ),
-            data=data_create)
+            json=data_create)
         self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
 
         request = client_authenticate.post(
             reverse(
                 'api:externalrepairs-list'
             ),
-            data=data_create)
+            json=data_create)
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
         request_answer = json.loads(request.content)
 

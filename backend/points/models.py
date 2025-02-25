@@ -330,7 +330,7 @@ class ExtermalWorkInRepairs(models.Model):
         'ExternalRepairs',
         on_delete=models.CASCADE,
         verbose_name='Ремонт',
-        related_name='typework',
+        related_name='types_work',
     )
     external_work = models.ForeignKey(
         'ExternalTypeWorkRepairs',

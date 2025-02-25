@@ -295,7 +295,7 @@ class ExternalRepair():
     def __request_api_external_repair(self, body, auth_api: AuthAPI):
         return requests.post(
             self.__URL_API_EXTERNAL_REPAIR,
-            data=body,
+            json=body,
             headers=auth_api.headers
         )
 
@@ -315,7 +315,7 @@ class ExternalRepair():
             'comment': data['comment'],
         }
         try:
-            body['typework'] = data['types_work']
+            body['types_work'] = data['types_work']
         except KeyError:
             pass
         response = self.__request_api_external_repair(body, auth_api)
