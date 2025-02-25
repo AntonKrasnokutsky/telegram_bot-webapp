@@ -300,7 +300,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             if self.context['view'].action == 'list':
                 self.fields.update(
                     {
-                        "typework": ExtermalWorkInRepairsSerializer(
+                        "types_work": ExtermalWorkInRepairsSerializer(
                             many=True,
                             required=False
                         ),
@@ -309,7 +309,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             if self.context['view'].action == 'create':
                 self.fields.update(
                     {
-                        "typework": serializers.ListField(required=False),
+                        "types_work": serializers.ListField(required=False),
                     })
 
     class Meta:
@@ -329,12 +329,14 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
 
     def __get_external_works(self, *args, **kwargs):
         try:
-            typeworks = self.validated_data.pop('typework')
+            typeworks = self.validated_data.pop('types_work')
         except KeyError:
             return None
         type_works = []
+        print(typeworks)
         for typework in typeworks:
             try:
+                print(typework['external_work'])
                 work = ExternalTypeWorkRepairs.objects.get(
                     typework=typework['external_work'],
                     activ=True,
@@ -395,6 +397,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
         date = datetime.strptime(date_query, old_format)
         date = date.strftime(new_format)
         typeworks = self.__get_external_works()
+        print(self.validated_data)
         repairs = ExternalRepairs.objects.create(
             **self.validated_data,
             company=company,
@@ -405,7 +408,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             self.__add_type_works(repairs, typeworks)
         self.fields.update(
             {
-                "typework": ExtermalWorkInRepairsSerializer(
+                "types_work": ExtermalWorkInRepairsSerializer(
                     many=True,
                     required=False
                 ),
