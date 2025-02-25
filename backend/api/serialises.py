@@ -302,14 +302,13 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
                     {
                         "types_work": ExtermalWorkInRepairsSerializer(
                             many=True,
-                            required=False
                         ),
 
                     })
             if self.context['view'].action == 'create':
                 self.fields.update(
                     {
-                        "types_work": serializers.ListField(required=False),
+                        "types_work": serializers.ListField(),
                     })
 
     class Meta:
@@ -333,10 +332,9 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
         except KeyError:
             return None
         type_works = []
-        print(typeworks)
+
         for typework in typeworks:
             try:
-                print(typework['external_work'])
                 work = ExternalTypeWorkRepairs.objects.get(
                     typework=typework['external_work'],
                     activ=True,
@@ -397,7 +395,6 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
         date = datetime.strptime(date_query, old_format)
         date = date.strftime(new_format)
         typeworks = self.__get_external_works()
-        print(self.validated_data)
         repairs = ExternalRepairs.objects.create(
             **self.validated_data,
             company=company,
@@ -410,7 +407,7 @@ class ExternalRepairsSerializer(serializers.ModelSerializer):
             {
                 "types_work": ExtermalWorkInRepairsSerializer(
                     many=True,
-                    required=False
+                    required=True,
                 ),
 
             })
