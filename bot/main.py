@@ -333,7 +333,12 @@ def make_messagedata(data, *args, **kwargs):
         )
         result += f'11. Сироп "Лесной орех" (пл. 1л.): {data["syrup_nut"]}\n'
     elif data['type'] == 'Ремонт для внешних':
-        result += f'Виды работ: {data["types_work"]}\n'
+        result += 'Виды работ:'
+        for work in data["types_work"]:
+            result += (
+                f'{work["external_work"]} '
+                f'в количестве {work["count"]}\n'
+            )
         result += f'Серийный номер кофе: {data["serial_num_coffe"]}'
     return result
 
@@ -487,7 +492,6 @@ async def web_app_external_repair(message: types.Message, data):
     logging.debug('Данные по внешнему ремонту.')
     data['type'] = 'Ремонт для внешних'
     data['fio'] = message.from_user.id
-
     try:
         external_repairs.send_extenal_repairs_info(data, auth_api)
         logging.info('Данные по ремоту внешних компаний отправлены.')
