@@ -312,7 +312,7 @@ class ExternalRepair():
             'serviceman': data['fio'],
             'company': data['company'],
             'serial_num_coffe': data['serial_num_coffe'],
-            'comment': data['comment'],
+            'comments': data['comment'],
         }
         try:
             body['types_work'] = data['types_work']

@@ -93,6 +93,7 @@ class ExternalRepairsTable(tables.Table):
             'company',
             'types_work',
             'serial_num_coffe',
+            'comments',
         )
 
     def render_types_work(self, value):

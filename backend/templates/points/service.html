@@ -117,13 +117,13 @@
                 <input class="input btn" id="stirrer_inc" onclick="btn_inc('stirrer', 500, 250)" value="+" readonly>
                 <div style="color: red;" id="error_stirrer"></div>
             </div>
-            <div class="ib bor" id="div_straws">
+            <!-- <div class="ib bor" id="div_straws">
                 <p>Трубочки</p>
                 <input class="input btn" id="straws_dec" onclick="btn_dec('straws', 0, 50)" value="-" readonly>
                 <input id="straws" step="50" min="0" max="150" readonly value="0">
                 <input class="input btn" id="stirrer_inc" onclick="btn_inc('straws', 150, 50)" value="+" readonly>
                 <div style="color: red;" id="error_straws"></div>
-            </div>
+            </div> -->
             <div class="ib bor" id="div_collection">
                 <p>Сумма инкассации</p>
                 <input class="input input_long" type="number" name="collection" id="collection" min="0" placeholder="Сумма инкассации" required >
@@ -147,7 +147,7 @@
         let glasses = document.getElementById("glasses")
         let covers = document.getElementById("covers")
         let stirrer = document.getElementById("stirrer")
-        let straws = document.getElementById("straws")
+        // let straws = document.getElementById("straws")
         let fuel = document.getElementById("fuelcompensations")
 
         tg.expand();
@@ -260,10 +260,10 @@
                 return;
             }
 
-            if (isNaN(parseInt(straws.value, 10))) {
-                document.getElementById("error_straws").innerText = "Укажите количество трубочек";
-                return;
-            }
+            // if (isNaN(parseInt(straws.value, 10))) {
+            //     document.getElementById("error_straws").innerText = "Укажите количество трубочек";
+            //     return;
+            // }
 
             if (isNaN(parseInt(collection.value, 10))) {
                 document.getElementById("error_collection").innerText = "Не внесена сумма инкасации"
@@ -286,7 +286,8 @@
                 covers: covers.value,
                 stirrer: stirrer.value,
                 collection: collection.value,
-                straws: straws.value,
+                // straws: straws.value,
+                straws: 0,
                 fuel: fuel.value,
             };
 
