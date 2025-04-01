@@ -104,6 +104,7 @@ class ExtarnalRepairsTableExport(TableExport):
             'Вид работ',
             'Стоимость работ',
             'Серийный номер кофе',
+            'Коментарий',
         ]
         index = None
         """Transform a table to a tablib dataset."""

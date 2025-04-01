@@ -339,6 +339,7 @@ def make_messagedata(data, *args, **kwargs):
                 f'{work["external_work"]} '
                 f'в количестве {work["count"]}\n'
             )
+        result += f'Коментарий: {data["comment"]}\n'
         result += f'Серийный номер кофе: {data["serial_num_coffe"]}'
     return result
 
