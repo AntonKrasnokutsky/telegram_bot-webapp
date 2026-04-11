@@ -29,7 +29,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', default=False))
-
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
@@ -59,6 +58,7 @@ INSTALLED_APPS = [
     'core',
     'users',
     'points',
+    'parse_events',
     'api',
 
 ]

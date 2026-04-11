@@ -13,9 +13,10 @@ from .views import (
 app_name = 'api'
 
 router = routers.DefaultRouter()
+router.include_root_view = False
 router.register(
     'v2/serviceman',
-    ServiceManViewSet
+    ServiceManViewSet,
 )
 router.register(
     'v2/externalrepairs',

@@ -24,6 +24,7 @@ handler500 = 'core.views.internal_error'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api')),
+    path('api/', include('parse_events.urls', namespace='parse_events')),
     path('', include('points.urls', namespace='points')),
     path('auth/', include('users.urls', namespace='users')),
     path('auth/', include('django.contrib.auth.urls')),
