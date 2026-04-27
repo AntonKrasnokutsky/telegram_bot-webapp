@@ -3,6 +3,7 @@ import django_tables2 as tables
 from .models import (
     Audit,
     ExternalRepairs,
+    ExtermalWorkInRepairs,
     Repairs,
     Services,
 )
@@ -80,7 +81,7 @@ class ServiceTable(tables.Table):
 
 # Ремонт оборудования сторонних компаний
 class ExternalRepairsTable(tables.Table):
-    types_work = tables.Column()
+    types_work = tables.Column(verbose_name='Виды работ')
 
     export_formats = ['xls', 'xlsx']
 
@@ -96,9 +97,50 @@ class ExternalRepairsTable(tables.Table):
             'comments',
         )
 
-    def render_types_work(self, value):
-        result = ''
-        for work in value.all():
-            result += str(work.external_work)
-            result += f' Количество: {work.count}\n'
-        return result
+    def render_types_work(self, record):
+        # Получаем все связанные работы для текущего ремонта
+        works = ExtermalWorkInRepairs.objects.filter(external_repair=record)
+        if not works.exists():
+            return 'Нет работ'
+
+        result_lines = []
+        for work in works:
+            # Форматируем каждую работу: вид + тариф + количество
+            work_info = f'{work.external_work.typework}'
+            work_info += f' (Тариф: {work.external_work.price} руб.)'
+            work_info += f' — Кол-во: {work.count}'
+            result_lines.append(work_info)
+        # Объединяем строки с переносом
+        return '\n'.join(result_lines)
+
+
+class ExternalRepairsManTable(tables.Table):
+    types_work = tables.Column(verbose_name='Виды работ')
+
+    class Meta:
+        model = ExternalRepairs
+        per_page = 20
+        fields = (
+            'date',
+            'service_man',
+            'company',
+            'types_work',
+            'serial_num_coffe',
+            'comments',
+        )
+
+    def render_types_work(self, record):
+        # Получаем все связанные работы для текущего ремонта
+        works = ExtermalWorkInRepairs.objects.filter(external_repair=record)
+        if not works.exists():
+            return 'Нет работ'
+
+        result_lines = []
+        for work in works:
+            # Форматируем каждую работу: вид + тариф + количество
+            work_info = f'{work.external_work.typework}'
+            work_info += f' (Тариф: {work.external_work.price} руб.)'
+            work_info += f' — Кол-во: {work.count}'
+            result_lines.append(work_info)
+        # Объединяем строки с переносом
+        return '\n'.join(result_lines)

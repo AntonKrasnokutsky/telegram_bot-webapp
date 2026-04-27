@@ -19,6 +19,8 @@ from .views import (
     TypeWorkRepairsCreateView,
     RepairsListFilteredView,
     ServiceListFilteredView,
+    ExternalRepairsWebView,
+    ExternalRepairsListServiceMan,
 )
 
 app_name = 'points'
@@ -105,6 +107,16 @@ urlpatterns = [
     path(
         'repairexternal/',
         ExternalRepairsView.as_view()
+    ),
+    path(
+        'externalrepair/',
+        ExternalRepairsWebView.as_view(),
+        name='externalrepair'
+    ),
+    path(
+        'external/list/',
+        ExternalRepairsListServiceMan.as_view(),
+        name='external_man_list'
     ),
     path(
         'repairexternalsalary/',

@@ -21,7 +21,6 @@ router.register(
     'v2/externalrepairs',
     ExternalRepairViewASet,
 )
-
 urlpatterns = [
     path('', include(router.urls)),
     path(

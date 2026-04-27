@@ -51,3 +51,13 @@ class ExternalRepairsFilter(FilterSet):
     class Meta:
         model = ExternalRepairs
         fields = ['date', 'service_man', 'company',]
+
+
+class ExternalRepairsServiceManFilter(FilterSet):
+    date = DateFromToRangeFilter(
+        widget=DurationRangeWidget(attrs={'type': 'date'})
+    )
+
+    class Meta:
+        model = ExternalRepairs
+        fields = ['date', 'company',]
