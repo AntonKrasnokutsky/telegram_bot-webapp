@@ -4,6 +4,7 @@
   <nav class="navbar navbar-light">
       <ul class="nav nav-pills">
         {% if user.is_authenticated %}
+        {% if user.is_superuser %}
         <li class="nav-item"> 
           <a class="nav-link"
           href="{% url 'points:service_list' %}">Обслуживания</a>
@@ -28,6 +29,13 @@
           <a class="nav-link"
           href="{% url 'points:externalcompany' %}">Внешние</a>
         </li>
+        {% endif %}
+        {% if user.userprofile.office_engineer %}
+        <li class="nav-item"> 
+          <a class="nav-link"
+          href="{% url 'points:external_man_list' %}">Внешние ремонты</a>
+        </li>
+        {% endif %}
         <li class="nav-item"> 
           <a class="nav-link link-light"
           href="{% url 'users:logout' %}">Выйти</a>

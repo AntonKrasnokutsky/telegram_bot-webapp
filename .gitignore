@@ -1,3 +1,7 @@
+logpass.txt
+restore.sh
+*.dump
+*.sql
 backend/static/
 backend/*.json
 photo/
