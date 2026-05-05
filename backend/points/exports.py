@@ -117,24 +117,29 @@ class ExtarnalRepairsTableExport(TableExport):
 
         kwargs = {"title": default_dataset_title()}
         kwargs.update(dataset_kwargs or {})
+        # print(kwargs['title'])
         dataset = Dataset(**kwargs)
         for i, row in enumerate(
             table.as_values(exclude_columns=exclude_columns)
         ):
             if i == 0:
-                index = row.index('Ремонт')
+                print(row)
+                index = row.index('Виды работ')
                 dataset.headers = headers
             else:
                 price = 0
-                if row[index]:
+                if 'Нет работ' in row[index]:
+                    print('Нет работ')
+                if row[index] and 'Нет работ' not in row[index]:
                     for work in row[index].split('\n'):
-                        typework = work.split(' Тариф: ')
+                        typework = work.split(' (Тариф: ')
                         if typework[0]:
+                            # print(typework)
                             prof = ExternalTypeWorkRepairs.objects.get(
                                 typework=typework[0],
                                 activ=True
                             ).price
-                            count = typework[1].split(' Количество: ')
+                            count = typework[1].split('Кол-во: ')
                             price += prof * int(count[1])
                     row.insert(index + 1, price)
                 else:
