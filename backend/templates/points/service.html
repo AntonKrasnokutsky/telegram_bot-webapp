@@ -160,7 +160,7 @@
                 options += '<option value="' + "{{ item.value }}" + '" />';
             {% endfor %};
             document.getElementById('points').innerHTML = options;
-
+            console.log(options);
             var options = '';
             {% for item in fuelcompensations %}
                 options += '<option value="' + "{{ item.value }}" + '" />';

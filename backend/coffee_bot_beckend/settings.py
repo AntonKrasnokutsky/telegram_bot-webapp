@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'djoser',
     'core',
     'users',
+    'profiles',
     'points',
     'api',
 
@@ -176,6 +177,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 CSRF_TRUSTED_ORIGINS = [f'https://{os.getenv("DOMAIN_NAME")}', ]
+
+# AUTH_USER_MOEL = 'uesrs.ServiceManUser'
 
 LOGIN_REDIRECT_URL = 'users:login'
 ACCOUNT_LOGOUT_REDIRECT = 'users:login'
